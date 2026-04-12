@@ -18,7 +18,16 @@ add_library(DspSignalGenerators STATIC)
 add_library(DspSignalGenerators::DspSignalGenerators ALIAS DspSignalGenerators)
 
 target_sources(DspSignalGenerators PRIVATE
-  # Phase 1 skeleton — sources added in Phase 2
+  src/signal_generators/src/cw_generator_rocm.cpp
+  src/signal_generators/src/lfm_generator_rocm.cpp
+  src/signal_generators/src/lfm_conjugate_generator_rocm.cpp
+  src/signal_generators/src/lfm_generator_analytical_delay_rocm.cpp
+  src/signal_generators/src/noise_generator_rocm.cpp
+  src/signal_generators/src/script_generator_rocm.cpp
+  src/signal_generators/src/form_signal_generator_rocm.cpp
+  src/signal_generators/src/delayed_form_signal_generator_rocm.cpp
+  src/signal_generators/src/form_script_generator_rocm.cpp
+  src/signal_generators/src/signal_generator_factory.cpp
 )
 
 target_include_directories(DspSignalGenerators
@@ -26,6 +35,7 @@ target_include_directories(DspSignalGenerators
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
   PRIVATE
+    src/signal_generators/include
     kernels/
     src
 )
