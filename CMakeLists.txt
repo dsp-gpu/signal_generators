@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
-project(DspSignalGenerators VERSION 0.1.0 LANGUAGES CXX HIP)
+project(DspSignalGenerators VERSION 0.1.0
+  DESCRIPTION "Signal generators: CW, LFM, Noise, Script, FormSignal"
+  LANGUAGES CXX HIP)
 
 # ── Опции ──────────────────────────────────────────────────────────
 option(DSP_SIGNAL_GENERATORS_BUILD_TESTS  "Build tests"            ON)
