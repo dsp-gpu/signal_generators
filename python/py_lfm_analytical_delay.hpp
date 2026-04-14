@@ -13,7 +13,7 @@
  * @date 2026-02-18
  */
 
-#include "generators/lfm_generator_analytical_delay.hpp"
+#include <signal_generators/generators/lfm_generator_analytical_delay.hpp>
 
 // ============================================================================
 // PyLfmAnalyticalDelay — LFM with per-antenna analytical delay

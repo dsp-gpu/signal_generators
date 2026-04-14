@@ -21,7 +21,7 @@
  * @date 2026-03-23
  */
 
-#include "generators/lfm_generator_analytical_delay_rocm.hpp"
+#include <signal_generators/generators/lfm_generator_analytical_delay_rocm.hpp>
 
 // ============================================================================
 // PyLfmAnalyticalDelayROCm — pythonic wrapper

@@ -22,7 +22,7 @@
  * @date 2026-03-10
  */
 
-#include "generators/form_signal_generator_rocm.hpp"
+#include <signal_generators/generators/form_signal_generator_rocm.hpp>
 
 // ============================================================================
 // PyFormSignalGeneratorROCm — pythonic wrapper

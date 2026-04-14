@@ -12,8 +12,8 @@
 
 #if ENABLE_ROCM
 
-#include "generators/script_generator_rocm.hpp"
-#include "generators/script_generator.hpp"  // ParsedScript, ScriptParams (types only)
+#include <signal_generators/generators/script_generator_rocm.hpp>
+#include <signal_generators/generators/script_generator.hpp>  // ParsedScript, ScriptParams (types only)
 
 #include <hip/hiprtc.h>
 #include <stdexcept>

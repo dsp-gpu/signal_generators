@@ -25,8 +25,8 @@
 
 #if ENABLE_ROCM
 
-#include "../include/generators/form_signal_generator_rocm.hpp"
-#include "DrvGPU/services/gpu_benchmark_base.hpp"
+#include <signal_generators/generators/form_signal_generator_rocm.hpp>
+#include <core/services/gpu_benchmark_base.hpp>
 
 #include <hip/hip_runtime.h>
 

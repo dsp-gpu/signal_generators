@@ -8,9 +8,9 @@
 
 #if ENABLE_ROCM
 
-#include "generators/lfm_generator_analytical_delay_rocm.hpp"
-#include "kernels/lfm_kernels_rocm.hpp"
-#include "rocm_profiling_helpers.hpp"
+#include <signal_generators/generators/lfm_generator_analytical_delay_rocm.hpp>
+#include <signal_generators/kernels/lfm_kernels_rocm.hpp>
+#include <spectrum/utils/rocm_profiling_helpers.hpp>
 
 #include <cmath>
 #include <stdexcept>

@@ -11,10 +11,10 @@
 
 #if ENABLE_ROCM
 
-#include "generators/form_signal_generator_rocm.hpp"
-#include "kernels/form_signal_kernels_rocm.hpp"
-#include "rocm_profiling_helpers.hpp"
-#include "services/console_output.hpp"
+#include <signal_generators/generators/form_signal_generator_rocm.hpp>
+#include <signal_generators/kernels/form_signal_kernels_rocm.hpp>
+#include <spectrum/utils/rocm_profiling_helpers.hpp>
+#include <core/services/console_output.hpp>
 
 #include <stdexcept>
 #include <cmath>

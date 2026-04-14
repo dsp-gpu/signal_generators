@@ -8,9 +8,9 @@
 
 #if ENABLE_ROCM
 
-#include "generators/cw_generator_rocm.hpp"
-#include "kernels/cw_kernels_rocm.hpp"
-#include "services/console_output.hpp"
+#include <signal_generators/generators/cw_generator_rocm.hpp>
+#include <signal_generators/kernels/cw_kernels_rocm.hpp>
+#include <core/services/console_output.hpp>
 
 #include <stdexcept>
 #include <cmath>

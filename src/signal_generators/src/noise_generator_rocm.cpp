@@ -10,9 +10,9 @@
 
 #if ENABLE_ROCM
 
-#include "generators/noise_generator_rocm.hpp"
-#include "kernels/noise_kernels_rocm.hpp"
-#include "services/console_output.hpp"
+#include <signal_generators/generators/noise_generator_rocm.hpp>
+#include <signal_generators/kernels/noise_kernels_rocm.hpp>
+#include <core/services/console_output.hpp>
 
 #include <stdexcept>
 #include <cmath>

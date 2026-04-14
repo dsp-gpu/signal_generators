@@ -8,7 +8,7 @@
 
 #if ENABLE_ROCM
 
-#include "generators/form_script_generator_rocm.hpp"
+#include <signal_generators/generators/form_script_generator_rocm.hpp>
 
 #include <sstream>
 #include <iomanip>

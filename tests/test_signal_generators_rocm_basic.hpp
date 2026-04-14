@@ -19,14 +19,14 @@
 
 #if ENABLE_ROCM
 
-#include "generators/cw_generator_rocm.hpp"
-#include "generators/lfm_generator_rocm.hpp"
-#include "generators/noise_generator_rocm.hpp"
-#include "generators/lfm_conjugate_generator_rocm.hpp"
-#include "backends/rocm/rocm_backend.hpp"
+#include <signal_generators/generators/cw_generator_rocm.hpp>
+#include <signal_generators/generators/lfm_generator_rocm.hpp>
+#include <signal_generators/generators/noise_generator_rocm.hpp>
+#include <signal_generators/generators/lfm_conjugate_generator_rocm.hpp>
+#include <core/backends/rocm/rocm_backend.hpp>
 
 // test_utils — единая тестовая инфраструктура
-#include "modules/test_utils/test_utils.hpp"
+#include <core/test_utils/test_utils.hpp>
 
 #include <vector>
 #include <complex>

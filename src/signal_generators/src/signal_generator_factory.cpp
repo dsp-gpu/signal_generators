@@ -6,10 +6,10 @@
  * @date 2026-02-13
  */
 
-#include "signal_generator_factory.hpp"
-#include "generators/cw_generator.hpp"
-#include "generators/lfm_generator.hpp"
-#include "generators/noise_generator.hpp"
+#include <signal_generators/signal_generator_factory.hpp>
+#include <signal_generators/generators/cw_generator.hpp>
+#include <signal_generators/generators/lfm_generator.hpp>
+#include <signal_generators/generators/noise_generator.hpp>
 
 #include <stdexcept>
 

@@ -20,12 +20,12 @@
 
 #if ENABLE_ROCM
 
-#include "generators/form_signal_generator_rocm.hpp"
-#include "params/form_params.hpp"
-#include "backends/rocm/rocm_backend.hpp"
+#include <signal_generators/generators/form_signal_generator_rocm.hpp>
+#include <signal_generators/params/form_params.hpp>
+#include <core/backends/rocm/rocm_backend.hpp>
 
 // test_utils — единая тестовая инфраструктура
-#include "modules/test_utils/test_utils.hpp"
+#include <core/test_utils/test_utils.hpp>
 
 #include <vector>
 #include <complex>

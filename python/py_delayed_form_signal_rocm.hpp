@@ -21,7 +21,7 @@
  * @date 2026-03-23
  */
 
-#include "generators/delayed_form_signal_generator_rocm.hpp"
+#include <signal_generators/generators/delayed_form_signal_generator_rocm.hpp>
 
 // ============================================================================
 // PyDelayedFormSignalGeneratorROCm — pythonic wrapper

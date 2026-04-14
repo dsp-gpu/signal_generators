@@ -34,19 +34,32 @@ target_sources(DspSignalGenerators PRIVATE
 
 target_include_directories(DspSignalGenerators
   PUBLIC
+    # Стандарт AMD: #include <signal_generators/generators/...>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/generated>
     $<INSTALL_INTERFACE:include>
   PRIVATE
-    src/signal_generators/include
     kernels/
     src
 )
+# hiprtc: find_library через CMAKE_PREFIX_PATH (portable, без абсолютных путей)
+find_library(HIPRTC_LIB
+  NAMES hiprtc
+  PATH_SUFFIXES lib lib64
+  REQUIRED
+)
+message(STATUS "[DspSignalGenerators] hiprtc: ${HIPRTC_LIB}")
+
 target_link_libraries(DspSignalGenerators
   PUBLIC  DspCore::DspCore DspSpectrum::DspSpectrum
-  PRIVATE hiprtc
+  PRIVATE ${HIPRTC_LIB}
 )
 target_compile_features(DspSignalGenerators PUBLIC cxx_std_17)
+
+# ENABLE_ROCM для #if блоков
+if(ENABLE_ROCM)
+  target_compile_definitions(DspSignalGenerators PUBLIC ENABLE_ROCM=1)
+endif()
 
 # ── Git Version ────────────────────────────────────────────────────
 find_package(Git QUIET)
