@@ -12,30 +12,21 @@
 
 #include <signal_generators/generators/noise_generator_rocm.hpp>
 #include <signal_generators/kernels/noise_kernels_rocm.hpp>
+#include <spectrum/utils/rocm_profiling_helpers.hpp>
+#include <core/services/scoped_hip_event.hpp>
 #include <core/services/console_output.hpp>
 
 #include <stdexcept>
 #include <cmath>
+
+using fft_func_utils::MakeROCmDataFromEvents;
+using drv_gpu_lib::ScopedHipEvent;
 
 namespace signal_gen {
 
 static const std::vector<std::string> kNoiseKernelNames = {
   "generate_noise_gaussian", "generate_noise_white"
 };
-
-static drv_gpu_lib::ROCmProfilingData MakeROCmData(
-    hipEvent_t s, hipEvent_t e, uint32_t kind, const char* op) {
-  hipEventSynchronize(e);
-  float ms = 0.0f;
-  hipEventElapsedTime(&ms, s, e);
-  hipEventDestroy(s);
-  hipEventDestroy(e);
-  drv_gpu_lib::ROCmProfilingData d{};
-  uint64_t ns = static_cast<uint64_t>(ms * 1e6f);
-  d.start_ns = 0; d.end_ns = ns; d.complete_ns = ns;
-  d.kind = kind; d.op_string = op;
-  return d;
-}
 
 NoiseGeneratorROCm::NoiseGeneratorROCm(drv_gpu_lib::IBackend* backend)
     : ctx_(backend, "NoiseGen", "modules/signal_generators/kernels") {
@@ -85,10 +76,10 @@ drv_gpu_lib::InputData<void*> NoiseGeneratorROCm::GenerateToGpu(
   // 1D grid (all samples in one dimension)
   unsigned int grid = (total_u + kBlockSize - 1) / kBlockSize;
 
-  hipEvent_t ev_s = nullptr, ev_e = nullptr;
+  ScopedHipEvent ev_s, ev_e;
   if (prof_events) {
-    hipEventCreate(&ev_s); hipEventCreate(&ev_e);
-    hipEventRecord(ev_s, ctx_.stream());
+    ev_s.Create(); ev_e.Create();
+    hipEventRecord(ev_s.get(), ctx_.stream());
   }
 
   err = hipModuleLaunchKernel(k,
@@ -97,17 +88,17 @@ drv_gpu_lib::InputData<void*> NoiseGeneratorROCm::GenerateToGpu(
       0, ctx_.stream(),
       args, nullptr);
   if (err != hipSuccess) {
-    if (ev_s) { hipEventDestroy(ev_s); hipEventDestroy(ev_e); }
     (void)hipFree(output_ptr);
     throw std::runtime_error("NoiseGeneratorROCm: kernel launch failed: " +
                               std::string(hipGetErrorString(err)));
   }
 
-  if (prof_events) hipEventRecord(ev_e, ctx_.stream());
+  if (prof_events) hipEventRecord(ev_e.get(), ctx_.stream());
   hipStreamSynchronize(ctx_.stream());
 
   if (prof_events) {
-    prof_events->push_back({"Kernel", MakeROCmData(ev_s, ev_e, 0, kernel_name)});
+    prof_events->push_back({"Kernel",
+        MakeROCmDataFromEvents(ev_s.get(), ev_e.get(), 0, kernel_name)});
   }
 
   drv_gpu_lib::InputData<void*> result;

@@ -22,7 +22,10 @@
 #include <cstring>
 #include <vector>
 
+#include <core/services/scoped_hip_event.hpp>
+
 using fft_func_utils::MakeROCmDataFromEvents;
+using drv_gpu_lib::ScopedHipEvent;
 
 namespace signal_gen {
 
@@ -127,11 +130,11 @@ FormSignalGeneratorROCm::GenerateInputData(ROCmProfEvents* prof_events) {
       (params_.points + kBlockSize - 1) / kBlockSize);
   unsigned int grid_y = params_.antennas;
 
-  hipEvent_t ev_k_s = nullptr, ev_k_e = nullptr;
+  ScopedHipEvent ev_k_s, ev_k_e;
   if (prof_events) {
-    hipEventCreate(&ev_k_s);
-    hipEventCreate(&ev_k_e);
-    hipEventRecord(ev_k_s, ctx_.stream());
+    ev_k_s.Create();
+    ev_k_e.Create();
+    hipEventRecord(ev_k_s.get(), ctx_.stream());
   }
 
   err = hipModuleLaunchKernel(
@@ -142,11 +145,10 @@ FormSignalGeneratorROCm::GenerateInputData(ROCmProfEvents* prof_events) {
       args, nullptr);
 
   if (prof_events) {
-    hipEventRecord(ev_k_e, ctx_.stream());
+    hipEventRecord(ev_k_e.get(), ctx_.stream());
   }
 
   if (err != hipSuccess) {
-    if (ev_k_s) { hipEventDestroy(ev_k_s); hipEventDestroy(ev_k_e); }
     (void)hipFree(output_ptr);
     throw std::runtime_error(
         "FormSignalGeneratorROCm: kernel launch failed: " +
@@ -157,7 +159,7 @@ FormSignalGeneratorROCm::GenerateInputData(ROCmProfEvents* prof_events) {
 
   if (prof_events) {
     prof_events->push_back({"Kernel",
-        MakeROCmDataFromEvents(ev_k_s, ev_k_e, 0, "generate_form_signal")});
+        MakeROCmDataFromEvents(ev_k_s.get(), ev_k_e.get(), 0, "generate_form_signal")});
   }
 
   drv_gpu_lib::InputData<void*> result;

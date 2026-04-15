@@ -19,7 +19,10 @@
 #define M_PI 3.14159265358979323846
 #endif
 
+#include <core/services/scoped_hip_event.hpp>
+
 using fft_func_utils::MakeROCmDataFromEvents;
+using drv_gpu_lib::ScopedHipEvent;
 
 namespace signal_gen {
 
@@ -75,10 +78,10 @@ drv_gpu_lib::InputData<void*> LfmGeneratorAnalyticalDelayROCm::GenerateToGpu(
   unsigned int grid_x = (n_point + 255) / 256;
   unsigned int grid_y = n_ant;
 
-  hipEvent_t ev_s = nullptr, ev_e = nullptr;
+  ScopedHipEvent ev_s, ev_e;
   if (prof_events) {
-    hipEventCreate(&ev_s); hipEventCreate(&ev_e);
-    hipEventRecord(ev_s, ctx_.stream());
+    ev_s.Create(); ev_e.Create();
+    hipEventRecord(ev_s.get(), ctx_.stream());
   }
 
   void* args[] = { &output, &d_delays, &n_ant, &n_point,
@@ -95,13 +98,13 @@ drv_gpu_lib::InputData<void*> LfmGeneratorAnalyticalDelayROCm::GenerateToGpu(
     throw std::runtime_error("LfmAnalyticalDelay: kernel launch failed");
   }
 
-  if (prof_events) hipEventRecord(ev_e, ctx_.stream());
+  if (prof_events) hipEventRecord(ev_e.get(), ctx_.stream());
   hipStreamSynchronize(ctx_.stream());
   hipFree(d_delays);
 
   if (prof_events) {
     prof_events->push_back({"Kernel",
-        MakeROCmDataFromEvents(ev_s, ev_e, 0, "generate_lfm_analytical_delay")});
+        MakeROCmDataFromEvents(ev_s.get(), ev_e.get(), 0, "generate_lfm_analytical_delay")});
   }
 
   drv_gpu_lib::InputData<void*> result;
