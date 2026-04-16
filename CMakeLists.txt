@@ -19,6 +19,9 @@ fetch_dsp_spectrum()
 add_library(DspSignalGenerators STATIC)
 add_library(DspSignalGenerators::DspSignalGenerators ALIAS DspSignalGenerators)
 
+# PIC нужен для Python bindings (.so линкует static lib)
+set_target_properties(DspSignalGenerators PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 target_sources(DspSignalGenerators PRIVATE
   src/signal_generators/src/cw_generator_rocm.cpp
   src/signal_generators/src/lfm_generator_rocm.cpp

@@ -20,23 +20,32 @@
 #include "py_helpers.hpp"
 
 #if ENABLE_ROCM
+#include "py_gpu_context.hpp"
 #include "py_form_signal_rocm.hpp"
 #include "py_delayed_form_signal_rocm.hpp"
 #include "py_lfm_analytical_delay_rocm.hpp"
 #endif
 
-#include "py_lfm_analytical_delay.hpp"
+// py_lfm_analytical_delay.hpp — OpenCL GPUContext, только nvidia-ветка
+// #include "py_lfm_analytical_delay.hpp"
 
 PYBIND11_MODULE(dsp_signal_generators, m) {
     m.doc() = "dsp::signal_generators — ROCm signal generators\n\n"
               "Classes:\n"
+              "  ROCmGPUContext                  - GPU context (AMD ROCm)\n"
               "  FormSignalGeneratorROCm        - form signal generator (ROCm)\n"
               "  DelayedFormSignalGeneratorROCm - with fractional delay (ROCm)\n"
               "  LfmAnalyticalDelayGenerator    - LFM analytical delay\n";
 
-    register_lfm_analytical_delay(m);
+    // register_lfm_analytical_delay(m);  // OpenCL-only, nvidia-ветка
 
 #if ENABLE_ROCM
+    py::class_<ROCmGPUContext>(m, "ROCmGPUContext",
+        "ROCm GPU context (creates HIP backend for AMD GPU).")
+        .def(py::init<int>(), py::arg("device_index") = 0)
+        .def_property_readonly("device_name", &ROCmGPUContext::device_name)
+        .def_property_readonly("device_index", &ROCmGPUContext::device_index);
+
     register_form_signal_rocm(m);
     register_delayed_form_signal_rocm(m);
     register_lfm_analytical_delay_rocm(m);

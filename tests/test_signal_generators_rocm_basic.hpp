@@ -26,7 +26,7 @@
 #include <core/backends/rocm/rocm_backend.hpp>
 
 // test_utils — единая тестовая инфраструктура
-#include <core/test_utils/test_utils.hpp>
+#include "test_utils/test_utils.hpp"
 
 #include <vector>
 #include <complex>
