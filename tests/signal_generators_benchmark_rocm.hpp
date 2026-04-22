@@ -27,6 +27,7 @@
 
 #include <signal_generators/generators/form_signal_generator_rocm.hpp>
 #include <core/services/gpu_benchmark_base.hpp>
+#include <core/services/profiling/profiling_facade.hpp>
 
 #include <hip/hip_runtime.h>
 
@@ -60,13 +61,13 @@ protected:
     hipFree(input.data);
   }
 
-  /// Замер — GenerateInputData с ROCmProfEvents → RecordROCmEvent → GPUProfiler
+  /// Замер — GenerateInputData с ROCmProfEvents → ProfilingFacade::BatchRecord
   void ExecuteKernelTimed() override {
     signal_gen::ROCmProfEvents events;
     auto input = gen_.GenerateInputData(&events);
     hipFree(input.data);
-    for (auto& [name, data] : events)
-      RecordROCmEvent(name, data);
+    drv_gpu_lib::profiling::ProfilingFacade::GetInstance()
+        .BatchRecord(gpu_id_, "signal_generators/form_signal", events);
   }
 
 private:
