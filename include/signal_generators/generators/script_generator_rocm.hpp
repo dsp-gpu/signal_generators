@@ -2,17 +2,18 @@
 
 /**
  * @file script_generator_rocm.hpp
- * @brief ScriptGeneratorROCm — text DSL → HIP kernel (hiprtc) compiler
+ * @brief ScriptGeneratorROCm — text DSL → HIP kernel via GpuContext (disk cache!)
  *
  * ROCm port of ScriptGenerator. Same DSL format:
  *   [Params] ANTENNAS, POINTS
  *   [Defs]   per-antenna variables
  *   [Signal] formula using ID, T, defs
  *
- * Compiles DSL → HIP C++ kernel source → hiprtc → hipModuleLaunchKernel.
+ * Compiles DSL → HIP C++ kernel source → GpuContext::CompileModule
+ * → disk cache (clean-slate v2, keyed by CompileKey).
  *
  * @author Kodo (AI Assistant)
- * @date 2026-03-22
+ * @date 2026-03-22  (revised 2026-04-22 for kernel_cache_v2)
  */
 
 #if ENABLE_ROCM
@@ -21,6 +22,7 @@
 #include <core/interface/gpu_context.hpp>
 
 #include <hip/hip_runtime.h>
+#include <memory>
 #include <string>
 #include <vector>
 #include <complex>
@@ -54,14 +56,13 @@ public:
   uint32_t GetPoints() const;
   size_t GetTotalSamples() const;
   const std::string& GetKernelSource() const { return kernel_source_; }
-  bool IsReady() const { return module_ != nullptr; }
+  bool IsReady() const { return kernel_fn_ != nullptr; }
 
 private:
   ParsedScript ParseScript(const std::string& text);
   std::string GenerateHIPKernelSource(const ParsedScript& script);
   std::string PrepareExpression(const std::string& line);
   void CompileKernel(const std::string& source);
-  void ReleaseGpuResources();
 
   static std::string Trim(const std::string& s);
   static std::string ToUpper(const std::string& s);
@@ -69,7 +70,12 @@ private:
   drv_gpu_lib::IBackend* backend_ = nullptr;
   hipStream_t stream_ = nullptr;
 
-  hipModule_t module_ = nullptr;
+  /// Per-script GpuContext — recreated on each LoadScript because CompileModule
+  /// is idempotent (one source per context). Different user scripts → unique
+  /// CompileKey.Hash → unique HSACO file, так что disk cache работает через имя файла.
+  std::unique_ptr<drv_gpu_lib::GpuContext> ctx_;
+
+  /// Cached kernel function pointer after ctx_->CompileModule().
   hipFunction_t kernel_fn_ = nullptr;
 
   uint32_t antennas_ = 0;
