@@ -1,13 +1,15 @@
 /**
  * @file script_generator_rocm.cpp
- * @brief ScriptGeneratorROCm — DSL → HIP kernel (hiprtc)
+ * @brief ScriptGeneratorROCm — DSL → HIP kernel via GpuContext (disk cache v2)
  *
- * Port of script_generator.cpp: OpenCL → hiprtc.
- * DSL parser is identical (CPU-only code), only kernel format and
- * compilation/execution path changed.
+ * Phase B1 of kernel_cache_v2: manual hiprtc removed, compilation delegated
+ * to GpuContext::CompileModule which uses KernelCacheService (key-based cache).
+ *
+ * Different user scripts → different CompileKey.Hash → different HSACO files.
+ * Same script recompiled → disk hit ~1ms instead of ~150ms recompile.
  *
  * @author Kodo (AI Assistant)
- * @date 2026-03-22
+ * @date 2026-03-22  (migrated 2026-04-22 to GpuContext)
  */
 
 #if ENABLE_ROCM
@@ -15,13 +17,15 @@
 #include <signal_generators/generators/script_generator_rocm.hpp>
 #include <signal_generators/generators/script_generator.hpp>  // ParsedScript, ScriptParams (types only)
 
-#include <hip/hiprtc.h>
+#include <core/services/cache_dir_resolver.hpp>
+
 #include <stdexcept>
 #include <sstream>
 #include <fstream>
 #include <algorithm>
 #include <cctype>
 #include <cstring>
+#include <utility>
 
 namespace signal_gen {
 
@@ -36,26 +40,29 @@ ScriptGeneratorROCm::ScriptGeneratorROCm(drv_gpu_lib::IBackend* backend)
   stream_ = static_cast<hipStream_t>(backend_->GetNativeQueue());
 }
 
-ScriptGeneratorROCm::~ScriptGeneratorROCm() {
-  ReleaseGpuResources();
-}
+ScriptGeneratorROCm::~ScriptGeneratorROCm() = default;  // GpuContext owns module, self-releases
 
 ScriptGeneratorROCm::ScriptGeneratorROCm(ScriptGeneratorROCm&& other) noexcept
     : backend_(other.backend_), stream_(other.stream_)
-    , module_(other.module_), kernel_fn_(other.kernel_fn_)
+    , ctx_(std::move(other.ctx_))
+    , kernel_fn_(other.kernel_fn_)
     , antennas_(other.antennas_), points_(other.points_)
     , kernel_source_(std::move(other.kernel_source_)) {
-  other.module_ = nullptr; other.kernel_fn_ = nullptr;
+  other.kernel_fn_ = nullptr;
+  other.backend_   = nullptr;
+  other.stream_    = nullptr;
 }
 
 ScriptGeneratorROCm& ScriptGeneratorROCm::operator=(ScriptGeneratorROCm&& other) noexcept {
   if (this != &other) {
-    ReleaseGpuResources();
     backend_ = other.backend_; stream_ = other.stream_;
-    module_ = other.module_; kernel_fn_ = other.kernel_fn_;
+    ctx_ = std::move(other.ctx_);
+    kernel_fn_ = other.kernel_fn_;
     antennas_ = other.antennas_; points_ = other.points_;
     kernel_source_ = std::move(other.kernel_source_);
-    other.module_ = nullptr; other.kernel_fn_ = nullptr;
+    other.kernel_fn_ = nullptr;
+    other.backend_ = nullptr;
+    other.stream_  = nullptr;
   }
   return *this;
 }
@@ -71,10 +78,13 @@ size_t ScriptGeneratorROCm::GetTotalSamples() const {
 // ============================================================================
 
 void ScriptGeneratorROCm::LoadScript(const std::string& script_text) {
-  ReleaseGpuResources();
+  // Reset state — new GpuContext per script (CompileModule is idempotent per-ctx).
+  ctx_.reset();
+  kernel_fn_ = nullptr;
+
   auto script = ParseScript(script_text);
   antennas_ = script.params.antennas;
-  points_ = script.params.points;
+  points_   = script.params.points;
   kernel_source_ = GenerateHIPKernelSource(script);
   CompileKernel(kernel_source_);
 }
@@ -93,7 +103,7 @@ void ScriptGeneratorROCm::LoadFile(const std::string& file_path) {
 // ============================================================================
 
 void* ScriptGeneratorROCm::Generate() {
-  if (!module_)
+  if (!kernel_fn_)
     throw std::runtime_error("ScriptGeneratorROCm: no script loaded");
 
   size_t total = GetTotalSamples();
@@ -266,48 +276,19 @@ std::string ScriptGeneratorROCm::PrepareExpression(const std::string& line) {
 }
 
 // ============================================================================
-// Kernel Compilation (hiprtc)
+// Kernel Compilation via GpuContext (disk cache v2)
 // ============================================================================
 
 void ScriptGeneratorROCm::CompileKernel(const std::string& source) {
-  hiprtcProgram prog;
-  hiprtcResult rtc = hiprtcCreateProgram(&prog, source.c_str(),
-      "script_signal.hip", 0, nullptr, nullptr);
-  if (rtc != HIPRTC_SUCCESS)
-    throw std::runtime_error("ScriptGeneratorROCm: hiprtcCreateProgram failed");
+  // One GpuContext per script. cache_dir через ResolveCacheDir (exe-relative).
+  ctx_ = std::make_unique<drv_gpu_lib::GpuContext>(
+      backend_,
+      "ScriptGen",
+      drv_gpu_lib::ResolveCacheDir("script_gen"));
 
-  const char* opts[] = {"-O3", "-std=c++17"};
-  rtc = hiprtcCompileProgram(prog, 2, opts);
-  if (rtc != HIPRTC_SUCCESS) {
-    size_t log_size = 0;
-    hiprtcGetProgramLogSize(prog, &log_size);
-    std::string log(log_size, '\0');
-    hiprtcGetProgramLog(prog, &log[0]);
-    hiprtcDestroyProgram(&prog);
-    throw std::runtime_error(
-        "ScriptGeneratorROCm: compilation failed!\n=== Source ===\n" +
-        source + "\n=== Log ===\n" + log);
-  }
-
-  size_t code_size = 0;
-  hiprtcGetCodeSize(prog, &code_size);
-  std::vector<char> code(code_size);
-  hiprtcGetCode(prog, code.data());
-  hiprtcDestroyProgram(&prog);
-
-  hipError_t err = hipModuleLoadData(&module_, code.data());
-  if (err != hipSuccess)
-    throw std::runtime_error("ScriptGeneratorROCm: hipModuleLoadData failed");
-
-  err = hipModuleGetFunction(&kernel_fn_, module_, "script_signal");
-  if (err != hipSuccess) {
-    hipModuleUnload(module_); module_ = nullptr;
-    throw std::runtime_error("ScriptGeneratorROCm: hipModuleGetFunction failed");
-  }
-}
-
-void ScriptGeneratorROCm::ReleaseGpuResources() {
-  if (module_) { hipModuleUnload(module_); module_ = nullptr; kernel_fn_ = nullptr; }
+  // Compile (hits disk cache on 2nd call with same source — ~1ms vs 150ms).
+  ctx_->CompileModule(source.c_str(), {"script_signal"}, /*extra_defines=*/{});
+  kernel_fn_ = ctx_->GetKernel("script_signal");
 }
 
 // ============================================================================
