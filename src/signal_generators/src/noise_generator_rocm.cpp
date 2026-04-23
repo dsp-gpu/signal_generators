@@ -15,6 +15,7 @@
 #include <spectrum/utils/rocm_profiling_helpers.hpp>
 #include <core/services/scoped_hip_event.hpp>
 #include <core/services/console_output.hpp>
+#include <core/services/cache_dir_resolver.hpp>
 
 #include <stdexcept>
 #include <cmath>
@@ -29,7 +30,7 @@ static const std::vector<std::string> kNoiseKernelNames = {
 };
 
 NoiseGeneratorROCm::NoiseGeneratorROCm(drv_gpu_lib::IBackend* backend)
-    : ctx_(backend, "NoiseGen", "modules/signal_generators/kernels") {
+    : ctx_(backend, "NoiseGen", drv_gpu_lib::ResolveCacheDir("signal_generators")) {
 }
 
 void NoiseGeneratorROCm::EnsureCompiled() {

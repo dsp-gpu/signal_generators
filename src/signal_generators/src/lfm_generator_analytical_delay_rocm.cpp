@@ -20,6 +20,7 @@
 #endif
 
 #include <core/services/scoped_hip_event.hpp>
+#include <core/services/cache_dir_resolver.hpp>
 
 using fft_func_utils::MakeROCmDataFromEvents;
 using drv_gpu_lib::ScopedHipEvent;
@@ -32,7 +33,7 @@ static const std::vector<std::string> kDelayKernelNames = {
 
 LfmGeneratorAnalyticalDelayROCm::LfmGeneratorAnalyticalDelayROCm(
     drv_gpu_lib::IBackend* backend, const LfmParams& params)
-    : ctx_(backend, "LfmDelay", "modules/signal_generators/kernels")
+    : ctx_(backend, "LfmDelay", drv_gpu_lib::ResolveCacheDir("signal_generators"))
     , params_(params) {
 }
 

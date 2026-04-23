@@ -10,6 +10,7 @@
 
 #include <signal_generators/generators/lfm_conjugate_generator_rocm.hpp>
 #include <signal_generators/kernels/lfm_kernels_rocm.hpp>
+#include <core/services/cache_dir_resolver.hpp>
 
 #include <cmath>
 #include <stdexcept>
@@ -32,7 +33,7 @@ static const std::vector<std::string> kConjKernelNames = {
 LfmConjugateGeneratorROCm::LfmConjugateGeneratorROCm(
     drv_gpu_lib::IBackend* backend,
     const LfmParams& params)
-    : ctx_(backend, "LfmConj", "modules/signal_generators/kernels")
+    : ctx_(backend, "LfmConj", drv_gpu_lib::ResolveCacheDir("signal_generators"))
     , params_(params) {
 }
 
