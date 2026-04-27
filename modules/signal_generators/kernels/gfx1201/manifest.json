@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "kernels": [
+    {
+      "name": "CwGen_kernels",
+      "comment": "CwGen hiprtc kernels",
+      "created": "2026-04-20T18:54:46",
+      "params": "",
+      "backend": "rocm"
+    },
+    {
+      "name": "LfmGen_kernels",
+      "comment": "LfmGen hiprtc kernels",
+      "created": "2026-04-20T18:54:46",
+      "params": "",
+      "backend": "rocm"
+    },
+    {
+      "name": "NoiseGen_kernels",
+      "comment": "NoiseGen hiprtc kernels",
+      "created": "2026-04-20T18:54:46",
+      "params": "",
+      "backend": "rocm"
+    },
+    {
+      "name": "LfmConj_kernels",
+      "comment": "LfmConj hiprtc kernels",
+      "created": "2026-04-20T18:54:46",
+      "params": "",
+      "backend": "rocm"
+    },
+    {
+      "name": "FormSignal_kernels",
+      "comment": "FormSignal hiprtc kernels",
+      "created": "2026-04-20T18:54:46",
+      "params": "",
+      "backend": "rocm"
+    }
+  ]
+}
