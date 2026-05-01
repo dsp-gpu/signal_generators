@@ -1,21 +1,45 @@
 #pragma once
 
-#if !ENABLE_ROCM  // OpenCL-only: ROCm uses DelayedFormSignalGeneratorROCm
+// ============================================================================
+// DelayedFormSignalGenerator — getX + дробная задержка Farrow 48×5 (OpenCL)
+//
+// ЧТО:    Композиция: FormSignalGenerator (чистый сигнал, noise=0) + LchFarrow
+//         (дробная задержка Lagrange 48×5 per-antenna + шум через SetNoise).
+//         Задержка задаётся в микросекундах на каждую антенну, шум
+//         добавляется ПОСЛЕ применения задержки.
+//
+// ЗАЧЕМ:  Эмуляция реального radar-приёма: разные пути сигнала к разным
+//         антеннам = разные задержки (sub-sample точность). Альтернатива
+//         post-processing'у через LchFarrow в pipeline'е — здесь delay
+//         встроен в этап генерации, упрощает тесты beamforming'а и
+//         калибровки фазового центра.
+//
+// ПОЧЕМУ: - Только OpenCL (`#if !ENABLE_ROCM`). ROCm-аналог:
+//           DelayedFormSignalGeneratorROCm.
+//         - Композиция (не наследование) — SRP: этот класс координирует,
+//           FormSignalGenerator генерирует, LchFarrow задерживает/шумит.
+//         - Move-only: содержит move-only компоненты.
+//         - Шум через LchFarrow (а не через FormSignalGenerator): шум
+//           идёт ПОСЛЕ задержки — иначе шум тоже бы интерполировался,
+//           что меняет его статистику (некоррелированность по выборкам).
+//         - delay_us — МИКРОСЕКУНДЫ (контракт API со стороны Python).
+//         - Матрица Lagrange 48×5: 48 фаз × 5 коэффициентов на фазу.
+//           Опционально загружается из JSON (LoadMatrix), иначе встроенная.
+//
+// Использование:
+//   DelayedFormSignalGenerator gen(backend);
+//   FormParams p; p.fs=12e6; p.f0=1e6; p.antennas=8; p.points=4096;
+//   p.amplitude=1.0; p.noise_amplitude=0.1;
+//   gen.SetParams(p);
+//   gen.SetDelays({0.0f, 1.5f, 3.0f, 4.5f, 6.0f, 7.5f, 9.0f, 10.5f}); // мкс
+//   auto input = gen.GenerateInputData();
+//   clReleaseMemObject(input.data);
+//
+// История:
+//   - Создан: 2026-02-17
+// ============================================================================
 
-/**
- * @file delayed_form_signal_generator.hpp
- * @brief DelayedFormSignalGenerator — генератор с дробной задержкой (Farrow 48×5)
- *
- * Обёртка над FormSignalGenerator + LchFarrow:
- *   1. Генерация чистого сигнала (getX, noise=0) через FormSignalGenerator
- *   2. Применение дробной задержки (Lagrange 48×5) per-antenna через LchFarrow
- *   3. Шум (Philox + Box-Muller) добавляется через LchFarrow::SetNoise()
- *
- * Задержка задаётся в микросекундах (float) на каждую антенну.
- *
- * @author Кодо (AI Assistant)
- * @date 2026-02-17
- */
+#if !ENABLE_ROCM  // OpenCL-only: ROCm uses DelayedFormSignalGeneratorROCm
 
 #include <signal_generators/params/form_params.hpp>
 #include <signal_generators/generators/form_signal_generator.hpp>
@@ -33,32 +57,14 @@ namespace signal_gen {
 
 /**
  * @class DelayedFormSignalGenerator
- * @brief GPU-генератор с дробной задержкой Farrow (Lagrange 48×5)
+ * @brief OpenCL-генератор getX с дробной задержкой Farrow (Lagrange 48×5).
  *
- * Использует LchFarrow для применения дробной задержки.
- *
- * @code
- * DelayedFormSignalGenerator gen(backend);
- *
- * FormParams params;
- * params.fs = 12e6;
- * params.f0 = 1e6;
- * params.antennas = 8;
- * params.points = 4096;
- * params.amplitude = 1.0;
- * params.noise_amplitude = 0.1;  // шум добавляется ПОСЛЕ задержки
- * gen.SetParams(params);
- *
- * // Задержки в микросекундах (по одной на антенну)
- * gen.SetDelays({0.0f, 1.5f, 3.0f, 4.5f, 6.0f, 7.5f, 9.0f, 10.5f});
- *
- * // GPU
- * auto input = gen.GenerateInputData();
- * clReleaseMemObject(input.data);
- *
- * // CPU
- * auto cpu_data = gen.GenerateToCpu();
- * @endcode
+ * @note Move-only (composite над move-only компонентами).
+ * @note Шум идёт ПОСЛЕ задержки (через LchFarrow::SetNoise), не до.
+ * @note Только OpenCL. ROCm-аналог: DelayedFormSignalGeneratorROCm.
+ * @see signal_gen::DelayedFormSignalGeneratorROCm
+ * @see signal_gen::FormSignalGenerator
+ * @see lch_farrow::LchFarrow
  */
 class DelayedFormSignalGenerator {
 public:

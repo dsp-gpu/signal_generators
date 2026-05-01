@@ -1,15 +1,23 @@
 #pragma once
 
 /**
- * @file signal_request.hpp
- * @brief Типы запросов на генерацию сигналов
+ * @brief Типы запросов на генерацию сигналов: enum + POD-параметры + variant-обёртка.
  *
- * SignalKind — тип сигнала (CW, LFM, NOISE, FORM_SIGNAL)
- * CwParams, LfmParams, NoiseParams, FormParams — параметры генераторов
- * SignalRequest — единый запрос с variant
+ * @note Тип B (simple structs + enum): только данные + сравнения + один helper getter.
+ *       Содержимое:
+ *         - SignalKind     — enum: CW / LFM / NOISE / FORM_SIGNAL
+ *         - NoiseType      — enum: WHITE / GAUSSIAN
+ *         - CwParams       — f0, phase, amplitude, complex_iq, freq_step (multi-beam)
+ *         - LfmParams      — f_start, f_end, amplitude, complex_iq + GetChirpRate(duration)
+ *         - NoiseParams    — type, power (дисперсия для Gaussian), seed
+ *         - SignalRequest  — kind + system + variant<CwParams, LfmParams, NoiseParams, FormParams>
+ *       FormParams — отдельный сложный тип в form_params.hpp (с парсером).
+ *       operator==/!= нужны для кеширования генераторов в SignalService (перекомпиляция
+ *       ядра только при смене params).
  *
- * @author Кодо (AI Assistant)
- * @date 2026-02-13
+ * История:
+ *   - Создан:  2026-02-13
+ *   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
  */
 
 #include <signal_generators/params/system_sampling.hpp>

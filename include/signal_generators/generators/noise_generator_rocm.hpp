@@ -1,19 +1,35 @@
 #pragma once
 
-/**
- * @file noise_generator_rocm.hpp
- * @brief NoiseGeneratorROCm — Noise generator (ROCm/HIP)
- *
- * ROCm port of NoiseGenerator (OpenCL). Same algorithm, HIP runtime.
- * Uses Ref03 GpuContext for kernel compilation.
- *
- * Philox-2x32-10 PRNG + Box-Muller for Gaussian noise.
- *
- * Compiles ONLY with ENABLE_ROCM=1 (Linux + AMD GPU).
- *
- * @author Kodo (AI Assistant)
- * @date 2026-03-14
- */
+// ============================================================================
+// NoiseGeneratorROCm — генератор гауссовского комплексного шума (ROCm/HIP)
+//
+// ЧТО:    ROCm/HIP-порт NoiseGenerator. Тот же алгоритм:
+//         Philox-2x32-10 PRNG + Box-Muller для нормального распределения.
+//         Через GpuContext (Ref03 Layer 1) и hipStream.
+//
+// ЗАЧЕМ:  Production-вариант шума для main-ветки (Linux + AMD + ROCm 7.2+,
+//         правило 09-rocm-only). Используется в тестах SNR / детекторов /
+//         radar-пайплайнов на реальном железе. Воспроизводимость по seed —
+//         критична для регрессионных тестов.
+//
+// ПОЧЕМУ: - GpuContext + KernelCacheService → hipModule компилируется
+//           один раз; hot-path без overhead.
+//         - Philox-2x32 (counter-based) — каждая нить берёт уникальный
+//           counter, параллелизм без коллизий PRNG-состояний.
+//         - rng_ (std::mt19937) на хосте — для генерации seeds, если caller
+//           не передал свои (не для основного шума, его делает GPU).
+//         - kBlockSize=256 — оптимум для warp=64 на RDNA4 (правило 13).
+//         - Stub-секция #else (Windows без ROCm) — все методы throw.
+//
+// Использование:
+//   signal_gen::NoiseGeneratorROCm gen(rocm_backend);
+//   auto out = gen.GenerateToGpu(system, NoiseParams{.amplitude=1.0f, .seed=42},
+//                                 beam_count);
+//   // out.data — void* (HIP device pointer); caller вызывает hipFree.
+//
+// История:
+//   - Создан: 2026-03-14 (порт OpenCL-варианта на ROCm для main-ветки)
+// ============================================================================
 
 #if ENABLE_ROCM
 
@@ -33,6 +49,16 @@ namespace signal_gen {
 
 using ROCmProfEvents = std::vector<std::pair<const char*, drv_gpu_lib::ROCmProfilingData>>;
 
+/**
+ * @class NoiseGeneratorROCm
+ * @brief ROCm/HIP-генератор гауссовского комплексного шума.
+ *
+ * @note Move-only: GPU-ресурсы (GpuContext, hipModule) уникальны.
+ * @note Требует #if ENABLE_ROCM. На Windows — stub (все методы throw).
+ * @note API совместим с NoiseGenerator (OpenCL) по семантике.
+ * @see signal_gen::NoiseGenerator (legacy OpenCL)
+ * @see drv_gpu_lib::GpuContext (Layer 1 Ref03)
+ */
 class NoiseGeneratorROCm {
 public:
   explicit NoiseGeneratorROCm(drv_gpu_lib::IBackend* backend);

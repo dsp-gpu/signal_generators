@@ -1,14 +1,21 @@
 #pragma once
 
 /**
- * @file noise_kernels_rocm.hpp
- * @brief HIP kernel source for Noise generator (ROCm port of noise_kernel.cl + prng.cl)
+ * @brief HIP kernel-source для Noise-генератора (Philox + Box-Muller / uniform).
  *
- * Philox-2x32-10 PRNG + Box-Muller for Gaussian noise.
- * Embedded as raw string for hiprtc compilation.
+ * @note Тип B (technical header): R"HIP(...)HIP" source для hiprtc.
+ *       Kernels:
+ *         - generate_noise_gaussian — комплексный Gaussian шум, std_dev задаётся
+ *                                     (Philox-2x32-10 → Box-Muller → re=r·cos, im=r·sin)
+ *         - generate_noise_white    — равномерный шум на [-amplitude, +amplitude]
+ *       PRNG: Philox-2x32-10 (counter-based) — воспроизводим при одинаковом seed.
+ *       Используется __umulhi (HIP intrinsic) — быстрее чем 64-bit mul на RDNA4.
+ *       1D grid: total_points / blockDim.x. __launch_bounds__(256).
+ * @note Порт из noise_kernel.cl + prng.cl (OpenCL → HIP/ROCm).
  *
- * @author Kodo (AI Assistant)
- * @date 2026-03-14
+ * История:
+ *   - Создан:  2026-03-14
+ *   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
  */
 
 namespace signal_gen {

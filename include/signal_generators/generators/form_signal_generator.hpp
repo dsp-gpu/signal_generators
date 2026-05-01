@@ -1,25 +1,44 @@
 #pragma once
 
-#if !ENABLE_ROCM  // OpenCL-only: ROCm uses FormSignalGeneratorROCm
+// ============================================================================
+// FormSignalGenerator — мультиканальный GPU-генератор по формуле getX (OpenCL)
+//
+// ЧТО:    Параллельная генерация комплексного сигнала по антеннам:
+//           X = a·norm·exp(j·(2π·f0·t + π·fdev/ti·(t-ti/2)² + φ))
+//             + an·norm·(randn + j·randn)
+//           X = 0 при t<0 или t>ti-dt
+//         Поддержка: мультиканал, per-channel задержка (FIXED/LINEAR/RANDOM),
+//         встроенный шум Philox-2x32 + Box-Muller, ЛЧМ при fdev≠0.
+//
+// ЗАЧЕМ:  Формирующий импульс radar-pipeline: один kernel запуск выдаёт
+//         весь приёмный массив (antennas × points) с готовой задержкой и
+//         шумом — без post-processing. Совместим с InputData<cl_mem> →
+//         подаётся прямо в SpectrumMaximaFinder / FFTProcessor без копий.
+//
+// ПОЧЕМУ: - Это OpenCL-вариант под `#if !ENABLE_ROCM` (legacy nvidia-ветка).
+//           ROCm-вариант: FormSignalGeneratorROCm.
+//         - Standalone-класс (не наследует ISignalGenerator) — свой API
+//           под мультиканальность и InputData<cl_mem> метаданные.
+//         - Move-only: cl_program/queue/context уникальны на инстанс.
+//         - backend не владеет (raw указатель) — DrvGPU выше по стеку.
+//         - Шум встроен в kernel (Philox) — без отдельного NoiseGenerator
+//           прохода → одна launch latency вместо двух.
+//
+// Использование:
+//   FormSignalGenerator gen(backend);
+//   FormParams p;
+//   p.fs=12e6; p.f0=1e6; p.antennas=8; p.points=4096;
+//   p.amplitude=1.0; p.noise_amplitude=0.1;
+//   gen.SetParams(p);
+//   auto input = gen.GenerateInputData();   // InputData<cl_mem>
+//   // ... подать input в FFT / SpectrumMaximaFinder ...
+//   clReleaseMemObject(input.data);
+//
+// История:
+//   - Создан: 2026-02-17
+// ============================================================================
 
-/**
- * @file form_signal_generator.hpp
- * @brief FormSignalGenerator — мультиканальный генератор комплексных сигналов
- *
- * Формула getX:
- *   X = a*norm*exp(j*(2pi*f0*t + pi*fdev/ti*((t-ti/2)^2) + phi))
- *     + an*norm*(randn + j*randn)
- *   X = 0 при t < 0 или t > ti - dt
- *
- * Поддержка:
- * - Мультиканальная генерация (antennas каналов параллельно)
- * - Per-channel задержка: FIXED / LINEAR / RANDOM
- * - Шум: Philox-2x32 + Box-Muller (встроен в kernel)
- * - Chirp: fdev != 0 дает ЛЧМ-модуляцию
- *
- * @author Кодо (AI Assistant)
- * @date 2026-02-17
- */
+#if !ENABLE_ROCM  // OpenCL-only: ROCm uses FormSignalGeneratorROCm
 
 #include <signal_generators/params/form_params.hpp>
 #include <core/interface/i_backend.hpp>
@@ -35,34 +54,12 @@ namespace signal_gen {
 
 /**
  * @class FormSignalGenerator
- * @brief GPU-генератор комплексных сигналов по формуле getX
+ * @brief OpenCL-генератор комплексных сигналов по формуле getX (мультиканал).
  *
- * Standalone класс (не ISignalGenerator) — свой API для мультиканальности.
- *
- * @code
- * FormSignalGenerator gen(backend);
- *
- * FormParams params;
- * params.fs = 12e6;
- * params.f0 = 1e6;
- * params.antennas = 8;
- * params.points = 4096;
- * params.amplitude = 1.0;
- * params.noise_amplitude = 0.1;
- * params.tau_base = 0.0;
- * params.tau_step = 0.0001;
- * gen.SetParams(params);
- *
- * // GPU (InputData<cl_mem> — совместимо с fft_func)
- * auto input = gen.GenerateInputData();
- * // input.data, input.antenna_count, input.n_point, input.gpu_memory_bytes
- * // ... передать в SpectrumMaximaFinder::Process(input) ...
- * clReleaseMemObject(input.data);
- *
- * // CPU (vector per channel)
- * auto cpu_data = gen.GenerateToCpu();
- * // cpu_data[antenna_id][sample_id]
- * @endcode
+ * @note Move-only: GPU-ресурсы (cl_program/queue/context) уникальны на инстанс.
+ * @note Доступен только в OpenCL-сборке. ROCm-вариант: FormSignalGeneratorROCm.
+ * @see signal_gen::FormSignalGeneratorROCm
+ * @see signal_gen::DelayedFormSignalGenerator
  */
 class FormSignalGenerator {
 public:

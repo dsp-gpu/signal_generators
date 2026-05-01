@@ -1,15 +1,48 @@
 #pragma once
 
-/**
- * @file i_signal_generator.hpp
- * @brief Интерфейс генератора сигналов (Strategy pattern)
- *
- * Каждый генератор (CW, LFM, Noise) реализует этот интерфейс.
- * Поддерживает генерацию на CPU (reference) и GPU (production).
- *
- * @author Кодо (AI Assistant)
- * @date 2026-02-13
- */
+// ============================================================================
+// ISignalGenerator — интерфейс генератора сигналов (Strategy)
+//
+// ЧТО:    Pure-virtual интерфейс из 3 методов: GenerateToCpu (reference) /
+//         GenerateToGpu (production) / Kind(). Реализуют все генераторы
+//         модуля — CwGenerator, LfmGenerator, NoiseGenerator. Через
+//         ISignalGenerator* SignalService и Python-биндинги работают со
+//         всеми типами сигналов одинаково.
+//
+// ЗАЧЕМ:  Без общего интерфейса фасад / тесты / биндинги дублировали бы
+//         диспетчеризацию по SignalKind. Через ISignalGenerator caller
+//         делает просто `gen->GenerateToGpu(system, beam_count)` — фабрика
+//         (SignalGeneratorFactory) сама выбрала конкретную стратегию.
+//         Парный CPU-метод даёт reference для сверки GPU-результата.
+//
+// ПОЧЕМУ: - Strategy (GoF): новый сигнал = новый класс, без правок фасада
+//           (OCP). Альтернатива (switch по SignalKind) ломает OCP.
+//         - GenerateToCpu и GenerateToGpu обе в интерфейсе → каждый
+//           генератор обязан иметь reference (LSP не нарушается, тесты
+//           гарантированы).
+//         - GenerateToGpu возвращает cl_mem (caller владеет, должен сам
+//           clReleaseMemObject) — не RAII-обёртка, потому что результат
+//           передаётся в чужой pipeline (fft_func, radar) который сам
+//           решает срок жизни.
+//         - Kind() для introspection в Python-биндингах и логах.
+//
+// Использование:
+//   class MyGen : public ISignalGenerator {
+//     void GenerateToCpu(const SystemSampling& sys, std::complex<float>* out,
+//                        size_t out_size) override { ... }
+//     cl_mem GenerateToGpu(const SystemSampling& sys, size_t beam_count) override { ... }
+//     SignalKind Kind() const override { return SignalKind::CW; }
+//   };
+//
+//   auto gen = SignalGeneratorFactory::CreateCw(backend, params);
+//   cl_mem gpu_buf = gen->GenerateToGpu({1000.0, 4096}, 8);
+//   // ... передать в pipeline ...
+//   clReleaseMemObject(gpu_buf);
+//
+// История:
+//   - Создан:  2026-02-13
+//   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
+// ============================================================================
 
 #include <signal_generators/params/signal_request.hpp>
 #include <CL/cl.h>
@@ -21,12 +54,13 @@ namespace signal_gen {
 
 /**
  * @class ISignalGenerator
- * @brief Абстрактный интерфейс генератора сигналов
+ * @brief Pure-virtual контракт всех генераторов сигналов (Strategy).
  *
- * Реализации:
- * - CwGenerator  — синусоида (CW)
- * - LfmGenerator — линейная ЧМ (chirp)
- * - NoiseGenerator — шум (Gaussian / White)
+ * @note Pure interface — нельзя инстанцировать. Все методы обязательны.
+ * @note GenerateToGpu возвращает cl_mem с переданным владением: caller
+ *       обязан clReleaseMemObject.
+ * @see SignalGeneratorFactory
+ * @see SignalService
  */
 class ISignalGenerator {
 public:

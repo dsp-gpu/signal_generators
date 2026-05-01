@@ -1,18 +1,33 @@
 #pragma once
 
-/**
- * @file lfm_generator_analytical_delay_rocm.hpp
- * @brief ROCm LFM generator with analytical per-antenna delay
- *
- * s(t) = A * exp(j * [pi*mu*(t-tau)^2 + 2*pi*f_start*(t-tau)])
- * where tau = delay_us[antenna] * 1e-6 (microseconds → seconds)
- * output = 0 when t < tau (signal hasn't arrived yet)
- *
- * Ref03: GpuContext for compilation. Kernel: generate_lfm_analytical_delay.
- *
- * @author Kodo (AI Assistant)
- * @date 2026-03-22
- */
+// ============================================================================
+// LfmGeneratorAnalyticalDelayROCm — LFM chirp с аналитической задержкой (ROCm)
+//
+// ЧТО:    ROCm/HIP-порт LfmGeneratorAnalyticalDelay. Та же формула:
+//           s(t) = A · exp(j·(π·μ·(t−τ)² + 2π·f_start·(t−τ))),
+//         где τ = delay_us[antenna] · 1e-6 (мкс → с), output = 0 при t < τ.
+//         Kernel: generate_lfm_analytical_delay; компиляция через GpuContext.
+//
+// ЗАЧЕМ:  Эталон «идеальной» fractional-delay для тестирования LchFarrow
+//         на ROCm-стеке (правило 09-rocm-only). Production-вариант для
+//         multi-antenna симуляции в radar-pipeline на Linux + AMD.
+//
+// ПОЧЕМУ: - GpuContext (Ref03 Layer 1) → KernelCacheService один раз
+//           компилирует HIP module, дальше hot-path без overhead.
+//         - Move-only с default — GpuContext сам обрабатывает RAII.
+//         - Stub-секция #else (Windows без ROCm) — все методы throw, чтобы
+//           Python-биндинги собирались кросс-платформенно.
+//
+// Использование:
+//   signal_gen::LfmGeneratorAnalyticalDelayROCm gen(rocm_backend, lfm_params);
+//   gen.SetSampling(system);
+//   gen.SetDelays({0.0f, 0.27f, 0.54f});  // микросекунды
+//   auto out = gen.GenerateToGpu();
+//   // out.data — void* (HIP device pointer); caller вызывает hipFree.
+//
+// История:
+//   - Создан: 2026-03-22 (порт OpenCL-варианта на ROCm для main-ветки)
+// ============================================================================
 
 #if ENABLE_ROCM
 
@@ -32,6 +47,16 @@ namespace signal_gen {
 
 using ROCmProfEvents = std::vector<std::pair<const char*, drv_gpu_lib::ROCmProfilingData>>;
 
+/**
+ * @class LfmGeneratorAnalyticalDelayROCm
+ * @brief ROCm/HIP LFM-генератор с аналитической per-antenna задержкой.
+ *
+ * @note Move-only: GPU-ресурсы (GpuContext, hipModule) уникальны.
+ * @note Требует #if ENABLE_ROCM. На Windows — stub (все методы throw).
+ * @note API совместим с LfmGeneratorAnalyticalDelay (OpenCL).
+ * @see signal_gen::LfmGeneratorAnalyticalDelay (legacy OpenCL)
+ * @see drv_gpu_lib::GpuContext (Layer 1 Ref03)
+ */
 class LfmGeneratorAnalyticalDelayROCm {
 public:
   LfmGeneratorAnalyticalDelayROCm(drv_gpu_lib::IBackend* backend,

@@ -1,19 +1,33 @@
 #pragma once
 
-/**
- * @file lfm_generator_rocm.hpp
- * @brief LfmGeneratorROCm — LFM (chirp) signal generator (ROCm/HIP)
- *
- * ROCm port of LfmGenerator (OpenCL). Same algorithm, HIP runtime.
- * Uses Ref03 GpuContext for kernel compilation.
- *
- * s(t) = amplitude * exp(j * (pi * chirp_rate * t^2 + 2*pi*f_start*t))
- *
- * Compiles ONLY with ENABLE_ROCM=1 (Linux + AMD GPU).
- *
- * @author Kodo (AI Assistant)
- * @date 2026-03-14
- */
+// ============================================================================
+// LfmGeneratorROCm — генератор LFM chirp (ROCm/HIP)
+//
+// ЧТО:    ROCm-порт LfmGenerator. Та же формула chirp:
+//         s(t) = A · exp(j·(π·k·t² + 2π·f_start·t)),
+//         но через HIP runtime + GpuContext (Ref03 Layer 1) — hipModule,
+//         hipStream, void* device pointers. Возвращает InputData<void*>.
+//
+// ЗАЧЕМ:  Main-ветка DSP-GPU работает на Linux + AMD + ROCm 7.2+ (правило
+//         09-rocm-only). LfmGenerator (OpenCL) — legacy nvidia, не работает
+//         на RDNA4. LfmGeneratorROCm — production-вариант для радара.
+//
+// ПОЧЕМУ: - GpuContext + KernelCacheService → hipModuleLoad один раз,
+//           дальше hot-path без overhead перекомпиляции.
+//         - kBlockSize=256 — оптимум для warp=64 на RDNA4 (правило 13).
+//         - Stub-секция #else (Windows без ROCm) — все методы throw, чтобы
+//           Python-биндинги собирались кросс-платформенно (одна сборка).
+//         - ROCmProfEvents — лист пар (имя, ROCmProfilingData), nullptr →
+//           production без overhead, &vec → benchmark с замерами hipEvent.
+//
+// Использование:
+//   signal_gen::LfmGeneratorROCm gen(rocm_backend);
+//   auto out = gen.GenerateToGpu(system, lfm_params, beam_count);
+//   // out.data — void* (HIP device pointer); caller вызывает hipFree.
+//
+// История:
+//   - Создан: 2026-03-14 (порт OpenCL-варианта на ROCm для main-ветки)
+// ============================================================================
 
 #if ENABLE_ROCM
 
@@ -32,6 +46,16 @@ namespace signal_gen {
 
 using ROCmProfEvents = std::vector<std::pair<const char*, drv_gpu_lib::ROCmProfilingData>>;
 
+/**
+ * @class LfmGeneratorROCm
+ * @brief ROCm/HIP-генератор LFM chirp с multi-beam.
+ *
+ * @note Move-only: GPU-ресурсы (GpuContext, hipModule) уникальны.
+ * @note Требует #if ENABLE_ROCM. На Windows — stub (все методы throw).
+ * @note API совместим с LfmGenerator для прозрачной замены backend'а.
+ * @see signal_gen::LfmGenerator (legacy OpenCL)
+ * @see drv_gpu_lib::GpuContext (Layer 1 Ref03)
+ */
 class LfmGeneratorROCm {
 public:
   explicit LfmGeneratorROCm(drv_gpu_lib::IBackend* backend);

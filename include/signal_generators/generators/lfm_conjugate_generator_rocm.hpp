@@ -1,21 +1,37 @@
 #pragma once
 
-/**
- * @file lfm_conjugate_generator_rocm.hpp
- * @brief LfmConjugateGeneratorROCm — conjugate LFM reference signal (ROCm/HIP)
- *
- * Formula: s_ref*(t) = exp(-j[pi*mu*t^2 + 2*pi*f_start*t])
- * where mu = (f_end - f_start) / T, T = num_samples / sample_rate
- *
- * Used by HeterodyneDechirp as reference for dechirp processing:
- *   s_dc = s_rx(t) * s_ref*(t)  →  tone at f_beat = mu*tau
- *
- * Ref03: GpuContext for kernel compilation.
- * Kernel: generate_lfm_conjugate (in lfm_kernels_rocm.hpp)
- *
- * @author Kodo (AI Assistant)
- * @date 2026-03-22
- */
+// ============================================================================
+// LfmConjugateGeneratorROCm — комплексно-сопряжённый LFM (ROCm/HIP)
+//
+// ЧТО:    ROCm/HIP-порт LfmConjugateGenerator. Та же формула:
+//           s_ref*(t) = exp(−j·(π·μ·t² + 2π·f_start·t)),
+//         где μ = (f_end − f_start)/T, T = num_samples / sample_rate.
+//         Kernel: generate_lfm_conjugate (lfm_kernels_rocm.hpp);
+//         компиляция через GpuContext (Ref03 Layer 1).
+//
+// ЗАЧЕМ:  HeterodyneDechirp использует этот сигнал как reference для
+//           s_dc = s_rx(t) · s_ref*(t)  →  тон на f_beat = μ·τ.
+//         Это ключевой шаг pulse compression в FMCW-радарах. На main-ветке
+//         (Linux + AMD + ROCm 7.2+, правило 09-rocm-only) OpenCL не работает,
+//         поэтому ROCm-вариант обязателен для production.
+//
+// ПОЧЕМУ: - GpuContext + KernelCacheService → hipModule компилируется один
+//           раз, дальше hot-path без overhead.
+//         - kBlockSize=256 — оптимум для warp=64 на RDNA4 (правило 13).
+//         - Move-only с default — GpuContext сам обрабатывает RAII.
+//         - Stub-секция #else (Windows без ROCm) — все методы throw, чтобы
+//           Python-биндинги собирались кросс-платформенно.
+//
+// Использование:
+//   signal_gen::LfmConjugateGeneratorROCm gen(rocm_backend, lfm_params);
+//   gen.SetSampling(system);
+//   void* ref = gen.GenerateToGpu();
+//   // ... передать в HeterodyneDechirp ...
+//   hipFree(ref);
+//
+// История:
+//   - Создан: 2026-03-22 (порт OpenCL-варианта на ROCm для main-ветки)
+// ============================================================================
 
 #if ENABLE_ROCM
 
@@ -31,6 +47,16 @@
 
 namespace signal_gen {
 
+/**
+ * @class LfmConjugateGeneratorROCm
+ * @brief ROCm/HIP conjugate-LFM генератор для dechirp-обработки.
+ *
+ * @note Move-only: GPU-ресурсы (GpuContext, hipModule) уникальны.
+ * @note Требует #if ENABLE_ROCM. На Windows — stub (все методы throw).
+ * @note API совместим с LfmConjugateGenerator (OpenCL).
+ * @see signal_gen::LfmConjugateGenerator (legacy OpenCL)
+ * @see drv_gpu_lib::GpuContext (Layer 1 Ref03)
+ */
 class LfmConjugateGeneratorROCm {
 public:
   explicit LfmConjugateGeneratorROCm(drv_gpu_lib::IBackend* backend,

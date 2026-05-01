@@ -1,20 +1,35 @@
 #pragma once
 
-/**
- * @file cw_generator.hpp
- * @brief CW (Continuous Wave) генератор — синусоида на GPU/CPU
- *
- * Генерирует: s(t) = A * exp(j * (2*pi*f*t + phase))
- * Для multi-beam: freq_i = f0 + i * freq_step
- *
- * Мигрировано из test_signal_generator.hpp + расширено:
- * - IBackend* вместо raw cl_context/queue
- * - Configurable amplitude, phase, freq_step
- * - CPU reference implementation
- *
- * @author Кодо (AI Assistant)
- * @date 2026-02-13
- */
+// ============================================================================
+// CwGenerator — генератор Continuous Wave (комплексной синусоиды) на OpenCL
+//
+// ЧТО:    Генератор простейшего тонового сигнала s(t) = A·exp(j·(2π·f·t + φ))
+//         на GPU и CPU. Для multi-beam режима частоты разнесены: f_i = f0 +
+//         i·freq_step. Реализует общий интерфейс ISignalGenerator (CW kind).
+//
+// ЗАЧЕМ:  CW — опорный сигнал для тестов FFT, оконных функций, beamforming'а
+//         и калибровки тракта. Без чистой синусоиды нечем верифицировать
+//         spectrum-модуль (один пик в спектре = один частотный bin).
+//         Multi-beam позволяет одновременно генерировать набор тонов для
+//         тестов нескольких лучей в radar-pipeline.
+//
+// ПОЧЕМУ: - Это OpenCL-вариант (legacy nvidia-ветка) под `#if !ENABLE_ROCM`
+//           неявным образом — файл не имеет guard'а, но используется только
+//           когда ROCm отключён. ROCm-вариант: CwGeneratorROCm.
+//         - Move-only: cl_context/queue/program уникальны на инстанс,
+//           копирование = double-release GPU-ресурсов.
+//         - backend не владеет (raw указатель) — DrvGPU создан выше по стеку
+//           и переживает генератор.
+//         - CPU-реализация GenerateToCpu — для эталона / unit-тестов без GPU.
+//
+// Использование:
+//   signal_gen::CwGenerator gen(backend, CwParams{.f0=1e6, .amplitude=1.0});
+//   auto out = gen.GenerateToGpu(system, beam_count);
+//   // out — cl_mem с сигналом, caller вызывает clReleaseMemObject(out).
+//
+// История:
+//   - Создан: 2026-02-13 (legacy OpenCL-ветка)
+// ============================================================================
 
 #include <signal_generators/i_signal_generator.hpp>
 #include <core/interface/i_backend.hpp>
@@ -27,6 +42,16 @@
 
 namespace signal_gen {
 
+/**
+ * @class CwGenerator
+ * @brief OpenCL-генератор CW (комплексной синусоиды) с поддержкой multi-beam.
+ *
+ * @note Move-only: GPU-ресурсы (cl_program/queue/context) уникальны на инстанс.
+ * @note backend не владеет — caller гарантирует переживание генератора.
+ * @note Доступен только в OpenCL-сборке. ROCm-вариант: CwGeneratorROCm.
+ * @see signal_gen::CwGeneratorROCm
+ * @see signal_gen::ISignalGenerator
+ */
 class CwGenerator : public ISignalGenerator {
 public:
     /// Тип для сбора OpenCL событий профилирования (имя → cl_event)

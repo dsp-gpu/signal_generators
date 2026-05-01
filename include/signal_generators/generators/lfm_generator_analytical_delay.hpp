@@ -1,19 +1,35 @@
 #pragma once
 
-/**
- * @file lfm_generator_analytical_delay.hpp
- * @brief LfmGeneratorAnalyticalDelay - LFM signal with analytical fractional delay
- *
- * Generates LFM (chirp) signal with per-antenna delay by time substitution:
- *   S_delayed(t) = A * exp(j * (pi * k * t_local^2 + 2*pi * f_start * t_local))
- *   where t_local = t - tau, and output = 0 when t < tau.
- *
- * This is the "ideal" delay — no interpolation artifacts.
- * Used as reference for testing LchFarrow and beamforming applications.
- *
- * @author Kodo (AI Assistant)
- * @date 2026-02-18
- */
+// ============================================================================
+// LfmGeneratorAnalyticalDelay — LFM chirp со встроенной аналитической задержкой
+//
+// ЧТО:    LFM с per-antenna задержкой через подстановку времени:
+//           s_delayed(t) = A · exp(j·(π·k·(t−τ)² + 2π·f_start·(t−τ))),
+//         output = 0 при t < τ (сигнал ещё «не пришёл»). Задержка задаётся
+//         вектором delay_us (микросекунды) — по одному значению на антенну.
+//
+// ЗАЧЕМ:  «Идеальная» задержка без интерполяционных артефактов — эталон
+//         для тестов LchFarrow (polyphase fractional resampling) и
+//         beamforming-пайплайнов: можно сравнивать LchFarrow-выход с
+//         математически точным сдвигом. Не требует post-processing через
+//         LchFarrow — задержка вшита в фазу.
+//
+// ПОЧЕМУ: - OpenCL-вариант (legacy). ROCm-вариант: LfmGeneratorAnalyticalDelayROCm.
+//         - Move-only: cl_program/queue/context уникальны.
+//         - backend не владеет — caller гарантирует переживание объекта.
+//         - GenerateToCpu даёт 2D vector [antenna][sample] для удобства
+//           проверки формы сигнала по каждой антенне.
+//
+// Использование:
+//   signal_gen::LfmGeneratorAnalyticalDelay gen(backend, lfm_params);
+//   gen.SetSampling(system);
+//   gen.SetDelays({0.0f, 0.27f, 0.54f});  // микросекунды
+//   auto out = gen.GenerateToGpu();
+//   // out.data — cl_mem [antennas × points]; caller clReleaseMemObject(out.data).
+//
+// История:
+//   - Создан: 2026-02-18 (legacy OpenCL-ветка)
+// ============================================================================
 
 #include <signal_generators/params/signal_request.hpp>
 #include <signal_generators/params/system_sampling.hpp>
@@ -30,7 +46,12 @@ namespace signal_gen {
 
 /**
  * @class LfmGeneratorAnalyticalDelay
- * @brief GPU/CPU LFM generator with analytical per-antenna delay
+ * @brief GPU/CPU LFM-генератор с аналитической per-antenna задержкой.
+ *
+ * @note Move-only: cl_program/queue/context уникальны на инстанс.
+ * @note backend не владеет — caller гарантирует переживание генератора.
+ * @note OpenCL-вариант. ROCm-аналог: LfmGeneratorAnalyticalDelayROCm.
+ * @see signal_gen::LfmGeneratorAnalyticalDelayROCm
  *
  * @code
  * LfmGeneratorAnalyticalDelay gen(backend);

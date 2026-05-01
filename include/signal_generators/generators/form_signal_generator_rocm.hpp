@@ -1,31 +1,36 @@
 #pragma once
 
-/**
- * @file form_signal_generator_rocm.hpp
- * @brief FormSignalGeneratorROCm - multi-channel getX signal generator (ROCm/HIP)
- *
- * ROCm port of FormSignalGenerator (OpenCL). Same algorithm, HIP runtime:
- * - hiprtc for kernel compilation
- * - void* device pointers instead of cl_mem
- * - hipStream_t instead of cl_command_queue
- *
- * Compiles ONLY with ENABLE_ROCM=1 (Linux + AMD GPU).
- *
- * Usage:
- * @code
- * FormSignalGeneratorROCm gen(rocm_backend);
- * gen.SetParams(params);
- *
- * auto result = gen.GenerateInputData();
- * // result.data is void* (HIP device pointer), caller must hipFree()
- *
- * auto cpu_data = gen.GenerateToCpu();
- * // cpu_data[antenna][sample] = complex<float>
- * @endcode
- *
- * @author Kodo (AI Assistant)
- * @date 2026-02-23
- */
+// ============================================================================
+// FormSignalGeneratorROCm — мультиканальный генератор по формуле getX (ROCm/HIP)
+//
+// ЧТO:    Порт FormSignalGenerator на HIP runtime: тот же алгоритм getX
+//         (CW + ЛЧМ + Philox-шум, один kernel на весь массив antennas×points),
+//         но с hiprtc для компиляции, void* device pointers вместо cl_mem,
+//         hipStream_t вместо cl_command_queue. Использует Ref03 GpuContext.
+//
+// ЗАЧЕМ:  Целевая платформа DSP-GPU — Debian + ROCm 7.2+ (RX 9070, MI100).
+//         OpenCL-ветка legacy; формирование импульса radar-pipeline на
+//         AMD GPU делает этот класс. Один launch → готовый InputData<void*>
+//         для FFTProcessor / SpectrumMaximaFinder без копий.
+//
+// ПОЧЕМУ: - Под `#if ENABLE_ROCM`. На Windows / без ROCm — stub с throw,
+//           чтобы линковка не падала, а вызов давал понятный runtime error.
+//         - Move-only: GpuContext + compiled module уникальны на инстанс.
+//         - kBlockSize = 256 — оптимум warp=64 на RDNA4/CDNA1.
+//         - Шум встроен в kernel (Philox-2x32 + Box-Muller) — одна launch
+//           latency вместо двух (без отдельного NoiseGenerator прохода).
+//         - backend не владеет (raw указатель) — DrvGPU выше по стеку.
+//
+// Использование:
+//   FormSignalGeneratorROCm gen(rocm_backend);
+//   gen.SetParams(params);
+//   auto result = gen.GenerateInputData();
+//   // result.data — void* (HIP device pointer), caller обязан hipFree()
+//   auto cpu_data = gen.GenerateToCpu();   // vector[antenna][sample]
+//
+// История:
+//   - Создан: 2026-02-23
+// ============================================================================
 
 #if ENABLE_ROCM
 
@@ -48,7 +53,16 @@ namespace signal_gen {
 /// Список событий профилирования ROCm (имя стадии + ROCmProfilingData)
 using ROCmProfEvents = std::vector<std::pair<const char*, drv_gpu_lib::ROCmProfilingData>>;
 
-/// @ingroup grp_signal_generators
+/**
+ * @class FormSignalGeneratorROCm
+ * @brief ROCm/HIP-генератор getX (мультиканал, встроенный Philox-шум, ЛЧМ).
+ *
+ * @ingroup grp_signal_generators
+ * @note Move-only: GpuContext + compiled module уникальны на инстанс.
+ * @note Доступен только при ENABLE_ROCM=1. OpenCL-вариант: FormSignalGenerator.
+ * @see signal_gen::FormSignalGenerator
+ * @see signal_gen::DelayedFormSignalGeneratorROCm
+ */
 class FormSignalGeneratorROCm {
 public:
   explicit FormSignalGeneratorROCm(drv_gpu_lib::IBackend* backend);
@@ -76,8 +90,8 @@ public:
   // ════════════════════════════════════════════════════════════════════════
 
   /**
-   * @brief Generate signal on GPU (ROCm)
-   * @return InputData<void*> with generated signal (caller must hipFree result.data)
+   * @brief Генерация сигнала на GPU (ROCm)
+   * @return InputData<void*> с сгенерированным сигналом (caller обязан hipFree result.data)
    */
   drv_gpu_lib::InputData<void*> GenerateInputData();
 
@@ -90,7 +104,7 @@ public:
   drv_gpu_lib::InputData<void*> GenerateInputData(ROCmProfEvents* prof_events);
 
   /**
-   * @brief Generate signal on GPU, read back to CPU
+   * @brief Генерация на GPU с возвратом результата на CPU
    * @return vector[antenna][sample] = complex<float>
    */
   std::vector<std::vector<std::complex<float>>> GenerateToCpu();

@@ -1,20 +1,34 @@
 #pragma once
 
-/**
- * @file cw_generator_rocm.hpp
- * @brief CwGeneratorROCm — CW (sinusoid) signal generator (ROCm/HIP)
- *
- * ROCm port of CwGenerator (OpenCL). Same algorithm, HIP runtime.
- * Uses Ref03 GpuContext for kernel compilation.
- *
- * s(t) = amplitude * exp(j * (2*pi*freq*t + initial_phase))
- * For multi-beam: freq_i = base_freq + beam_id * freq_step
- *
- * Compiles ONLY with ENABLE_ROCM=1 (Linux + AMD GPU).
- *
- * @author Kodo (AI Assistant)
- * @date 2026-03-14
- */
+// ============================================================================
+// CwGeneratorROCm — генератор Continuous Wave (комплексной синусоиды) на ROCm/HIP
+//
+// ЧТО:    Порт CwGenerator на HIP runtime: s(t) = A·exp(j·(2π·f·t + φ)).
+//         Для multi-beam режима частоты разнесены: f_i = f0 + i·freq_step.
+//         Использует Ref03 GpuContext для компиляции ядра через hiprtc.
+//
+// ЗАЧЕМ:  CW — опорный тоновый сигнал для тестов FFT, оконных функций и
+//         beamforming на целевой платформе DSP-GPU (Debian + ROCm 7.2+).
+//         Один пик в спектре = один частотный bin → эталон для проверки
+//         spectrum-модуля и калибровки тракта на AMD GPU.
+//
+// ПОЧЕМУ: - ROCm-вариант под `#if ENABLE_ROCM`. На Windows / без ROCm —
+//           stub с throw std::runtime_error (не падает на этапе линковки).
+//         - Move-only: GpuContext + compiled module уникальны на инстанс,
+//           копирование = double-release HIP-ресурсов.
+//         - kBlockSize = 256 — оптимум для warp=64 RDNA4 (gfx1201).
+//         - backend не владеет (raw указатель) — DrvGPU создан выше по стеку.
+//         - Lazy compile через EnsureCompiled() — первый вызов компилирует
+//           kernel через hiprtc, далее переиспользуется.
+//
+// Использование:
+//   signal_gen::CwGeneratorROCm gen(backend);
+//   auto out = gen.GenerateToGpu(system, params, beam_count);
+//   // out.data — void* HIP device pointer, caller вызывает hipFree(out.data)
+//
+// История:
+//   - Создан: 2026-03-14
+// ============================================================================
 
 #if ENABLE_ROCM
 
@@ -33,24 +47,36 @@ namespace signal_gen {
 
 using ROCmProfEvents = std::vector<std::pair<const char*, drv_gpu_lib::ROCmProfilingData>>;
 
-/// @ingroup grp_signal_generators
+/**
+ * @class CwGeneratorROCm
+ * @brief ROCm/HIP-генератор CW (комплексной синусоиды) с поддержкой multi-beam.
+ *
+ * @ingroup grp_signal_generators
+ * @note Move-only: GpuContext + compiled module уникальны на инстанс.
+ * @note backend не владеет — caller гарантирует переживание генератора.
+ * @note Доступен только при ENABLE_ROCM=1. OpenCL-вариант: CwGenerator.
+ * @see signal_gen::CwGenerator
+ */
 class CwGeneratorROCm {
 public:
   explicit CwGeneratorROCm(drv_gpu_lib::IBackend* backend);
   ~CwGeneratorROCm() = default;
 
+  // Запрет копирования
   CwGeneratorROCm(const CwGeneratorROCm&) = delete;
   CwGeneratorROCm& operator=(const CwGeneratorROCm&) = delete;
+
+  // Перемещение
   CwGeneratorROCm(CwGeneratorROCm&&) noexcept = default;
   CwGeneratorROCm& operator=(CwGeneratorROCm&&) noexcept = default;
 
   /**
-   * @brief Generate CW signal on GPU
-   * @param system Sampling parameters (fs, length)
-   * @param params CW parameters (f0, phase, amplitude, freq_step)
-   * @param beam_count Number of beams
-   * @param prof_events Optional profiling (nullptr = no overhead)
-   * @return InputData<void*> with GPU signal (caller must hipFree result.data)
+   * @brief Генерация CW-сигнала на GPU
+   * @param system     Параметры дискретизации (fs, length)
+   * @param params     Параметры CW (f0, phase, amplitude, freq_step)
+   * @param beam_count Количество лучей
+   * @param prof_events nullptr → production (zero overhead); &vec → benchmark
+   * @return InputData<void*> с GPU-сигналом (caller обязан hipFree result.data)
    */
   drv_gpu_lib::InputData<void*> GenerateToGpu(
       const SystemSampling& system,
@@ -58,7 +84,7 @@ public:
       uint32_t beam_count,
       ROCmProfEvents* prof_events = nullptr);
 
-  /// CPU reference implementation
+  /// CPU-эталон (для unit-тестов и сравнения с GPU)
   std::vector<std::complex<float>> GenerateToCpu(
       const SystemSampling& system,
       const CwParams& params,

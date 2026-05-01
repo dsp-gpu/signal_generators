@@ -1,12 +1,51 @@
 #pragma once
 
-/**
- * @file signal_generator_factory.hpp
- * @brief Фабрика генераторов сигналов (Factory pattern)
- *
- * @author Кодо (AI Assistant)
- * @date 2026-02-13
- */
+// ============================================================================
+// SignalGeneratorFactory — Factory Method для генераторов сигналов
+//
+// ЧТО:    Статическая фабрика, создающая конкретные генераторы:
+//         - CreateCw / CreateLfm / CreateNoise — возвращают
+//           unique_ptr<ISignalGenerator> по соответствующему *Params;
+//         - CreateForm[ROCm] / CreateFormScript — возвращают конкретные
+//           типы (FormSignalGenerator[ROCm], FormScriptGenerator), т.к. их
+//           API шире ISignalGenerator (мультиканальный, DSL, on-disk cache);
+//         - Create(SignalRequest) — диспетчер по SignalKind через variant.
+//
+// ЗАЧЕМ:  Caller (SignalService, Python-биндинги, тесты) не должен знать
+//         про конкретные классы и их платформенно-зависимые варианты
+//         (FormSignalGenerator OpenCL vs FormSignalGeneratorROCm). Factory
+//         скрывает выбор реализации через #if ENABLE_ROCM. Без неё каждый
+//         caller плодил бы свой #if — нарушение DRY и риск рассинхрона.
+//
+// ПОЧЕМУ: - Factory Method (GoF) + GRASP Creator: factory знает контекст
+//           (какой backend доступен, какой ctor вызвать).
+//         - Static-only (без состояния) → нет нужды в инстансе фабрики.
+//         - unique_ptr<ISignalGenerator> для CW/LFM/Noise → caller владеет,
+//           RAII освобождает; интерфейс достаточен для всех 3 типов.
+//         - Для Form-генераторов возвращается КОНКРЕТНЫЙ тип: их API
+//           (мультиканал, antenna_count, FormParams) не вписывается в
+//           интерфейс single-beam ISignalGenerator → ISP (узкие интерфейсы).
+//         - #if ENABLE_ROCM ветвление — единственный способ выбрать backend
+//           без runtime-стоимости (платформа фиксирована при компиляции).
+//
+// Использование:
+//   // CW generator через интерфейс:
+//   auto cw = SignalGeneratorFactory::CreateCw(backend, CwParams{.f0 = 1e6});
+//   cl_mem buf = cw->GenerateToGpu({1000.0, 4096}, 8);
+//
+//   // Form generator (ROCm) через конкретный тип:
+//   auto form = SignalGeneratorFactory::CreateFormROCm(
+//       backend, FormParams::ParseFromString("f0=1e6,a=1.0,an=0.1"));
+//   form->GenerateBatch(...);
+//
+//   // Универсально через SignalRequest:
+//   SignalRequest req{SignalKind::LFM, {1e6, 4096}, LfmParams{}};
+//   auto gen = SignalGeneratorFactory::Create(backend, req);
+//
+// История:
+//   - Создан:  2026-02-13
+//   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
+// ============================================================================
 
 #include <signal_generators/i_signal_generator.hpp>
 #include <signal_generators/params/signal_request.hpp>
@@ -26,7 +65,13 @@ namespace signal_gen {
 
 /**
  * @class SignalGeneratorFactory
- * @brief Создаёт генераторы по типу сигнала
+ * @brief Фабрика генераторов сигналов (CW / LFM / Noise / Form / FormScript).
+ *
+ * @note Static-only: инстансы не создаются.
+ * @note Для CW/LFM/Noise возвращает unique_ptr<ISignalGenerator>; для Form-
+ *       вариантов — конкретные типы (их API шире интерфейса).
+ * @see ISignalGenerator
+ * @see SignalRequest
  */
 class SignalGeneratorFactory {
 public:

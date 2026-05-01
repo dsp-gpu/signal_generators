@@ -1,20 +1,35 @@
 #pragma once
 
-/**
- * @file lfm_conjugate_generator.hpp
- * @brief Conjugate LFM generator: conj(s_tx) at tau=0
- *
- * Formula: s_ref*(t) = exp(-j[pi*mu*t^2 + 2*pi*f_start*t])
- * where mu = (f_end - f_start) / T = B/T
- *
- * Used as reference signal for dechirp processing:
- *   s_dc = s_rx(t) * s_ref*(t)   // result = tone at f_beat = mu*tau
- *
- * Analog of LfmGeneratorAnalyticalDelay but (1) always delay=0, (2) conjugate
- *
- * @author Kodo (AI Assistant)
- * @date 2026-02-21
- */
+// ============================================================================
+// LfmConjugateGenerator — комплексно-сопряжённый LFM (reference для dechirp)
+//
+// ЧТО:    Генерирует s_ref*(t) = exp(−j·(π·μ·t² + 2π·f_start·t)), где
+//         μ = (f_end − f_start)/T. Это комплексно-сопряжённая копия LFM
+//         при τ = 0. Производит один сигнал длиной system.length (без
+//         multi-beam, без задержек).
+//
+// ЗАЧЕМ:  Опорный сигнал для dechirp-обработки (matched filter):
+//           s_dc = s_rx(t) · s_ref*(t)  →  тон на f_beat = μ·τ.
+//         После FFT каждый принятый эхо-сигнал даёт пик на частоте,
+//         пропорциональной задержке (= дальности цели). Без conjugate
+//         не получится pulse compression.
+//
+// ПОЧЕМУ: - OpenCL-вариант (legacy). ROCm-вариант: LfmConjugateGeneratorROCm.
+//         - Move-only: cl_program/queue/context уникальны.
+//         - backend не владеет — caller гарантирует переживание объекта.
+//         - Аналог LfmGeneratorAnalyticalDelay, но (1) τ всегда 0,
+//           (2) знак фазы инвертирован.
+//
+// Использование:
+//   signal_gen::LfmConjugateGenerator gen(backend, lfm_params);
+//   gen.SetSampling(system);
+//   cl_mem ref = gen.GenerateToGpu();
+//   // ... использовать в dechirp pipeline ...
+//   clReleaseMemObject(ref);
+//
+// История:
+//   - Создан: 2026-02-21 (legacy OpenCL-ветка)
+// ============================================================================
 
 #include <signal_generators/params/signal_request.hpp>
 #include <signal_generators/params/system_sampling.hpp>
@@ -30,7 +45,13 @@ namespace signal_gen {
 
 /**
  * @class LfmConjugateGenerator
- * @brief GPU/CPU conjugate LFM generator for dechirp reference
+ * @brief GPU/CPU conjugate-LFM генератор — reference для dechirp.
+ *
+ * @note Move-only: cl_program/queue/context уникальны на инстанс.
+ * @note backend не владеет — caller гарантирует переживание генератора.
+ * @note OpenCL-вариант. ROCm-аналог: LfmConjugateGeneratorROCm.
+ * @see signal_gen::LfmConjugateGeneratorROCm
+ * @see HeterodyneDechirp (radar/heterodyne)
  *
  * @code
  * LfmConjugateGenerator gen(backend, lfm_params);

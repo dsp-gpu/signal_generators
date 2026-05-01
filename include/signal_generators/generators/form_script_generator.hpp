@@ -1,19 +1,45 @@
 #pragma once
 
-/**
- * @file form_script_generator.hpp
- * @brief FormScriptGenerator — DSL-генератор сигналов с on-disk кэшем кернелов
- *
- * Генерирует OpenCL kernel из FormParams с поддержкой:
- * - DSL-представление (human-readable скрипт)
- * - Параметры как #define → оптимизация компилятором OpenCL
- * - On-disk кэш: сохранение .cl source + binary по имени
- * - Версионирование: коллизии → _00, _01, ...
- * - manifest.json: индекс кернелов с комментариями
- *
- * @author Кодо (AI Assistant)
- * @date 2026-02-17
- */
+// ============================================================================
+// FormScriptGenerator — DSL-генератор сигналов с on-disk кэшем kernels (OpenCL)
+//
+// ЧТО:    Расширение FormSignalGenerator: преобразует FormParams в DSL-скрипт
+//         (читаемый текстовый сегментный формат), генерирует OpenCL kernel
+//         source с параметрами как #define, компилирует и кэширует на диск
+//         (.cl source + .bin binary). manifest.json — индекс кернелов с
+//         комментариями. Версионирование коллизий: name → name_00, name_01.
+//
+// ЗАЧЕМ:  Прогрев pipeline и воспроизводимость экспериментов: один раз
+//         собрали kernel под конкретные FormParams (CW + LFM сегменты,
+//         модуляции, паузы из script.json), сохранили на диск с
+//         осмысленным именем — далее любой запуск вытаскивает binary
+//         минуя hiprtc/clBuildProgram. Параметры как #define → компилятор
+//         constant-folding'ит → быстрее runtime-параметров через kernel args.
+//
+// ПОЧЕМУ: - Только OpenCL-вариант (нет ENABLE_ROCM guard'а — файл не
+//           собирается в ROCm-сборке через CMake). ROCm-аналог:
+//           FormScriptGeneratorROCm (упрощённый, без on-disk binary cache).
+//         - Move-only: cl_program/queue/context уникальны на инстанс.
+//         - On-disk cache делегирован сервису core::KernelCacheService —
+//           один источник правды для всех модулей (SRP).
+//         - Два режима: SetParams→Compile→Generate ИЛИ LoadKernel→Generate.
+//         - manifest.json — отдельная запись KernelManifestEntry с
+//           комментарием, датой, params_string и backend ("opencl"/"rocm").
+//
+// Использование:
+//   FormScriptGenerator gen(backend);
+//   FormParams p; p.f0=1e6; p.antennas=8; p.points=4096;
+//   gen.SetParams(p); gen.Compile();
+//   auto input = gen.GenerateInputData();          // InputData<cl_mem>
+//   gen.SaveKernel("my_signal", "CW 1MHz 8ch");    // .cl + .bin + manifest
+//
+//   // Повторный запуск — без recompile:
+//   gen.LoadKernel("my_signal");
+//   auto input2 = gen.GenerateInputData();
+//
+// История:
+//   - Создан: 2026-02-17
+// ============================================================================
 
 #include <signal_generators/params/form_params.hpp>
 #include <core/interface/i_backend.hpp>
@@ -44,30 +70,12 @@ struct KernelManifestEntry {
 
 /**
  * @class FormScriptGenerator
- * @brief DSL-генератор + on-disk кэш кернелов для формулы getX
+ * @brief DSL-генератор + on-disk кэш OpenCL kernels для формулы getX.
  *
- * Два режима работы:
- * 1. **Из параметров**: SetParams() → Compile() → Generate()
- * 2. **Из кэша**: LoadKernel(name) → Generate()
- *
- * @code
- * FormScriptGenerator gen(backend);
- *
- * // Режим 1: из параметров
- * FormParams p;
- * p.f0 = 1e6; p.antennas = 8; p.points = 4096;
- * gen.SetParams(p);
- * gen.Compile();
- * auto input = gen.GenerateInputData();
- * gen.SaveKernel("my_signal", "CW 1MHz 8ch");
- *
- * // Режим 2: из кэша
- * gen.LoadKernel("my_signal");
- * auto input2 = gen.GenerateInputData();
- *
- * // DSL текст (для просмотра)
- * std::cout << gen.GenerateScript() << std::endl;
- * @endcode
+ * @note Move-only: GPU-ресурсы (cl_program/queue/context) уникальны на инстанс.
+ * @note Только OpenCL. ROCm-аналог: FormScriptGeneratorROCm.
+ * @see signal_gen::FormScriptGeneratorROCm
+ * @see signal_gen::FormSignalGenerator
  */
 class FormScriptGenerator {
 public:

@@ -1,16 +1,20 @@
 #pragma once
 
 /**
- * @file prof_utils.hpp
- * @brief CollectOrRelease — общая утилита профилирования OpenCL событий
+ * @brief CollectOrRelease — header-only утилита для профилирования OpenCL событий.
  *
- * Используется во всех генераторах модуля signal_generators.
- * Предотвращает дублирование кода в каждом .cpp файле.
+ * @note Тип B (technical header): один inline-template в namespace signal_gen.
+ *       Поведение:
+ *         - prof_events == nullptr → production-путь: clReleaseEvent(ev)
+ *         - prof_events != nullptr → сохранить пару (name, ev) для отчёта
+ *       Правило: вызывать ПОСЛЕ того как event использован как wait-dependency
+ *       следующего kernel'а — иначе release освободит event до использования.
+ *       Используется во всех cpp-генераторах модуля (CW/LFM/Noise/Form) для
+ *       устранения копипасты «if profiling … else release».
  *
- * Правило: вызывать ПОСЛЕ того как event использован как wait-dependency.
- *
- * @author Кодо (AI Assistant)
- * @date 2026-03-09
+ * История:
+ *   - Создан:  2026-03-09
+ *   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
  */
 
 #include <CL/cl.h>

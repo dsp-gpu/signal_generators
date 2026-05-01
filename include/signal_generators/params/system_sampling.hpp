@@ -1,11 +1,15 @@
 #pragma once
 
 /**
- * @file system_sampling.hpp
- * @brief Системные параметры дискретизации
+ * @brief POD-структура системных параметров дискретизации сигнала.
  *
- * @author Кодо (AI Assistant)
- * @date 2026-02-13
+ * @note Тип B (simple struct): только данные, без поведения / валидации.
+ *       Общая для всех генераторов модуля (CW / LFM / Noise) — задаёт fs и length.
+ *       Передаётся по значению в ISignalGenerator::GenerateToCpu / GenerateToGpu.
+ *
+ * История:
+ *   - Создан:  2026-02-13
+ *   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
  */
 
 #include <cstddef>
@@ -13,7 +17,8 @@
 namespace signal_gen {
 
 /**
- * @brief Параметры дискретизации — общие для всех генераторов
+ * @struct SystemSampling
+ * @brief Параметры дискретизации — общие для всех генераторов.
  */
 struct SystemSampling {
     double fs = 1000.0;    ///< Частота дискретизации (Hz)

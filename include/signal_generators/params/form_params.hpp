@@ -1,18 +1,45 @@
 #pragma once
 
-/**
- * @file form_params.hpp
- * @brief FormParams — параметры мультиканального генератора сигналов (getX)
- *
- * Формула: X = a*norm*exp(j*(2pi*f0*t + pi*fdev/ti*((t-ti/2)^2) + phi))
- *            + an*norm*(randn + j*randn)
- * Окно: X=0 при t<0 или t>ti-dt
- *
- * Парсер из строки: "f0=1e6,a=1.0,an=0.1,tau=0.001"
- *
- * @author Кодо (AI Assistant)
- * @date 2026-02-17
- */
+// ============================================================================
+// FormParams + TauMode — параметры мультиканального генератора FormSignal
+//
+// ЧТО:    POD-структура с 18+ полями (sampling / signal / noise / per-channel
+//         delay / freq range) для FormSignalGenerator(ROCm). Включает:
+//         - enum TauMode (FIXED / LINEAR / RANDOM) — режим per-channel задержки;
+//         - GetTauMode() — авто-детект режима по заполненным полям;
+//         - GetDuration() / GetDt() — производные от fs/points;
+//         - ParseFromString("f0=1e6,a=1.0,an=0.1,tau=0.001") — парсер из DSL,
+//           поддерживает 17 ключей, кидает std::invalid_argument при ошибке.
+//
+// ЗАЧЕМ:  FormSignal — самый сложный сигнал в модуле (chirp + Gaussian noise
+//         + per-channel tau с тремя режимами). Передавать 18 параметров через
+//         ctor нечитаемо. Структура с дефолтами + DSL-парсер позволяют:
+//         - задавать только нужные поля (остальное — дефолты);
+//         - конфигурировать из Python через строку;
+//         - сравнивать наборы параметров для кеширования (operator== не
+//           нужен — кеш живёт через SignalService).
+//
+// ПОЧЕМУ: - POD + helpers (не методы full-fledged класса) — данные открыты
+//           для прямого доступа из kernel-launcher'а, не плодим getter'ы.
+//         - GetTauMode() возвращает enum (не bool flags) → kernel получает
+//           одно число tau_mode ∈ {0,1,2}, ветвится без switch.
+//         - ParseFromString static — fail-fast (бросает на неизвестном ключе),
+//           caller сразу видит опечатку.
+//         - norm = 1/√2 по умолчанию → нормализация мощности сигнала I/Q.
+//
+// Использование:
+//   // Из Python через DSL:
+//   auto params = FormParams::ParseFromString("f0=1e6,a=1.0,fdev=2e6,an=0.1");
+//
+//   // Прямо в C++:
+//   FormParams p;
+//   p.f0 = 1e6; p.amplitude = 1.0; p.tau_step = 1e-6;  // LINEAR mode
+//   assert(p.GetTauMode() == TauMode::LINEAR);
+//
+// История:
+//   - Создан:  2026-02-17
+//   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
+// ============================================================================
 
 #include <cstdint>
 #include <cmath>
@@ -38,6 +65,15 @@ enum class TauMode {
 // FormParams
 // ════════════════════════════════════════════════════════════════════════════
 
+/**
+ * @struct FormParams
+ * @brief Параметры мультиканального FormSignal-генератора (chirp + noise + tau).
+ *
+ * @note Aggregate-инициализация работает (все поля public, без user-defined ctor).
+ * @note ParseFromString — единственная точка валидации синтаксиса DSL-строки.
+ * @see TauMode
+ * @see SignalRequest
+ */
 struct FormParams {
   // --- Sampling ---
   double fs = 12e6;             ///< Частота дискретизации (Hz)

@@ -1,20 +1,38 @@
 #pragma once
 
-/**
- * @file script_generator_rocm.hpp
- * @brief ScriptGeneratorROCm — text DSL → HIP kernel via GpuContext (disk cache!)
- *
- * ROCm port of ScriptGenerator. Same DSL format:
- *   [Params] ANTENNAS, POINTS
- *   [Defs]   per-antenna variables
- *   [Signal] formula using ID, T, defs
- *
- * Compiles DSL → HIP C++ kernel source → GpuContext::CompileModule
- * → disk cache (clean-slate v2, keyed by CompileKey).
- *
- * @author Kodo (AI Assistant)
- * @date 2026-03-22  (revised 2026-04-22 for kernel_cache_v2)
- */
+// ============================================================================
+// ScriptGeneratorROCm — компилятор DSL в HIP kernel через GpuContext (disk cache)
+//
+// ЧТО:    ROCm/HIP-порт ScriptGenerator. Тот же DSL-формат
+//         ([Params]/[Defs]/[Signal]), но трансляция:
+//         DSL → HIP C++ kernel source → GpuContext::CompileModule
+//         → disk cache (kernel_cache_v2, ключ — CompileKey.Hash).
+//
+// ЗАЧЕМ:  Production-вариант runtime-компилируемых сигналов на main-ветке
+//         (Linux + AMD + ROCm 7.2+, правило 09-rocm-only). Главный плюс
+//         перед OpenCL: HSACO-кеш на диске — повторный запуск с тем же
+//         скриптом не перекомпилирует HIP-модуль (минус ~сотни мс старта).
+//
+// ПОЧЕМУ: - GpuContext per-script (не shared!) — CompileModule идемпотентен
+//           один раз на контекст; разные пользовательские скрипты =
+//           разный CompileKey.Hash = разные HSACO-файлы (disk cache работает
+//           через имя файла, без коллизий между скриптами).
+//         - kernel_fn_ кеширует hipFunction_t после CompileModule, чтобы
+//           Generate() не лез в KernelCacheService на каждый вызов.
+//         - Move-only: GpuContext (unique_ptr) + hipStream уникальны.
+//         - Stub-секция #else (Windows без ROCm) — все методы throw.
+//
+// Использование:
+//   signal_gen::ScriptGeneratorROCm gen(rocm_backend);
+//   gen.LoadFile("scripts/my_signal.signal");
+//   void* out = gen.Generate();
+//   // ... использовать ...
+//   hipFree(out);
+//
+// История:
+//   - Создан:    2026-03-22 (порт OpenCL-варианта на ROCm)
+//   - Обновлён:  2026-04-22 (миграция на kernel_cache_v2 / CompileKey.Hash)
+// ============================================================================
 
 #if ENABLE_ROCM
 
@@ -33,6 +51,17 @@ namespace signal_gen {
 struct ScriptParams;   // forward (defined in script_generator.hpp)
 struct ParsedScript;   // forward
 
+/**
+ * @class ScriptGeneratorROCm
+ * @brief ROCm/HIP DSL-генератор с disk-cache HSACO через GpuContext.
+ *
+ * @note Move-only: GpuContext (unique_ptr) и hipStream уникальны.
+ * @note Требует #if ENABLE_ROCM. На Windows — stub (все методы throw).
+ * @note Per-script GpuContext: каждый LoadScript пересоздаёт контекст
+ *       (см. ctx_) — disk cache ключуется CompileKey.Hash.
+ * @see signal_gen::ScriptGenerator (legacy OpenCL)
+ * @see drv_gpu_lib::GpuContext (Layer 1 Ref03)
+ */
 class ScriptGeneratorROCm {
 public:
   explicit ScriptGeneratorROCm(drv_gpu_lib::IBackend* backend);

@@ -1,37 +1,40 @@
 #pragma once
 
-/**
- * @file script_generator.hpp
- * @brief ScriptGenerator - text DSL -> OpenCL kernel compiler
- *
- * Allows defining signal formulas in text format that get compiled
- * into GPU kernels at runtime.
- *
- * Format:
- * @code
- * [Params]
- * ANTENNAS = 256
- * POINTS = 10000
- *
- * [Defs]
- * // Variables that depend on antenna ID
- * var_A = 1.0 + (float)ID * 0.01
- * var_W = 0.1 + (float)ID * 0.0005
- * var_P = (float)ID * 3.14 / 180.0
- *
- * [Signal]
- * // Use 'res' for real output, 'res_re'+'res_im' for complex
- * res = var_A * sin(var_W * (float)T + var_P);
- * @endcode
- *
- * Built-in variables:
- * - ID  : antenna/beam index (0 to ANTENNAS-1)
- * - T   : sample index (0 to POINTS-1)
- * - M_PI_F : pi constant
- *
- * @author Kodo (AI Assistant)
- * @date 2026-02-13
- */
+// ============================================================================
+// ScriptGenerator — компилятор текстового DSL в OpenCL kernel
+//
+// ЧТО:    Парсер мини-языка [Params]/[Defs]/[Signal] в OpenCL kernel:
+//         юзер описывает формулу сигнала текстом, генератор формирует
+//         OpenCL-исходник, компилирует через cl_program и запускает на
+//         GPU. Встроенные переменные: ID (антенна), T (сэмпл), M_PI_F.
+//         Поддерживает реальный (res) и комплексный (res_re/res_im) выход.
+//
+// ЗАЧЕМ:  Гибкая radar-симуляция: набор импульсов произвольной формы
+//         (CW/LFM/паузы/комбинации) задаётся в JSON/text-конфиге, без
+//         перекомпиляции C++. Удобно для исследований, прототипирования
+//         новых сигналов, batch-тестов с разными параметрами от Python.
+//
+// ПОЧЕМУ: - Runtime-компиляция через clBuildProgram — пользовательский
+//           DSL транслируется в OpenCL C на лету.
+//         - Move-only: cl_program/queue/context уникальны на инстанс.
+//         - backend не владеет — caller гарантирует переживание объекта.
+//         - GetKernelSource() — для отладки сгенерированного kernel.
+//         - OpenCL-вариант (legacy). ROCm-вариант: ScriptGeneratorROCm.
+//
+// Использование:
+//   signal_gen::ScriptGenerator gen(backend);
+//   gen.LoadScript(R"(
+//       [Params] ANTENNAS = 8  POINTS = 4096
+//       [Defs]   var_W = 0.1 + (float)ID * 0.005
+//       [Signal] res = sin(var_W * (float)T);
+//   )");
+//   cl_mem out = gen.Generate();
+//   // ... использовать ...
+//   clReleaseMemObject(out);
+//
+// История:
+//   - Создан: 2026-02-13 (legacy OpenCL-ветка)
+// ============================================================================
 
 #include <core/interface/i_backend.hpp>
 #include <CL/cl.h>
@@ -60,9 +63,13 @@ struct ParsedScript {
 
 /**
  * @class ScriptGenerator
- * @brief Compiles text DSL -> OpenCL kernel and executes on GPU
+ * @brief Компилятор текстового DSL в OpenCL kernel с исполнением на GPU.
  *
- * Usage:
+ * @note Move-only: cl_program/queue/context уникальны на инстанс.
+ * @note backend не владеет — caller гарантирует переживание генератора.
+ * @note OpenCL-вариант. ROCm-аналог: ScriptGeneratorROCm.
+ * @see signal_gen::ScriptGeneratorROCm
+ *
  * @code
  * ScriptGenerator gen(backend);
  * gen.LoadScript(R"(

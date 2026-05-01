@@ -1,15 +1,36 @@
 #pragma once
 
-/**
- * @file form_script_generator_rocm.hpp
- * @brief ROCm: FormParams → DSL script → ScriptGeneratorROCm → GPU signal
- *
- * Simplified ROCm port of FormScriptGenerator.
- * Converts FormParams to DSL text, then uses ScriptGeneratorROCm to compile and execute.
- *
- * @author Kodo (AI Assistant)
- * @date 2026-03-22
- */
+// ============================================================================
+// FormScriptGeneratorROCm — ROCm-обёртка: FormParams → DSL → HIP signal
+//
+// ЧТО:    Упрощённый ROCm-порт FormScriptGenerator. Преобразует FormParams
+//         в DSL-текст (BuildScript), затем делегирует компиляцию и запуск
+//         базовому ScriptGeneratorROCm (через hiprtc). Без on-disk binary
+//         cache (в HIP бинарники привязаны к gfx-арке, кэширование делает
+//         сам hiprtc/JIT).
+//
+// ЗАЧЕМ:  Единый API для генерации сигналов из FormParams независимо от
+//         backend'а: тот же FormParams → одинаковый сигнал на OpenCL и
+//         ROCm. Удобно в radar-pipeline и тестах: SetParams → Generate,
+//         не зная деталей платформы.
+//
+// ПОЧЕМУ: - Под `#if ENABLE_ROCM`. На Windows / без ROCm — stub с throw.
+//         - Композиция (не наследование) над ScriptGeneratorROCm: SRP —
+//           этот класс отвечает только за FormParams→DSL, компиляцию и
+//           launch делает базовый класс.
+//         - backend не владеет (raw указатель) — DrvGPU выше по стеку.
+//         - Без on-disk binary cache (ROCm hiprtc сам кэширует JIT).
+//
+// Использование:
+//   FormScriptGeneratorROCm gen(rocm_backend);
+//   gen.SetParams(params);
+//   auto input = gen.GenerateInputData();   // InputData<void*>, hipFree caller
+//   auto cpu_data = gen.GenerateToCpu();
+//   std::string hip_src = gen.GetKernelSource();   // для дебага
+//
+// История:
+//   - Создан: 2026-03-22
+// ============================================================================
 
 #if ENABLE_ROCM
 
@@ -25,6 +46,15 @@
 
 namespace signal_gen {
 
+/**
+ * @class FormScriptGeneratorROCm
+ * @brief Композиция над ScriptGeneratorROCm: FormParams → DSL → HIP-сигнал.
+ *
+ * @ingroup grp_signal_generators
+ * @note Доступен только при ENABLE_ROCM=1. OpenCL-вариант: FormScriptGenerator.
+ * @see signal_gen::FormScriptGenerator
+ * @see signal_gen::ScriptGeneratorROCm
+ */
 class FormScriptGeneratorROCm {
 public:
   explicit FormScriptGeneratorROCm(drv_gpu_lib::IBackend* backend);
@@ -33,21 +63,21 @@ public:
   void SetParams(const FormParams& params);
   void SetParamsFromString(const std::string& params_str);
 
-  /// Generate on GPU → InputData<void*> (caller must hipFree)
+  /// Генерация на GPU → InputData<void*> (caller обязан hipFree)
   drv_gpu_lib::InputData<void*> GenerateInputData();
 
-  /// Generate → read back to CPU
+  /// Генерация на GPU с возвратом результата на CPU
   std::vector<std::vector<std::complex<float>>> GenerateToCpu();
 
   const FormParams& GetParams() const { return params_; }
   uint32_t GetAntennas() const { return params_.antennas; }
   uint32_t GetPoints() const { return params_.points; }
 
-  /// Get generated HIP kernel source (for debugging)
+  /// Сгенерированный HIP kernel source (для отладки)
   const std::string& GetKernelSource() const { return script_gen_.GetKernelSource(); }
 
 private:
-  /// Build DSL script text from FormParams
+  /// Построить текст DSL-скрипта из FormParams
   std::string BuildScript() const;
 
   drv_gpu_lib::IBackend* backend_;

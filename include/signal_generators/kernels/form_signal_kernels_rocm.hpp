@@ -1,18 +1,24 @@
 #pragma once
 
 /**
- * @file form_signal_kernels_rocm.hpp
- * @brief HIP kernel source for FormSignalGenerator (ROCm port)
+ * @brief HIP kernel-source для FormSignalGenerator (chirp + Gaussian noise + per-channel tau).
  *
- * Port of form_signal.cl + prng.cl to HIP.
- * Embedded as raw string for hiprtc compilation.
+ * @note Тип B (technical header): R"HIP(...)HIP" source для hiprtc.
+ *       Формула:
+ *         X = a·norm·exp(j·(2π·f₀·t + π·fdev/ti·((t-ti/2)²) + φ))
+ *           + an·norm·(randn_re + j·randn_im)
+ *         X = 0 если t < 0 или t > ti - dt   (временное окно сигнала)
+ *       Tau-режимы: 0=FIXED, 1=LINEAR (tau_base + ant·tau_step), 2=RANDOM (uniform[min,max]).
+ *       Внутри embedded:
+ *         - float2_t / uint2_t (hiprtc не имеет встроенных float2/uint2)
+ *         - Philox-2x32-10 PRNG (counter-based, воспроизводимый при фикс. seed)
+ *         - Box-Muller: u1, u2 → r=√(-2·ln u1), θ=2π·u2 → Gaussian (re, im)
+ *       2D grid: (points, antennas). __launch_bounds__(256).
+ * @note Порт из form_signal.cl + prng.cl (OpenCL → HIP/ROCm).
  *
- * X = a*norm*exp(j*(2pi*f0*t + pi*fdev/ti*((t-ti/2)^2) + phi))
- *   + an*norm*(randn_re + j*randn_im)
- * X = 0  if t < 0 or t > ti - dt
- *
- * @author Kodo (AI Assistant)
- * @date 2026-02-23
+ * История:
+ *   - Создан:  2026-02-23
+ *   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
  */
 
 namespace signal_gen {

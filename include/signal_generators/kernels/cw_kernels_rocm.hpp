@@ -1,16 +1,20 @@
 #pragma once
 
 /**
- * @file cw_kernels_rocm.hpp
- * @brief HIP kernel source for CW generator (ROCm port of cw_kernel.cl)
+ * @brief HIP kernel-source для CW-генератора (continuous wave).
  *
- * s(t) = amplitude * exp(j * (2*pi*freq*t + initial_phase))
- * For multi-beam: freq_i = base_freq + beam_id * freq_step
+ * @note Тип B (technical header): R"HIP(...)HIP" source для hiprtc.
+ *       Kernels:
+ *         - generate_cw       — комплексный выход s(t) = A·exp(j·(2π·f·t + φ₀))
+ *         - generate_cw_real  — действительный выход s(t) = A·cos(2π·f·t + φ₀), Im=0
+ *       Multi-beam: freq_i = base_freq + beam_id · freq_step.
+ *       2D grid: (n_point ÷ blockDim.x, beam_count). __launch_bounds__(256).
+ *       Используется __sincosf / __cosf — fast-math, погрешность ~2⁻²³.
+ * @note Порт из cw_kernel.cl (OpenCL → HIP/ROCm).
  *
- * Embedded as raw string for hiprtc compilation.
- *
- * @author Kodo (AI Assistant)
- * @date 2026-03-14
+ * История:
+ *   - Создан:  2026-03-14
+ *   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
  */
 
 namespace signal_gen {

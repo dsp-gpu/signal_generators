@@ -1,17 +1,37 @@
 #pragma once
 
-/**
- * @file delayed_form_signal_generator_rocm.hpp
- * @brief ROCm: FormSignalGeneratorROCm + LchFarrowROCm pipeline
- *
- * Pipeline:
- *   1. FormSignalGeneratorROCm → clean signal (GPU)
- *   2. LchFarrowROCm → fractional delay (Lagrange 48x5) per-antenna
- *   3. Noise added through LchFarrowROCm::SetNoise()
- *
- * @author Kodo (AI Assistant)
- * @date 2026-03-22
- */
+// ============================================================================
+// DelayedFormSignalGeneratorROCm — getX + дробная задержка Farrow 48×5 (ROCm)
+//
+// ЧТО:    Композиция: FormSignalGeneratorROCm (чистый сигнал) +
+//         LchFarrowROCm (дробная задержка Lagrange 48×5 per-antenna + шум).
+//         ROCm-аналог DelayedFormSignalGenerator: тот же pipeline, HIP runtime.
+//
+// ЗАЧЕМ:  Эмуляция реального radar-приёма на целевой платформе DSP-GPU
+//         (Debian + ROCm 7.2+, RX 9070 / MI100): разные задержки на
+//         разные антенны (sub-sample точность) для тестов beamforming'а
+//         и калибровки фазового центра.
+//
+// ПОЧЕМУ: - Под `#if ENABLE_ROCM`. На Windows / без ROCm — stub с throw.
+//         - Композиция (не наследование) — SRP: координация здесь,
+//           генерация в FormSignalGeneratorROCm, задержка/шум в LchFarrowROCm.
+//         - Шум через LchFarrowROCm::SetNoise (ПОСЛЕ задержки) — иначе
+//           шум интерполируется и теряет некоррелированность по выборкам.
+//         - delay_us — МИКРОСЕКУНДЫ (контракт API со стороны Python).
+//         - LoadMatrix(json_path) — опциональная загрузка матрицы Lagrange
+//           48×5 из JSON; иначе используется встроенная.
+//         - backend не владеет (raw указатель) — DrvGPU выше по стеку.
+//
+// Использование:
+//   DelayedFormSignalGeneratorROCm gen(rocm_backend);
+//   gen.SetParams(params);
+//   gen.SetDelays({0.0f, 1.5f, 3.0f, /*...*/});   // мкс per-antenna
+//   auto input = gen.GenerateInputData();          // InputData<void*>, hipFree
+//   auto cpu = gen.GenerateToCpu();                // vector[antenna][sample]
+//
+// История:
+//   - Создан: 2026-03-22
+// ============================================================================
 
 #if ENABLE_ROCM
 
@@ -28,6 +48,17 @@
 
 namespace signal_gen {
 
+/**
+ * @class DelayedFormSignalGeneratorROCm
+ * @brief ROCm-композит: FormSignalGeneratorROCm + LchFarrowROCm (delay + noise).
+ *
+ * @ingroup grp_signal_generators
+ * @note Доступен только при ENABLE_ROCM=1. OpenCL-вариант: DelayedFormSignalGenerator.
+ * @note Шум идёт ПОСЛЕ задержки (через LchFarrowROCm::SetNoise), не до.
+ * @see signal_gen::DelayedFormSignalGenerator
+ * @see signal_gen::FormSignalGeneratorROCm
+ * @see lch_farrow::LchFarrowROCm
+ */
 class DelayedFormSignalGeneratorROCm {
 public:
   explicit DelayedFormSignalGeneratorROCm(drv_gpu_lib::IBackend* backend);
@@ -45,10 +76,10 @@ public:
   uint32_t GetPoints() const { return params_.points; }
   const std::vector<float>& GetDelays() const { return lch_farrow_.GetDelays(); }
 
-  /// GPU generate: signal + delay → InputData<void*> (caller must hipFree)
+  /// Генерация на GPU: сигнал + задержка → InputData<void*> (caller обязан hipFree)
   drv_gpu_lib::InputData<void*> GenerateInputData();
 
-  /// CPU generate → vector[antenna][sample]
+  /// Генерация с возвратом на CPU → vector[antenna][sample]
   std::vector<std::vector<std::complex<float>>> GenerateToCpu();
 
 private:

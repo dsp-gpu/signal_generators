@@ -1,15 +1,24 @@
 #pragma once
 
 /**
- * @file lfm_kernels_rocm.hpp
- * @brief HIP kernel source for LFM generator (ROCm port of lfm_kernel.cl)
+ * @brief HIP kernel-source для LFM-генератора (linear frequency modulation, chirp).
  *
- * s(t) = amplitude * exp(j * (pi * chirp_rate * t^2 + 2*pi*f_start*t))
+ * @note Тип B (technical header): R"HIP(...)HIP" source для hiprtc.
+ *       Формула: s(t) = A·exp(j·(π·μ·t² + 2π·f_start·t)), μ = chirp_rate.
+ *       Kernels:
+ *         - generate_lfm                    — комплексный chirp, multi-beam (2D grid)
+ *         - generate_lfm_real               — действительный chirp (Im=0)
+ *         - generate_lfm_conjugate          — s_ref*(t) = exp(-j·(π·μ·t² + 2π·f_start·t)),
+ *                                             эталон для dechirp: s_dc = s_rx · s_ref*
+ *         - generate_lfm_analytical_delay   — аналитическая задержка per-antenna:
+ *                                             s(t) = A·exp(j·φ(t-τ)), output=0 при t<τ.
+ *                                             delay_us — массив [n_ant] в микросекундах.
+ *       2D grid: (n_point, beam_count или n_ant). __launch_bounds__(256).
+ * @note Порт из lfm_kernel.cl (OpenCL → HIP/ROCm).
  *
- * Embedded as raw string for hiprtc compilation.
- *
- * @author Kodo (AI Assistant)
- * @date 2026-03-14
+ * История:
+ *   - Создан:  2026-03-14
+ *   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
  */
 
 namespace signal_gen {
