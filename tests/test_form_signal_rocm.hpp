@@ -1,5 +1,19 @@
 #pragma once
 
+// ============================================================================
+// test_form_signal_rocm — тесты FormSignalGeneratorROCm (ROCm)
+//
+// ЧТО:    6 тестов: no_noise (GPU vs CPU), window (обнуление вне [0,ti-dt]),
+//         multi_channel (8 антенн, TAU_STEP=0.01), noise (mean~0, var~1),
+//         chirp (fdev=5000), gpu_ptr (GenerateInputData через void*).
+// ЗАЧЕМ:  FormSignalGenerator — комплексный генератор (CW+LFM+Noise+Script).
+//         Ошибки в phase accumulator или GPU ptr-round-trip незаметны
+//         до интеграции с heterodyne/radar.
+// ПОЧЕМУ: ENABLE_ROCM обёртка. Эталон — CPU через getX().
+//
+// История: Создан: 2026-04-12
+// ============================================================================
+
 /**
  * @file test_form_signal_rocm.hpp
  * @brief ROCm tests for FormSignalGeneratorROCm

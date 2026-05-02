@@ -1,5 +1,18 @@
 #pragma once
 
+// ============================================================================
+// test_signal_generators_benchmark_rocm — бенчмарк FormSignalGeneratorROCm
+//
+// ЧТО:    Запускает GpuBenchmarkBase-бенчмарк: GenerateInputData()
+//         → Results/Profiler/GPU_00_FormSignalROCm/.
+//         5 прогревочных + 20 замерных прогонов, ProfilingFacade.
+// ЗАЧЕМ:  Измеряет throughput генератора сигналов на GPU.
+//         Результат — в сравнении CPU vs GPU pipeline.
+// ПОЧЕМУ: Нет AMD GPU → [SKIP]. Вывод только через ConsoleOutput.
+//
+// История: Создан: 2026-04-12
+// ============================================================================
+
 /**
  * @file test_signal_generators_benchmark_rocm.hpp
  * @brief Test runner: FormSignalGeneratorROCm benchmark (GpuBenchmarkBase)

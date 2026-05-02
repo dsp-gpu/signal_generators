@@ -1,5 +1,18 @@
 #pragma once
 
+// ============================================================================
+// test_signal_generators_rocm_basic — CW/LFM/Noise/LfmConjugate (ROCm)
+//
+// ЧТО:    5 тестов: cw_gpu_vs_cpu, cw_multi_beam (8 beams),
+//         lfm_gpu_vs_cpu, noise_statistics (mean~0, power~1),
+//         lfm_conjugate (conj(LFM), negative phase check).
+// ЗАЧЕМ:  Базовый sanity для всех генераторов — падение здесь означает
+//         сломан фундамент signal_generators, heterodyne/radar будут врать.
+// ПОЧЕМУ: GPU vs CPU эталон. Phase accumulator в double для длинных T.
+//
+// История: Создан: 2026-04-12
+// ============================================================================
+
 /**
  * @file test_signal_generators_rocm_basic.hpp
  * @brief ROCm тесты: CW, LFM, Noise, LfmConjugate генераторы (GPU vs CPU)

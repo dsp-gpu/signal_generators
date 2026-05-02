@@ -1,26 +1,21 @@
 #pragma once
 
+// ============================================================================
+// FormSignalGeneratorROCmBenchmark — бенчмарк GenerateInputData() (ROCm)
+//
+// ЧТО:    Наследник GpuBenchmarkBase: 5 warmup + 20 замерных прогонов
+//         FormSignalGeneratorROCm::GenerateInputData().
+// ЗАЧЕМ:  Измерить GPU-время генерации FormSignal через ProfilingFacade.
+// ПОЧЕМУ: GpuBenchmarkBase инкапсулирует шаблон warmup/run/export,
+//         чтобы не дублировать код в каждом модуле (правило 06-profiling).
+//
+// История: Создан: 2026-03-01
+// ============================================================================
+
 /**
- * @file signal_generators_benchmark_rocm.hpp
- * @brief ROCm benchmark-класс для FormSignalGeneratorROCm (GpuBenchmarkBase)
- *
- * FormSignalGeneratorROCmBenchmark → GenerateInputData(): "Kernel"
- *
- * Компилируется только при ENABLE_ROCM=1 (Linux + AMD GPU).
- * На Windows без AMD GPU: compile-only, не выполняется.
- *
- * Использование:
- * @code
- *   FormSignalGeneratorROCm gen(backend);
- *   gen.SetParams(params);
- *   FormSignalGeneratorROCmBenchmark bench(backend, gen);
- *   bench.Run();
- *   bench.Report();
- * @endcode
- *
- * @author Кодо (AI Assistant)
- * @date 2026-03-01
- * @see GpuBenchmarkBase, MemoryBank/tasks/TASK_signal_generators_profiling.md
+ * @class FormSignalGeneratorROCmBenchmark
+ * @brief Бенчмарк для FormSignalGeneratorROCm::GenerateInputData().
+ * @note Не публичный API. Запускается через test_signal_generators_benchmark_rocm.hpp.
  */
 
 #if ENABLE_ROCM
