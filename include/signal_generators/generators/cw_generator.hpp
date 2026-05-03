@@ -74,22 +74,51 @@ public:
     CwGenerator& operator=(CwGenerator&& other) noexcept;
 
     // ISignalGenerator
+    /**
+     * @brief CPU reference генерация CW (continuous wave) сигнала.
+     *
+     * @param system Параметры дискретизации (fs, length).
+     * @param out Выходной буфер [out_size] complex<float>.
+     * @param out_size Размер буфера (должен быть >= system.length).
+     */
     void GenerateToCpu(const SystemSampling& system,
                        std::complex<float>* out, size_t out_size) override;
 
+    /**
+     * @brief GPU production генерация CW (multi-beam через freq_step).
+     *
+     * @param system Параметры дискретизации (fs, length).
+     * @param beam_count Количество лучей в выходе.
+     *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+     *
+     * @return cl_mem [beam_count × system.length × complex<float>]; caller обязан clReleaseMemObject.
+     *   @test_check result != nullptr
+     */
     cl_mem GenerateToGpu(const SystemSampling& system,
                          size_t beam_count = 1) override;
 
     /**
-     * @brief Генерация на GPU с опциональным сбором событий профилирования
+     * @brief Генерация на GPU с опциональным сбором событий профилирования.
      * @param prof_events nullptr → production (zero overhead); &vec → benchmark
+     *   @test { values=[nullptr] }
      *
      * Собирает события: "Kernel" (cw_kernel)
+     * @param system Параметры дискретизации (fs, length).
+     * @param beam_count Количество лучей в выходе.
+     *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+     * @return cl_mem [beam_count × system.length × complex<float>]; caller обязан clReleaseMemObject.
+     *   @test_check result != nullptr
      */
     cl_mem GenerateToGpu(const SystemSampling& system,
                          size_t beam_count,
                          ProfEvents* prof_events);
 
+    /**
+     * @brief Возвращает тип сигнала (для introspection).
+     *
+     * @return Всегда `SignalKind::CW` для этого класса.
+     *   @test_check result == SignalKind::CW
+     */
     SignalKind Kind() const override { return SignalKind::CW; }
 
     /// Обновить параметры CW

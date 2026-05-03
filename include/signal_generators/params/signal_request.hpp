@@ -63,7 +63,14 @@ struct LfmParams {
     double amplitude = 1.0;      ///< Амплитуда
     bool complex_iq = true;      ///< Комплексный выход
 
-    /// Скорость изменения частоты: k = (f_end - f_start) / duration
+    /**
+     * @brief Возвращает скорость изменения частоты chirp: k = (f_end − f_start) / duration.
+     *
+     * @param duration Длительность сигнала в секундах.
+     *
+     * @return Chirp rate в Гц/с.
+     *   @test_check std::isfinite(result)
+     */
     double GetChirpRate(double duration) const {
         return (f_end - f_start) / duration;
     }

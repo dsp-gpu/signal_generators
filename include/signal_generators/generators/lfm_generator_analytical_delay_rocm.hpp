@@ -77,10 +77,23 @@ public:
   const std::vector<float>& GetDelays() const { return delay_us_; }
   uint32_t GetAntennas() const { return static_cast<uint32_t>(delay_us_.size()); }
 
-  /// GPU generate → InputData<void*> (caller must hipFree result.data)
+  /**
+   * @brief GPU production генерация LFM с аналитической per-antenna задержкой.
+   *
+   * @param prof_events Сборщик ROCm-событий профилирования (опционально).
+   *   @test { values=[nullptr] }
+   *
+   * @return InputData<void*> [antennas × points × complex<float>]; caller обязан hipFree result.data.
+   *   @test_check result != nullptr
+   */
   drv_gpu_lib::InputData<void*> GenerateToGpu(ROCmProfEvents* prof_events = nullptr);
 
-  /// CPU reference
+  /**
+   * @brief CPU reference генерация LFM с аналитической задержкой (для сверки с GPU).
+   *
+   * @return vector[antenna_id][sample_id] complex<float>.
+   *   @test_check result.size() == delay_us_.size() && result[0].size() == system_.length
+   */
   std::vector<std::vector<std::complex<float>>> GenerateToCpu();
 
 private:
@@ -112,9 +125,28 @@ public:
   void SetParams(const LfmParams&) {}
   void SetSampling(const SystemSampling&) {}
   void SetDelays(const std::vector<float>&) {}
+  /**
+   * @brief Stub: бросает runtime_error — GenerateToGpu доступен только в ROCm-сборке.
+   *
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
+   */
   drv_gpu_lib::InputData<void*> GenerateToGpu(void* = nullptr) {
     throw std::runtime_error("LfmGeneratorAnalyticalDelayROCm: ROCm not enabled");
   }
+  /**
+   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
+   */
   std::vector<std::vector<std::complex<float>>> GenerateToCpu() {
     throw std::runtime_error("LfmGeneratorAnalyticalDelayROCm: ROCm not enabled");
   }

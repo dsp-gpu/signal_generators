@@ -74,9 +74,13 @@ public:
    * @brief Генерация CW-сигнала на GPU
    * @param system     Параметры дискретизации (fs, length)
    * @param params     Параметры CW (f0, phase, amplitude, freq_step)
+   *   @test_ref CwParams
    * @param beam_count Количество лучей
+   *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
    * @param prof_events nullptr → production (zero overhead); &vec → benchmark
+   *   @test { values=[nullptr] }
    * @return InputData<void*> с GPU-сигналом (caller обязан hipFree result.data)
+   *   @test_check result != nullptr
    */
   drv_gpu_lib::InputData<void*> GenerateToGpu(
       const SystemSampling& system,
@@ -84,7 +88,18 @@ public:
       uint32_t beam_count,
       ROCmProfEvents* prof_events = nullptr);
 
-  /// CPU-эталон (для unit-тестов и сравнения с GPU)
+  /**
+   * @brief CPU reference генерация CW (для сверки с GPU). Multi-beam через freq_step.
+   *
+   * @param system Параметры дискретизации (fs, length).
+   * @param params Параметры CW (f0, phase, amplitude, freq_step).
+   *   @test_ref CwParams
+   * @param beam_count Количество лучей в выходе.
+   *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+   *
+   * @return Массив [beam_count × system.length] complex<float> (interleaved beams).
+   *   @test_check result.size() == beam_count * system.length
+   */
   std::vector<std::complex<float>> GenerateToCpu(
       const SystemSampling& system,
       const CwParams& params,
@@ -113,9 +128,29 @@ namespace signal_gen {
 class CwGeneratorROCm {
 public:
   explicit CwGeneratorROCm(drv_gpu_lib::IBackend*) {}
+  /**
+   * @brief Stub: бросает runtime_error — GenerateToGpu доступен только в ROCm-сборке.
+   *
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
+   */
   drv_gpu_lib::InputData<void*> GenerateToGpu(const SystemSampling&, const CwParams&, uint32_t, void* = nullptr) {
     throw std::runtime_error("CwGeneratorROCm: ROCm not enabled");
   }
+  /**
+   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
+   *
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
+   */
   std::vector<std::complex<float>> GenerateToCpu(const SystemSampling&, const CwParams&, uint32_t) {
     throw std::runtime_error("CwGeneratorROCm: ROCm not enabled");
   }

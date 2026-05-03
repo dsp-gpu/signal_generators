@@ -104,15 +104,42 @@ public:
     // CPU generation
     // ═══════════════════════════════════════════════════════════════════
 
-    /// Генерация CW на CPU (1 луч)
+    /**
+     * @brief CW (continuous wave) reference на CPU. Использует кэшированный CwGenerator.
+     *
+     * @param params Параметры CW (f0, phase, amplitude, complex_iq, freq_step).
+     *   @test_ref CwParams
+     * @param system Параметры дискретизации (fs, length).
+     *
+     * @return Массив [system.length] complex<float> с CW-сигналом.
+     *   @test_check result.size() == system.length
+     */
     std::vector<std::complex<float>> GenerateCpu(
         const CwParams& params, const SystemSampling& system);
 
-    /// Генерация LFM на CPU (1 луч)
+    /**
+     * @brief LFM chirp reference на CPU. Использует кэшированный LfmGenerator.
+     *
+     * @param params Параметры LFM (f_start, f_end, amplitude, complex_iq).
+     *   @test_ref LfmParams
+     * @param system Параметры дискретизации (fs, length).
+     *
+     * @return Массив [system.length] complex<float> с LFM chirp.
+     *   @test_check result.size() == system.length
+     */
     std::vector<std::complex<float>> GenerateCpu(
         const LfmParams& params, const SystemSampling& system);
 
-    /// Генерация Noise на CPU (1 луч)
+    /**
+     * @brief Noise reference на CPU (white или Gaussian по NoiseParams::type).
+     *
+     * @param params Параметры шума (type, power, seed).
+     *   @test_ref NoiseParams
+     * @param system Параметры дискретизации (fs, length).
+     *
+     * @return Массив [system.length] complex<float> с шумовой реализацией.
+     *   @test_check result.size() == system.length
+     */
     std::vector<std::complex<float>> GenerateCpu(
         const NoiseParams& params, const SystemSampling& system);
 
@@ -120,15 +147,48 @@ public:
     // GPU generation
     // ═══════════════════════════════════════════════════════════════════
 
-    /// Генерация CW на GPU (N лучей)
+    /**
+     * @brief CW production на GPU (multi-beam). Возвращает cl_mem с переданным владением.
+     *
+     * @param params Параметры CW (для multi-beam используется freq_step).
+     *   @test_ref CwParams
+     * @param system Параметры дискретизации (fs, length).
+     * @param beam_count Количество лучей в выходе.
+     *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+     *
+     * @return cl_mem [beam_count × system.length × complex<float>]; caller обязан clReleaseMemObject.
+     *   @test_check result != nullptr
+     */
     cl_mem GenerateGpu(const CwParams& params, const SystemSampling& system,
                        size_t beam_count = 1);
 
-    /// Генерация LFM на GPU (N лучей)
+    /**
+     * @brief LFM production на GPU (multi-beam chirp). Возвращает cl_mem с переданным владением.
+     *
+     * @param params Параметры LFM (f_start, f_end, amplitude, complex_iq).
+     *   @test_ref LfmParams
+     * @param system Параметры дискретизации (fs, length).
+     * @param beam_count Количество лучей в выходе.
+     *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+     *
+     * @return cl_mem [beam_count × system.length × complex<float>]; caller обязан clReleaseMemObject.
+     *   @test_check result != nullptr
+     */
     cl_mem GenerateGpu(const LfmParams& params, const SystemSampling& system,
                        size_t beam_count = 1);
 
-    /// Генерация Noise на GPU (N лучей)
+    /**
+     * @brief Noise production на GPU (multi-beam). Возвращает cl_mem с переданным владением.
+     *
+     * @param params Параметры шума (type, power, seed).
+     *   @test_ref NoiseParams
+     * @param system Параметры дискретизации (fs, length).
+     * @param beam_count Количество лучей в выходе.
+     *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+     *
+     * @return cl_mem [beam_count × system.length × complex<float>]; caller обязан clReleaseMemObject.
+     *   @test_check result != nullptr
+     */
     cl_mem GenerateGpu(const NoiseParams& params, const SystemSampling& system,
                        size_t beam_count = 1);
 
@@ -139,15 +199,19 @@ public:
     /**
      * @brief Генерация FormSignal на GPU (мультиканальная)
      * @param params FormParams (fs, antennas, points уже внутри)
+     *   @test_ref FormParams
      * @return InputData<cl_mem> — совместимо с fft_func (data, antenna_count, n_point, gpu_memory_bytes)
      * @note Вызывающий код должен освободить result.data через clReleaseMemObject()
+     *   @test_check result.data != nullptr && result.antenna_count == params.antennas
      */
     drv_gpu_lib::InputData<cl_mem> GenerateFormGpu(const FormParams& params);
 
     /**
      * @brief Генерация FormSignal на CPU (по каналам)
      * @param params FormParams
+     *   @test_ref FormParams
      * @return vector[antenna_id][sample_id] complex<float>
+     *   @test_check result.size() == params.antennas && result[0].size() == params.points
      */
     std::vector<std::vector<std::complex<float>>> GenerateFormCpu(
         const FormParams& params);
@@ -159,9 +223,11 @@ public:
     /**
      * @brief Генерация сигнала с дробной задержкой (Farrow) на GPU
      * @param params FormParams (fs, antennas, points, noise_amplitude)
+     *   @test_ref FormParams
      * @param delay_us Задержки per-antenna в микросекундах
      * @return InputData<cl_mem>
      * @note Вызывающий код должен освободить result.data через clReleaseMemObject()
+     *   @test_check result.data != nullptr && result.antenna_count == params.antennas
      */
     drv_gpu_lib::InputData<cl_mem> GenerateDelayedFormGpu(
         const FormParams& params, const std::vector<float>& delay_us);
@@ -169,8 +235,10 @@ public:
     /**
      * @brief Генерация сигнала с дробной задержкой (Farrow) на CPU
      * @param params FormParams
+     *   @test_ref FormParams
      * @param delay_us Задержки per-antenna в микросекундах
      * @return vector[antenna_id][sample_id] complex<float>
+     *   @test_check result.size() == params.antennas && result[0].size() == params.points
      */
     std::vector<std::vector<std::complex<float>>> GenerateDelayedFormCpu(
         const FormParams& params, const std::vector<float>& delay_us);

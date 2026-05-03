@@ -83,15 +83,22 @@ public:
      *
      * @param system      Параметры дискретизации
      * @param beam_count  Количество лучей (1 = один сигнал)
+     *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
      * @return cl_mem буфер [beam_count * length * sizeof(complex<float>)]
      *
      * @note Вызывающий код должен освободить cl_mem через clReleaseMemObject()!
+     *   @test_check result != nullptr (cl_mem buffer with [beam_count × length × complex<float>])
      */
     virtual cl_mem GenerateToGpu(
         const SystemSampling& system,
         size_t beam_count = 1) = 0;
 
-    /// Тип сигнала
+    /**
+     * @brief Возвращает тип сигнала (для introspection в Python-биндингах и логах).
+     *
+     * @return Один из SignalKind::CW/LFM/NOISE/FORM_SIGNAL.
+     *   @test_check result == SignalKind::{CW|LFM|NOISE|FORM_SIGNAL}
+     */
     virtual SignalKind Kind() const = 0;
 };
 

@@ -140,6 +140,8 @@ struct FormParams {
    * Поддерживаемые ключи:
    * fs, f0, a, an, phi, fdev, norm, tau, tau_step, tau_min, tau_max,
    * tau_seed, noise_seed, antennas, points, freq_min, freq_max
+   *   @test_check parses "f0=1e6,a=1.0" → result.f0==1e6 && result.amplitude==1.0
+   *   @test_check throws std::invalid_argument on unknown key, missing '=', non-numeric value, out_of_range
    */
   static FormParams ParseFromString(const std::string& str) {
     FormParams p;

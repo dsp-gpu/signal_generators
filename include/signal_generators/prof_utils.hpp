@@ -32,6 +32,16 @@ namespace signal_gen {
  * @param prof_events  nullptr → production (clReleaseEvent); иначе → сохранить в вектор
  */
 template <typename ProfEvents>
+  /**
+   * @brief Сохраняет cl_event в prof_events или вызывает clReleaseEvent (production-путь).
+   *
+   * @tparam ProfEvents Тип вектора событий (vector<pair<const char*, cl_event>>).
+   *
+   * @param ev OpenCL event (nullptr → no-op).
+   * @param name Имя стадии (строковый литерал, лайфтайм >= prof_events).
+   * @param prof_events nullptr → release; иначе → push_back({name, ev}).
+   *   @test { values=[nullptr] }
+   */
 inline void CollectOrRelease(cl_event ev, const char* name, ProfEvents* prof_events) {
   if (!ev) return;
   if (prof_events)

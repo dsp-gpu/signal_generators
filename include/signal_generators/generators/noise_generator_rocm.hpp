@@ -69,12 +69,38 @@ public:
   NoiseGeneratorROCm(NoiseGeneratorROCm&&) noexcept = default;
   NoiseGeneratorROCm& operator=(NoiseGeneratorROCm&&) noexcept = default;
 
+  /**
+   * @brief GPU production генерация шума через Philox+BoxMuller. Multi-beam за один launch.
+   *
+   * @param system Параметры дискретизации (fs, length).
+   * @param params Параметры шума (type, power, seed).
+   *   @test_ref NoiseParams
+   * @param beam_count Количество лучей в выходе.
+   *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+   * @param prof_events Сборщик ROCm-событий профилирования (опционально).
+   *   @test { values=[nullptr] }
+   *
+   * @return InputData<void*> с HIP device pointer; caller обязан hipFree result.data.
+   *   @test_check result != nullptr
+   */
   drv_gpu_lib::InputData<void*> GenerateToGpu(
       const SystemSampling& system,
       const NoiseParams& params,
       uint32_t beam_count,
       ROCmProfEvents* prof_events = nullptr);
 
+  /**
+   * @brief CPU reference генерация шума (для unit-тестов и сверки с GPU).
+   *
+   * @param system Параметры дискретизации (fs, length).
+   * @param params Параметры шума (type, power, seed).
+   *   @test_ref NoiseParams
+   * @param beam_count Количество лучей в выходе.
+   *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+   *
+   * @return Массив [beam_count × system.length] complex<float> (interleaved beams).
+   *   @test_check result.size() == beam_count * system.length
+   */
   std::vector<std::complex<float>> GenerateToCpu(
       const SystemSampling& system,
       const NoiseParams& params,
@@ -104,9 +130,29 @@ namespace signal_gen {
 class NoiseGeneratorROCm {
 public:
   explicit NoiseGeneratorROCm(drv_gpu_lib::IBackend*) {}
+  /**
+   * @brief Stub: бросает runtime_error — GenerateToGpu доступен только в ROCm-сборке.
+   *
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
+   */
   drv_gpu_lib::InputData<void*> GenerateToGpu(const SystemSampling&, const NoiseParams&, uint32_t, void* = nullptr) {
     throw std::runtime_error("NoiseGeneratorROCm: ROCm not enabled");
   }
+  /**
+   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
+   *
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
+   */
   std::vector<std::complex<float>> GenerateToCpu(const SystemSampling&, const NoiseParams&, uint32_t) {
     throw std::runtime_error("NoiseGeneratorROCm: ROCm not enabled");
   }

@@ -89,20 +89,25 @@ public:
    * @brief Генерация на GPU с метаданными (InputData — как в fft_func)
    * @return InputData<cl_mem> с data, antenna_count, n_point, gpu_memory_bytes
    * @note Вызывающий код должен освободить input.data через clReleaseMemObject()!
+   *   @test_check result.data != nullptr && result.antenna_count == params_.antennas
    */
   drv_gpu_lib::InputData<cl_mem> GenerateInputData();
 
   /**
-   * @brief Генерация на GPU с опциональным сбором событий профилирования
+   * @brief Генерация на GPU с опциональным сбором событий профилирования.
    * @param prof_events nullptr → production (zero overhead); &vec → benchmark
+   *   @test { values=[nullptr] }
    *
    * Собирает события: "Kernel" (form_signal.cl)
+   * @return InputData<cl_mem> с data, antenna_count, n_point, gpu_memory_bytes.
+   *   @test_check result.data != nullptr && result.antenna_count == params_.antennas
    */
   drv_gpu_lib::InputData<cl_mem> GenerateInputData(ProfEvents* prof_events);
 
   /**
    * @brief Генерация с возвратом на CPU (по каналам)
    * @return vector[antenna_id][sample_id] complex<float>
+   *   @test_check result.size() == params_.antennas && result[0].size() == params_.points
    */
   std::vector<std::vector<std::complex<float>>> GenerateToCpu();
 

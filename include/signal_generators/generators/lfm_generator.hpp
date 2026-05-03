@@ -62,22 +62,51 @@ public:
     LfmGenerator(LfmGenerator&& other) noexcept;
     LfmGenerator& operator=(LfmGenerator&& other) noexcept;
 
+    /**
+     * @brief CPU reference генерация LFM chirp.
+     *
+     * @param system Параметры дискретизации (fs, length).
+     * @param out Выходной буфер [out_size] complex<float>.
+     * @param out_size Размер буфера (должен быть >= system.length).
+     */
     void GenerateToCpu(const SystemSampling& system,
                        std::complex<float>* out, size_t out_size) override;
 
+    /**
+     * @brief GPU production генерация LFM chirp (multi-beam).
+     *
+     * @param system Параметры дискретизации (fs, length).
+     * @param beam_count Количество лучей в выходе.
+     *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+     *
+     * @return cl_mem [beam_count × system.length × complex<float>]; caller обязан clReleaseMemObject.
+     *   @test_check result != nullptr
+     */
     cl_mem GenerateToGpu(const SystemSampling& system,
                          size_t beam_count = 1) override;
 
     /**
-     * @brief Генерация на GPU с опциональным сбором событий профилирования
+     * @brief Генерация на GPU с опциональным сбором событий профилирования.
      * @param prof_events nullptr → production (zero overhead); &vec → benchmark
+     *   @test { values=[nullptr] }
      *
      * Собирает события: "Kernel" (lfm_kernel)
+     * @param system Параметры дискретизации (fs, length).
+     * @param beam_count Количество лучей в выходе.
+     *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+     * @return cl_mem [beam_count × system.length × complex<float>]; caller обязан clReleaseMemObject.
+     *   @test_check result != nullptr
      */
     cl_mem GenerateToGpu(const SystemSampling& system,
                          size_t beam_count,
                          ProfEvents* prof_events);
 
+    /**
+     * @brief Возвращает тип сигнала (для introspection).
+     *
+     * @return Всегда `SignalKind::LFM` для этого класса.
+     *   @test_check result == SignalKind::LFM
+     */
     SignalKind Kind() const override { return SignalKind::LFM; }
 
     void SetParams(const LfmParams& params) { params_ = params; }

@@ -63,10 +63,20 @@ public:
   void SetParams(const FormParams& params);
   void SetParamsFromString(const std::string& params_str);
 
-  /// Генерация на GPU → InputData<void*> (caller обязан hipFree)
+  /**
+   * @brief GPU production: FormParams → DSL → hiprtc → HIP launch. Возвращает InputData<void*>.
+   *
+   * @return InputData<void*> [antennas × points × complex<float>]; caller обязан hipFree result.data.
+   *   @test_check result != nullptr && result.antenna_count == params_.antennas
+   */
   drv_gpu_lib::InputData<void*> GenerateInputData();
 
-  /// Генерация на GPU с возвратом результата на CPU
+  /**
+   * @brief Полный pipeline с readback на CPU (для unit-тестов и сверки).
+   *
+   * @return vector[antenna_id][sample_id] complex<float>.
+   *   @test_check result.size() == params_.antennas && result[0].size() == params_.points
+   */
   std::vector<std::vector<std::complex<float>>> GenerateToCpu();
 
   const FormParams& GetParams() const { return params_; }
@@ -102,9 +112,27 @@ class FormScriptGeneratorROCm {
 public:
   explicit FormScriptGeneratorROCm(drv_gpu_lib::IBackend*) {}
   void SetParams(const FormParams&) {}
+  /**
+   * @brief Stub: бросает runtime_error — GenerateInputData доступен только в ROCm-сборке.
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
+   */
   drv_gpu_lib::InputData<void*> GenerateInputData() {
     throw std::runtime_error("FormScriptGeneratorROCm: ROCm not enabled");
   }
+  /**
+   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
+   */
   std::vector<std::vector<std::complex<float>>> GenerateToCpu() {
     throw std::runtime_error("FormScriptGeneratorROCm: ROCm not enabled");
   }

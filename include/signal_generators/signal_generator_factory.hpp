@@ -75,15 +75,45 @@ namespace signal_gen {
  */
 class SignalGeneratorFactory {
 public:
-    /// Создать CW генератор
+    /**
+     * @brief Создаёт CW (continuous wave) генератор. Backend-вариант выбран compile-time через #if ENABLE_ROCM.
+     *
+     * @param backend Указатель на IBackend (non-owning, обязан быть валидным).
+     *   @test { values=["valid_backend"] }
+     * @param params Параметры CW (f0, phase, amplitude, complex_iq, freq_step).
+     *   @test_ref CwParams
+     *
+     * @return unique_ptr<ISignalGenerator> с конкретной CW-реализацией; caller владеет.
+     *   @test_check result != nullptr && result->Kind() == SignalKind::CW
+     */
     static std::unique_ptr<ISignalGenerator> CreateCw(
         drv_gpu_lib::IBackend* backend, const CwParams& params);
 
-    /// Создать LFM генератор
+    /**
+     * @brief Создаёт LFM (linear frequency modulation, chirp) генератор.
+     *
+     * @param backend Указатель на IBackend (non-owning, обязан быть валидным).
+     *   @test { values=["valid_backend"] }
+     * @param params Параметры LFM (f_start, f_end, amplitude, complex_iq).
+     *   @test_ref LfmParams
+     *
+     * @return unique_ptr<ISignalGenerator> с конкретной LFM-реализацией; caller владеет.
+     *   @test_check result != nullptr && result->Kind() == SignalKind::LFM
+     */
     static std::unique_ptr<ISignalGenerator> CreateLfm(
         drv_gpu_lib::IBackend* backend, const LfmParams& params);
 
-    /// Создать Noise генератор
+    /**
+     * @brief Создаёт Noise-генератор (white или Gaussian, выбор по NoiseParams::type).
+     *
+     * @param backend Указатель на IBackend (non-owning, обязан быть валидным).
+     *   @test { values=["valid_backend"] }
+     * @param params Параметры шума (type, power, seed).
+     *   @test_ref NoiseParams
+     *
+     * @return unique_ptr<ISignalGenerator> с конкретной Noise-реализацией; caller владеет.
+     *   @test_check result != nullptr && result->Kind() == SignalKind::NOISE
+     */
     static std::unique_ptr<ISignalGenerator> CreateNoise(
         drv_gpu_lib::IBackend* backend, const NoiseParams& params);
 
@@ -99,11 +129,30 @@ public:
         drv_gpu_lib::IBackend* backend, const FormParams& params);
 #endif
 
-    /// Создать FormScriptGenerator (DSL + on-disk cache)
+    /**
+     * @brief Создаёт FormScriptGenerator — мультиканальный генератор по DSL с on-disk кэшем.
+     *
+     * @param backend Указатель на IBackend (non-owning, обязан быть валидным).
+     *   @test { values=["valid_backend"] }
+     * @param params Параметры формы сигнала (см. FormParams::ParseFromString).
+     *   @test_ref FormParams
+     *
+     * @return unique_ptr<FormScriptGenerator>; caller владеет.
+     *   @test_check result != nullptr
+     */
     static std::unique_ptr<FormScriptGenerator> CreateFormScript(
         drv_gpu_lib::IBackend* backend, const FormParams& params);
 
-    /// Создать генератор по SignalRequest
+    /**
+     * @brief Диспетчер по SignalRequest::kind: создаёт CW/LFM/Noise генератор через variant params.
+     *
+     * @param backend Указатель на IBackend (non-owning, обязан быть валидным).
+     *   @test { values=["valid_backend"] }
+     * @param request SignalRequest с kind + system + variant<CwParams, LfmParams, NoiseParams, FormParams>.
+     *
+     * @return unique_ptr<ISignalGenerator> по выбранному kind; caller владеет.
+     *   @test_check result != nullptr && result->Kind() == request.kind
+     */
     static std::unique_ptr<ISignalGenerator> Create(
         drv_gpu_lib::IBackend* backend, const SignalRequest& request);
 };

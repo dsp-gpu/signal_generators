@@ -105,13 +105,25 @@ public:
   // DSL / Kernel source
   // ══════════════════════════════════════════════════════════════════════
 
-  /// Генерация читаемого DSL-скрипта из текущих params
+  /**
+   * @brief Возвращает читаемый DSL-скрипт (текстовое представление getX-формулы по params_).
+   *
+   * @return Multi-line строка с DSL-описанием сигнала (Params/Defs/Signal секции).
+   *   @test_check !result.empty()
+   */
   std::string GenerateScript() const;
 
-  /// Генерация полного OpenCL kernel source (с PRNG, #define params)
+  /**
+   * @brief Возвращает полный OpenCL kernel source (с PRNG-helpers и `#define`-параметрами).
+   *
+   * @return Готовый к clBuildProgram OpenCL C исходник.
+   *   @test_check !result.empty()
+   */
   std::string GenerateKernelSource() const;
 
-  /// Компиляция kernel из текущих params
+  /**
+   * @brief Компилирует OpenCL kernel из текущих params (внутри: GenerateKernelSource → clBuildProgram).
+   */
   void Compile();
 
   // ══════════════════════════════════════════════════════════════════════
@@ -136,7 +148,12 @@ public:
    */
   void LoadKernel(const std::string& name);
 
-  /// Список имён кернелов из manifest.json
+  /**
+   * @brief Возвращает список имён кернелов из on-disk manifest.json.
+   *
+   * @return vector<string> с именами (без расширений); пуст если кэш ещё не создан.
+   *   @test_check result.size() >= 0 (количество ранее сохранённых через SaveKernel)
+   */
   std::vector<std::string> ListKernels() const;
 
   // ══════════════════════════════════════════════════════════════════════
@@ -147,20 +164,25 @@ public:
    * @brief Генерация на GPU с метаданными (InputData — как в fft_func)
    * @return InputData<cl_mem> с data, antenna_count, n_point, gpu_memory_bytes
    * @note Вызывающий код должен освободить input.data через clReleaseMemObject()
+   *   @test_check result.data != nullptr && result.antenna_count == params_.antennas
    */
   drv_gpu_lib::InputData<cl_mem> GenerateInputData();
 
   /**
-   * @brief Генерация на GPU с опциональным сбором событий профилирования
+   * @brief Генерация на GPU с опциональным сбором событий профилирования.
    * @param prof_events nullptr → production (zero overhead); &vec → benchmark
+   *   @test { values=[nullptr] }
    *
    * Собирает события: "Kernel" (form_script_signal kernel)
+   * @return InputData<cl_mem> с data, antenna_count, n_point, gpu_memory_bytes; caller обязан clReleaseMemObject result.data.
+   *   @test_check result.data != nullptr
    */
   drv_gpu_lib::InputData<cl_mem> GenerateInputData(ProfEvents* prof_events);
 
   /**
    * @brief Генерация с возвратом на CPU (по каналам)
    * @return vector[antenna_id][sample_id] complex<float>
+   *   @test_check result.size() == params_.antennas && result[0].size() == params_.points
    */
   std::vector<std::vector<std::complex<float>>> GenerateToCpu();
 

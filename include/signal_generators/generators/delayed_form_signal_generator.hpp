@@ -97,6 +97,7 @@ public:
   /**
    * @brief Загрузить матрицу Lagrange из JSON-файла
    * @param json_path Путь к файлу (формат: { "data": [[...], ...] })
+   *   @test { values=["/tmp/test_config.json"] }
    *
    * Если не вызвано — используется встроенная матрица 48×5 из LchFarrow.
    */
@@ -106,20 +107,25 @@ public:
    * @brief Генерация на GPU: сигнал + задержка + шум
    * @return InputData<cl_mem>
    * @note Вызывающий код освобождает result.data через clReleaseMemObject()
+   *   @test_check result.data != nullptr && result.antenna_count == params.antennas
    */
   drv_gpu_lib::InputData<cl_mem> GenerateInputData();
 
   /**
-   * @brief Генерация на GPU с опциональным сбором событий профилирования
+   * @brief Генерация на GPU с опциональным сбором событий профилирования.
    * @param prof_events nullptr → production (zero overhead); &vec → benchmark
+   *   @test { values=[nullptr] }
    *
    * Собирает события: "Kernel" (FormSignal), "Upload_delay", "Kernel" (FarrowDelay)
+   * @return InputData<cl_mem> с задержанным FormSignal; caller обязан clReleaseMemObject result.data.
+   *   @test_check result.data != nullptr && result.antenna_count == params.antennas
    */
   drv_gpu_lib::InputData<cl_mem> GenerateInputData(ProfEvents* prof_events);
 
   /**
    * @brief Генерация с возвратом на CPU
    * @return vector[antenna_id][sample_id] complex<float>
+   *   @test_check result.size() == params.antennas && result[0].size() == params.points
    */
   std::vector<std::vector<std::complex<float>>> GenerateToCpu();
 

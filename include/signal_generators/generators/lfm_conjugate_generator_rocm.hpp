@@ -84,6 +84,7 @@ public:
   /**
    * @brief Generate conjugate LFM on CPU (reference)
    * @return vector<complex<float>>, length = system_.length
+   *   @test_check result.size() == system_.length
    */
   std::vector<std::complex<float>> GenerateToCpu();
 
@@ -115,7 +116,22 @@ public:
   explicit LfmConjugateGeneratorROCm(drv_gpu_lib::IBackend*, const LfmParams&) {}
   void SetParams(const LfmParams&) {}
   void SetSampling(const SystemSampling&) {}
+  /**
+   * @brief Stub: бросает runtime_error — GenerateToGpu доступен только в ROCm-сборке.
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
+   */
   void* GenerateToGpu() { throw std::runtime_error("LfmConjugateGeneratorROCm: ROCm not enabled"); }
+  /**
+   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
+   */
   std::vector<std::complex<float>> GenerateToCpu() {
     throw std::runtime_error("LfmConjugateGeneratorROCm: ROCm not enabled");
   }

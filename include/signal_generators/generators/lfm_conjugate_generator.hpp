@@ -95,20 +95,25 @@ public:
    * @brief Generate conjugate LFM on GPU
    * @return cl_mem with [num_samples] complex signal (conj LFM)
    * @note Caller must release via clReleaseMemObject()
+   *   @test_check result != nullptr (cl_mem [system_.length × complex<float>])
    */
   cl_mem GenerateToGpu();
 
   /**
-   * @brief Генерация на GPU с опциональным сбором событий профилирования
+   * @brief Генерация на GPU с опциональным сбором событий профилирования.
    * @param prof_events nullptr → production (zero overhead); &vec → benchmark
+   *   @test { values=[nullptr] }
    *
    * Собирает события: "Kernel" (lfm_conjugate.cl)
+   * @return cl_mem [system_.length × complex<float>] с conj(LFM); caller обязан clReleaseMemObject.
+   *   @test_check result != nullptr
    */
   cl_mem GenerateToGpu(ProfEvents* prof_events);
 
   /**
    * @brief Generate conjugate LFM on CPU (reference)
    * @return vector of complex<float>, length = system_.length
+   *   @test_check result.size() == system_.length
    */
   std::vector<std::complex<float>> GenerateToCpu();
 

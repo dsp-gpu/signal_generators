@@ -72,13 +72,31 @@ public:
   ScriptGeneratorROCm(ScriptGeneratorROCm&& other) noexcept;
   ScriptGeneratorROCm& operator=(ScriptGeneratorROCm&& other) noexcept;
 
+  /**
+   * @brief Парсит DSL-скрипт и компилирует HIP kernel через GpuContext (с disk cache).
+   *
+   * @param script_text DSL-текст ([Params]/[Defs]/[Signal] секции).
+   */
   void LoadScript(const std::string& script_text);
+  /**
+   * @brief Загружает DSL-скрипт из файла и компилирует kernel.
+   *
+   * @param file_path Путь к .signal/.txt файлу.
+   *   @test { values=["/tmp/test_config.json"] }
+   */
   void LoadFile(const std::string& file_path);
 
-  /// Generate on GPU → void* (caller must hipFree)
+  /**
+   * @brief Запускает скомпилированный kernel на GPU; возвращает device pointer (caller обязан hipFree).
+   */
   void* Generate();
 
-  /// Generate and read back to CPU
+  /**
+   * @brief Полный pipeline с readback на CPU (для unit-тестов и сверки).
+   *
+   * @return Массив [antennas × points] complex<float>.
+   *   @test_check result.size() == antennas_ * points_
+   */
   std::vector<std::complex<float>> GenerateToCpu();
 
   uint32_t GetAntennas() const;
@@ -126,8 +144,30 @@ namespace signal_gen {
 class ScriptGeneratorROCm {
 public:
   explicit ScriptGeneratorROCm(drv_gpu_lib::IBackend*) {}
+  /**
+   * @brief Stub: бросает runtime_error — LoadScript доступен только в ROCm-сборке.
+   *
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
+   */
   void LoadScript(const std::string&) { throw std::runtime_error("ScriptGeneratorROCm: ROCm not enabled"); }
+  /**
+   * @brief Stub: бросает runtime_error — Generate доступен только в ROCm-сборке.
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
+   */
   void* Generate() { throw std::runtime_error("ScriptGeneratorROCm: ROCm not enabled"); }
+  /**
+   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
+   */
   std::vector<std::complex<float>> GenerateToCpu() { throw std::runtime_error("ScriptGeneratorROCm: ROCm not enabled"); }
   bool IsReady() const { return false; }
 };

@@ -69,6 +69,12 @@ public:
 
   void SetParams(const FormParams& params);
   void SetDelays(const std::vector<float>& delay_us);
+  /**
+   * @brief Загружает матрицу Lagrange 48×5 для Farrow-фильтра из JSON-файла.
+   *
+   * @param json_path Путь к JSON с матрицей (формат: { "data": [[...], ...] }).
+   *   @test { values=["/tmp/test_config.json"] }
+   */
   void LoadMatrix(const std::string& json_path) { lch_farrow_.LoadMatrix(json_path); }
 
   const FormParams& GetParams() const { return params_; }
@@ -76,10 +82,20 @@ public:
   uint32_t GetPoints() const { return params_.points; }
   const std::vector<float>& GetDelays() const { return lch_farrow_.GetDelays(); }
 
-  /// Генерация на GPU: сигнал + задержка → InputData<void*> (caller обязан hipFree)
+  /**
+   * @brief GPU production: чистый сигнал → задержка Farrow → шум. Возвращает InputData<void*>.
+   *
+   * @return InputData<void*> [antennas × points × complex<float>]; caller обязан hipFree result.data.
+   *   @test_check result != nullptr && result.antenna_count == params_.antennas
+   */
   drv_gpu_lib::InputData<void*> GenerateInputData();
 
-  /// Генерация с возвратом на CPU → vector[antenna][sample]
+  /**
+   * @brief Полный pipeline с readback на CPU (для unit-тестов и сверки с GPU).
+   *
+   * @return vector[antenna_id][sample_id] complex<float>.
+   *   @test_check result.size() == params_.antennas && result[0].size() == params_.points
+   */
   std::vector<std::vector<std::complex<float>>> GenerateToCpu();
 
 private:
@@ -106,9 +122,27 @@ public:
   explicit DelayedFormSignalGeneratorROCm(drv_gpu_lib::IBackend*) {}
   void SetParams(const FormParams&) {}
   void SetDelays(const std::vector<float>&) {}
+  /**
+   * @brief Stub: бросает runtime_error — GenerateInputData доступен только в ROCm-сборке.
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
+   */
   drv_gpu_lib::InputData<void*> GenerateInputData() {
     throw std::runtime_error("DelayedFormSignalGeneratorROCm: ROCm not enabled");
   }
+  /**
+   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
+   */
   std::vector<std::vector<std::complex<float>>> GenerateToCpu() {
     throw std::runtime_error("DelayedFormSignalGeneratorROCm: ROCm not enabled");
   }

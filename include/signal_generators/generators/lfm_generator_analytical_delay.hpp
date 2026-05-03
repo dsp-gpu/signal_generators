@@ -102,20 +102,25 @@ public:
    * @brief Generate on GPU
    * @return InputData<cl_mem> with [antennas * points] complex signal
    * @note Caller must release result.data via clReleaseMemObject()
+   *   @test_check result.data != nullptr && result.antenna_count == delay_us_.size()
    */
   drv_gpu_lib::InputData<cl_mem> GenerateToGpu();
 
   /**
-   * @brief Генерация на GPU с опциональным сбором событий профилирования
+   * @brief Генерация на GPU с опциональным сбором событий профилирования.
    * @param prof_events nullptr → production (zero overhead); &vec → benchmark
+   *   @test { values=[nullptr] }
    *
    * Собирает события: "Kernel" (lfm_analytical_delay.cl)
+   * @return InputData<cl_mem> [antennas × points × complex<float>]; caller обязан clReleaseMemObject result.data.
+   *   @test_check result.data != nullptr
    */
   drv_gpu_lib::InputData<cl_mem> GenerateToGpu(ProfEvents* prof_events);
 
   /**
    * @brief Generate on CPU (reference)
    * @return [antenna][sample] complex<float>
+   *   @test_check result.size() == delay_us_.size() && result[0].size() == system_.length
    */
   std::vector<std::vector<std::complex<float>>> GenerateToCpu();
 

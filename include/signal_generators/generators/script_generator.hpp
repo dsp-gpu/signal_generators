@@ -110,6 +110,7 @@ public:
     /**
      * @brief Parse and compile script from file
      * @param file_path Path to .signal or .txt file
+     *   @test { values=["/tmp/test_config.json"] }
      * @throws std::runtime_error if file cannot be read
      */
     void LoadFile(const std::string& file_path);
@@ -118,12 +119,14 @@ public:
      * @brief Generate signal on GPU
      * @return cl_mem buffer [antennas * points * sizeof(complex<float>)]
      * @note Caller must release via clReleaseMemObject()
+     *   @test_check result != nullptr (требуется LoadScript/LoadFile перед Generate)
      */
     cl_mem Generate();
 
     /**
      * @brief Generate and read back to CPU
      * @return Vector of complex samples [antennas * points]
+     *   @test_check result.size() == script_.params.antennas * script_.params.points
      */
     std::vector<std::complex<float>> GenerateToCpu();
 
