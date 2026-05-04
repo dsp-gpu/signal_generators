@@ -98,8 +98,7 @@ public:
     for (auto& row : data)
       flat.insert(flat.end(), row.begin(), row.end());
 
-    if (n_ant <= 1)
-      return vector_to_numpy(std::move(flat));
+    // Phase B 2026-05-04: всегда 2D (antennas, points) — consistency с docstring и тестами
     return vector_to_numpy_2d(std::move(flat), n_ant, n_points);
   }
 
@@ -153,7 +152,7 @@ inline void register_form_signal_rocm(py::module& m) {
       "  gen = gpuworklib.FormSignalGeneratorROCm(ctx)\n"
       "  gen.set_params(antennas=5, points=8000, fs=12e6, f0=2e6)\n"
       "  signal = gen.generate()  # numpy complex64 (5, 8000)\n")
-      .def(py::init<ROCmGPUContext&>(), py::arg("ctx"),
+      .def(py::init<ROCmGPUContext&>(), py::keep_alive<1, 2>(), py::arg("ctx"),
            "Create FormSignalGeneratorROCm bound to ROCm GPU context.")
 
       .def("set_params", &PyFormSignalGeneratorROCm::set_params,

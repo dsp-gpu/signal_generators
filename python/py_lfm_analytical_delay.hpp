@@ -150,8 +150,7 @@ inline void register_lfm_analytical_delay(py::module& m) {
         "  gen.set_sampling(fs=12e6, length=4096)\n"
         "  gen.set_delays([0.0, 0.1, 0.2, 0.5])\n"
         "  data = gen.generate_gpu()\n")
-        .def(py::init<GPUContext&, double, double, double, bool>(),
-             py::arg("ctx"), py::arg("f_start"), py::arg("f_end"),
+        .def(py::init<GPUContext&, double, double, double, bool>(), py::keep_alive<1, 2>(), py::arg("ctx"), py::arg("f_start"), py::arg("f_end"),
              py::arg("amplitude") = 1.0, py::arg("complex_iq") = true,
              "Create LFM analytical delay generator.\n\n"
              "Args:\n"

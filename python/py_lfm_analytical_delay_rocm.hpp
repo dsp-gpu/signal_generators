@@ -148,8 +148,7 @@ inline void register_lfm_analytical_delay_rocm(py::module& m) {
       "  gen.set_sampling(fs=12e6, length=4096)\n"
       "  gen.set_delays([0.0, 0.5, 1.0])\n"
       "  gpu = gen.generate_gpu()  # numpy complex64\n")
-      .def(py::init<ROCmGPUContext&, double, double, double>(),
-           py::arg("ctx"),
+      .def(py::init<ROCmGPUContext&, double, double, double>(), py::keep_alive<1, 2>(), py::arg("ctx"),
            py::arg("f_start") = 100.0,
            py::arg("f_end") = 500.0,
            py::arg("amplitude") = 1.0,

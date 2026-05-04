@@ -140,7 +140,7 @@ inline void register_delayed_form_signal_rocm(py::module& m) {
       "  gen.set_params(fs=1e6, antennas=8, points=4096, f0=50e3)\n"
       "  gen.set_delays([0.0, 1.5, 3.0, ...])\n"
       "  signal = gen.generate()  # numpy complex64 (8, 4096)\n")
-      .def(py::init<ROCmGPUContext&>(), py::arg("ctx"),
+      .def(py::init<ROCmGPUContext&>(), py::keep_alive<1, 2>(), py::arg("ctx"),
            "Create DelayedFormSignalGeneratorROCm bound to ROCm GPU context.")
 
       .def("set_params", &PyDelayedFormSignalGeneratorROCm::set_params,
