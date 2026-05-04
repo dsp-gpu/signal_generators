@@ -40,11 +40,8 @@ PYBIND11_MODULE(dsp_signal_generators, m) {
     // register_lfm_analytical_delay(m);  // OpenCL-only, nvidia-ветка
 
 #if ENABLE_ROCM
-    py::class_<ROCmGPUContext>(m, "ROCmGPUContext",
-        "ROCm GPU context (creates HIP backend for AMD GPU).")
-        .def(py::init<int>(), py::arg("device_index") = 0)
-        .def_property_readonly("device_name", &ROCmGPUContext::device_name)
-        .def_property_readonly("device_index", &ROCmGPUContext::device_index);
+    // ROCmGPUContext зарегистрирован в dsp_core (один раз глобально).
+    py::module_::import("dsp_core");
 
     register_form_signal_rocm(m);
     register_delayed_form_signal_rocm(m);
