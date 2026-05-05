@@ -109,7 +109,7 @@ public:
   /**
    * @brief Генерация на GPU с опциональным сбором событий профилирования.
    * @param prof_events nullptr → production (zero overhead); &vec → benchmark
-   *   @test { values=[nullptr] }
+   *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
    *
    * Собирает события: "Kernel" (lfm_analytical_delay.cl)
    * @return InputData<cl_mem> [antennas × points × complex<float>]; caller обязан clReleaseMemObject result.data.

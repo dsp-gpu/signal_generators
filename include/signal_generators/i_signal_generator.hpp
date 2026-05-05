@@ -83,7 +83,7 @@ public:
      *
      * @param system      Параметры дискретизации
      * @param beam_count  Количество лучей (1 = один сигнал)
-     *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+     *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
      * @return cl_mem буфер [beam_count * length * sizeof(complex<float>)]
      *
      * @note Вызывающий код должен освободить cl_mem через clReleaseMemObject()!

@@ -96,7 +96,7 @@ public:
   /**
    * @brief Генерация на GPU с опциональным сбором событий профилирования.
    * @param prof_events nullptr → production (zero overhead); &vec → benchmark
-   *   @test { values=[nullptr] }
+   *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
    *
    * Собирает события: "Kernel" (form_signal.cl)
    * @return InputData<cl_mem> с data, antenna_count, n_point, gpu_memory_bytes.

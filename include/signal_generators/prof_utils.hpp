@@ -40,7 +40,7 @@ template <typename ProfEvents>
    * @param ev OpenCL event (nullptr → no-op).
    * @param name Имя стадии (строковый литерал, лайфтайм >= prof_events).
    * @param prof_events nullptr → release; иначе → push_back({name, ev}).
-   *   @test { values=[nullptr] }
+   *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
    */
 inline void CollectOrRelease(cl_event ev, const char* name, ProfEvents* prof_events) {
   if (!ev) return;

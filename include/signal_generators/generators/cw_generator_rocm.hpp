@@ -76,9 +76,9 @@ public:
    * @param params     Параметры CW (f0, phase, amplitude, freq_step)
    *   @test_ref CwParams
    * @param beam_count Количество лучей
-   *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+   *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
    * @param prof_events nullptr → production (zero overhead); &vec → benchmark
-   *   @test { values=[nullptr] }
+   *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
    * @return InputData<void*> с GPU-сигналом (caller обязан hipFree result.data)
    *   @test_check result != nullptr
    */
@@ -95,7 +95,7 @@ public:
    * @param params Параметры CW (f0, phase, amplitude, freq_step).
    *   @test_ref CwParams
    * @param beam_count Количество лучей в выходе.
-   *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+   *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
    *
    * @return Массив [beam_count × system.length] complex<float> (interleaved beams).
    *   @test_check result.size() == beam_count * system.length

@@ -73,9 +73,9 @@ public:
    * @param params Параметры LFM (f_start, f_end, amplitude, complex_iq).
    *   @test_ref LfmParams
    * @param beam_count Количество лучей в выходе.
-   *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+   *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
    * @param prof_events Сборщик ROCm-событий профилирования (опционально).
-   *   @test { values=[nullptr] }
+   *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
    *
    * @return InputData<void*> с HIP device pointer; caller обязан hipFree result.data.
    *   @test_check result != nullptr
@@ -93,7 +93,7 @@ public:
    * @param params Параметры LFM (f_start, f_end, amplitude, complex_iq).
    *   @test_ref LfmParams
    * @param beam_count Количество лучей в выходе.
-   *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+   *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
    *
    * @return Массив [beam_count × system.length] complex<float> (interleaved beams).
    *   @test_check result.size() == beam_count * system.length

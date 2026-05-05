@@ -89,7 +89,7 @@ public:
      *
      * @param system Параметры дискретизации (fs, length).
      * @param beam_count Количество лучей в выходе.
-     *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+     *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
      *
      * @return cl_mem [beam_count × system.length × complex<float>]; caller обязан clReleaseMemObject.
      *   @test_check result != nullptr
@@ -100,12 +100,12 @@ public:
     /**
      * @brief Генерация на GPU с опциональным сбором событий профилирования.
      * @param prof_events nullptr → production (zero overhead); &vec → benchmark
-     *   @test { values=[nullptr] }
+     *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
      *
      * Собирает события: "Kernel" (cw_kernel)
      * @param system Параметры дискретизации (fs, length).
      * @param beam_count Количество лучей в выходе.
-     *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+     *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
      * @return cl_mem [beam_count × system.length × complex<float>]; caller обязан clReleaseMemObject.
      *   @test_check result != nullptr
      */

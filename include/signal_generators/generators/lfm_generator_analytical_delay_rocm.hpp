@@ -81,7 +81,7 @@ public:
    * @brief GPU production генерация LFM с аналитической per-antenna задержкой.
    *
    * @param prof_events Сборщик ROCm-событий профилирования (опционально).
-   *   @test { values=[nullptr] }
+   *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
    *
    * @return InputData<void*> [antennas × points × complex<float>]; caller обязан hipFree result.data.
    *   @test_check result != nullptr

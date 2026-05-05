@@ -154,7 +154,7 @@ public:
      *   @test_ref CwParams
      * @param system Параметры дискретизации (fs, length).
      * @param beam_count Количество лучей в выходе.
-     *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+     *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
      *
      * @return cl_mem [beam_count × system.length × complex<float>]; caller обязан clReleaseMemObject.
      *   @test_check result != nullptr
@@ -169,7 +169,7 @@ public:
      *   @test_ref LfmParams
      * @param system Параметры дискретизации (fs, length).
      * @param beam_count Количество лучей в выходе.
-     *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+     *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
      *
      * @return cl_mem [beam_count × system.length × complex<float>]; caller обязан clReleaseMemObject.
      *   @test_check result != nullptr
@@ -184,7 +184,7 @@ public:
      *   @test_ref NoiseParams
      * @param system Параметры дискретизации (fs, length).
      * @param beam_count Количество лучей в выходе.
-     *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+     *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
      *
      * @return cl_mem [beam_count × system.length × complex<float>]; caller обязан clReleaseMemObject.
      *   @test_check result != nullptr

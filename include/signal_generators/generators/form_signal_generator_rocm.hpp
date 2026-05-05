@@ -99,7 +99,7 @@ public:
   /**
    * @brief Генерация на GPU с опциональным сбором событий профилирования (ROCm)
    * @param prof_events nullptr → production (zero overhead); &vec → benchmark
-   *   @test { values=[nullptr] }
+   *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
    *
    * Собирает события: "Kernel" (generate_form_signal HIP kernel)
    * @return InputData<void*> с HIP device pointer; caller обязан hipFree result.data.
