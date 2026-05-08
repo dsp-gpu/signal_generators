@@ -26,18 +26,13 @@
 #include "py_lfm_analytical_delay_rocm.hpp"
 #endif
 
-// py_lfm_analytical_delay.hpp — OpenCL GPUContext, только nvidia-ветка
-// #include "py_lfm_analytical_delay.hpp"
-
 PYBIND11_MODULE(dsp_signal_generators, m) {
     m.doc() = "dsp::signal_generators — ROCm signal generators\n\n"
               "Classes:\n"
-              "  ROCmGPUContext                  - GPU context (AMD ROCm)\n"
-              "  FormSignalGeneratorROCm        - form signal generator (ROCm)\n"
-              "  DelayedFormSignalGeneratorROCm - with fractional delay (ROCm)\n"
-              "  LfmAnalyticalDelayGenerator    - LFM analytical delay\n";
-
-    // register_lfm_analytical_delay(m);  // OpenCL-only, nvidia-ветка
+              "  ROCmGPUContext                     - GPU context (AMD ROCm)\n"
+              "  FormSignalGeneratorROCm            - form signal generator (ROCm)\n"
+              "  DelayedFormSignalGeneratorROCm     - with fractional delay (ROCm)\n"
+              "  LfmAnalyticalDelayGeneratorROCm    - LFM analytical delay (ROCm)\n";
 
 #if ENABLE_ROCM
     // ROCmGPUContext зарегистрирован в dsp_core (один раз глобально).
