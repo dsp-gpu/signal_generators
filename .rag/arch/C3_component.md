@@ -20,19 +20,13 @@ description: "C3 Component — key classes и интерфейсы репо sign
 - **Методы:** 11, **test_params rows:** 19
 - **Brief:** *(описание не задано)*
 
-### `signal_gen::CwGeneratorROCm`
-
-- **Namespace:** `signal_gen`
-- **Методы:** 11, **test_params rows:** 19
-- **Brief:** ///
-
-### `signal_gen::LfmGeneratorROCm`
+### `signal_gen::NoiseGeneratorROCm`
 
 - **Namespace:** `signal_gen`
 - **Методы:** 11, **test_params rows:** 16
 - **Brief:** *(описание не задано)*
 
-### `signal_gen::NoiseGeneratorROCm`
+### `signal_gen::LfmGeneratorROCm`
 
 - **Namespace:** `signal_gen`
 - **Методы:** 11, **test_params rows:** 16
@@ -42,10 +36,7 @@ description: "C3 Component — key classes и интерфейсы репо sign
 
 - **Namespace:** `signal_gen`
 - **Методы:** 7, **test_params rows:** 15
-- **Brief:** /**
-@class SignalGeneratorFactory
-Создаёт генераторы по типу сигнала
-/
+- **Brief:** генераторы по типу сигнала
 
 ### `signal_gen::DelayedFormSignalGeneratorROCm`
 
@@ -59,12 +50,6 @@ description: "C3 Component — key classes и интерфейсы репо sign
 - **Методы:** 25, **test_params rows:** 6
 - **Brief:** *(описание не задано)*
 
-### `signal_gen::FormSignalGeneratorROCm`
-
-- **Namespace:** `signal_gen`
-- **Методы:** 25, **test_params rows:** 6
-- **Brief:** ///
-
 ### `signal_gen::LfmGeneratorAnalyticalDelayROCm`
 
 - **Namespace:** `signal_gen`
@@ -75,6 +60,18 @@ description: "C3 Component — key classes и интерфейсы репо sign
 
 - **Namespace:** `signal_gen`
 - **Методы:** 24, **test_params rows:** 5
+- **Brief:** *(описание не задано)*
+
+### `signal_gen::FormScriptGeneratorROCm`
+
+- **Namespace:** `signal_gen`
+- **Методы:** 14, **test_params rows:** 4
+- **Brief:** *(описание не задано)*
+
+### `signal_gen::LfmConjugateGeneratorROCm`
+
+- **Namespace:** `signal_gen`
+- **Методы:** 13, **test_params rows:** 2
 - **Brief:** *(описание не задано)*
 
 ## Интерфейсы (наследуемые)

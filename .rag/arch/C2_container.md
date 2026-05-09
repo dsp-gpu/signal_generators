@@ -37,7 +37,7 @@ description: "C2 Container — namespace tree и зависимости репо
 | Class | Namespace | Methods | TestParams |
 |-------|-----------|--------:|-----------:|
 | `CwGeneratorROCm` | `signal_gen` | 11 | 19 |
-| `CwGeneratorROCm` | `signal_gen` | 11 | 19 |
-| `LfmGeneratorROCm` | `signal_gen` | 11 | 16 |
 | `NoiseGeneratorROCm` | `signal_gen` | 11 | 16 |
+| `LfmGeneratorROCm` | `signal_gen` | 11 | 16 |
 | `SignalGeneratorFactory` | `signal_gen` | 7 | 15 |
+| `DelayedFormSignalGeneratorROCm` | `signal_gen` | 16 | 7 |

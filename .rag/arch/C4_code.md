@@ -16,10 +16,7 @@ description: "C4 Code — реальные классы с паттернами 
 
 | Класс | Паттерн | Brief |
 |-------|---------|-------|
-| `SignalGeneratorFactory` | **Factory** | /**
-@class SignalGeneratorFactory
-Создаёт генераторы по типу сигнала
-/ |
+| `SignalGeneratorFactory` | **Factory** | генераторы по типу сигнала |
 
 ## HIP-ядра (`kernels/rocm/`)
 
@@ -28,12 +25,12 @@ description: "C4 Code — реальные классы с паттернами 
 ## Все key_classes (FQN список)
 
 - `signal_gen::CwGeneratorROCm` (11 методов)
-- `signal_gen::CwGeneratorROCm` (11 методов)
-- `signal_gen::LfmGeneratorROCm` (11 методов)
 - `signal_gen::NoiseGeneratorROCm` (11 методов)
+- `signal_gen::LfmGeneratorROCm` (11 методов)
 - `signal_gen::SignalGeneratorFactory` (7 методов)
 - `signal_gen::DelayedFormSignalGeneratorROCm` (16 методов)
 - `signal_gen::FormSignalGeneratorROCm` (25 методов)
-- `signal_gen::FormSignalGeneratorROCm` (25 методов)
 - `signal_gen::LfmGeneratorAnalyticalDelayROCm` (18 методов)
 - `signal_gen::ScriptGeneratorROCm` (24 методов)
+- `signal_gen::FormScriptGeneratorROCm` (14 методов)
+- `signal_gen::LfmConjugateGeneratorROCm` (13 методов)
