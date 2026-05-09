@@ -158,7 +158,11 @@ used_by: []                              # TODO: AI-fill из других _RAG.
 python_modules:                          # TODO: auto from pybind_bindings
   - TODO
 
-tags: []                                 # TODO: AI-fill
+tags:                                    # auto-inferred (RAG_CLAUDE_C4)
+  - "#layer:compute"
+  - "#repo:signal_generators"
+  - "#namespace:signal_gen"
+  - "#pattern:Factory:SignalGeneratorFactory"
 
 notes: []                                # TODO: AI-fill из ai_summary
 
