@@ -51,9 +51,8 @@ signal_generators/
 
 ## 🏷️ RAG теги
 
-`#layer:compute` `#repo:signal_generators` `#namespace:signal_gen` `#pattern:Factory:SignalGeneratorFactory`
 
-<!-- END: RAG_CLAUDE_C4 (auto) -->
+`#layer:compute` `#repo:signal_generators` `#namespace:signal_gen` `#pattern:Factory:SignalGeneratorFactory` `#pattern:Facade:FormSignalGenerator` `#pattern:Facade:ScriptGenerator` `#pattern:Strategy:ISignalGenerator`
 
 ## 🔗 Правила (path-scoped автоматически)
 

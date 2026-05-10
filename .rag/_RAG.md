@@ -167,6 +167,9 @@ tags:                                    # auto-inferred (RAG_CLAUDE_C4)
   - "#repo:signal_generators"
   - "#namespace:signal_gen"
   - "#pattern:Factory:SignalGeneratorFactory"
+  - "#pattern:Facade:FormSignalGenerator"
+  - "#pattern:Facade:ScriptGenerator"
+  - "#pattern:Strategy:ISignalGenerator"
 
 notes: []                                # TODO: AI-fill из ai_summary
 
