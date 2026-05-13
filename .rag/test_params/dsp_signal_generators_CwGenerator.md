@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: signal_generators
-class_fqn: signal_gen::CwGenerator
+class_fqn: dsp::signal_generators::CwGenerator
 file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/cw_generator.hpp
 line: 30
 brief: "Генерирует сигналы непрерывной волны (CW) для CPU и GPU. Создает cl_mem для OpenCL-ускорения."
@@ -15,7 +15,7 @@ synonyms_en: ['Continuous Wave Generator', 'CW Signal Generator', 'Single Freque
 tags: ['GPU', 'OpenCL', 'Signal Generation', 'Radar', 'CW']
 ---
 
-# `signal_gen::CwGenerator` — карточка класса
+# `dsp::signal_generators::CwGenerator` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo signal_generators --class CwGenerator`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,8 +35,8 @@ tags: ['GPU', 'OpenCL', 'Signal Generation', 'Radar', 'CW']
 
 **Пример**:
 ```cpp
-#include "signal_generators/generators/cw_generator.hpp"
-using namespace signal_gen;
+#include "dsp/signal_generators/generators/cw_generator.hpp"
+using namespace dsp::signal_generators;
 CwGenerator gen;
 cl_mem gpu_buffer = gen.GenerateToGpu(system, 8);
 std::complex<float>* cpu_data = new std::complex<float>[1024];

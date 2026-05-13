@@ -1,4 +1,4 @@
-# Signal Generators — Полная документация
+﻿# Signal Generators — Полная документация
 
 > Генерация сигналов на GPU: CW, LFM, LFM-conj, Noise, FormSignal, Script, DelayedFormSignal, LfmAnalyticalDelay
 
@@ -426,14 +426,14 @@ Inline HIP kernel в `FormSignalGeneratorROCm`. Аналогичен `form_signa
 ```cpp
 #include "generators/cw_generator.hpp"
 
-signal_gen::CwParams cw;
+dsp::signal_generators::CwParams cw;
 cw.f0 = 1e6;        // 1 МГц
 cw.amplitude = 1.0;
 cw.phase = 0.0;
 cw.freq_step = 0.0; // multi-beam: шаг по частоте
 
-signal_gen::SystemSampling sys{12e6, 4096};
-signal_gen::CwGenerator gen(backend, cw);
+dsp::signal_generators::SystemSampling sys{12e6, 4096};
+dsp::signal_generators::CwGenerator gen(backend, cw);
 
 cl_mem buf = gen.GenerateToGpu(sys, /*beam_count=*/1);  // caller owns
 // ...
@@ -448,10 +448,10 @@ gen.GenerateToCpu(sys, cpu.data(), cpu.size());
 ```cpp
 #include "generators/lfm_generator.hpp"
 
-signal_gen::LfmParams lfm;
+dsp::signal_generators::LfmParams lfm;
 lfm.f_start = 1e6;  lfm.f_end = 2e6;  lfm.amplitude = 1.0;
 
-signal_gen::LfmGenerator gen(backend, lfm);
+dsp::signal_generators::LfmGenerator gen(backend, lfm);
 cl_mem buf = gen.GenerateToGpu({12e6, 4096}, 1);
 clReleaseMemObject(buf);
 ```
@@ -461,11 +461,11 @@ clReleaseMemObject(buf);
 ```cpp
 #include "generators/noise_generator.hpp"
 
-signal_gen::NoiseParams np;
-np.type = signal_gen::NoiseType::GAUSSIAN;
+dsp::signal_generators::NoiseParams np;
+np.type = dsp::signal_generators::NoiseType::GAUSSIAN;
 np.power = 1.0;  np.seed = 42;
 
-signal_gen::NoiseGenerator gen(backend, np);
+dsp::signal_generators::NoiseGenerator gen(backend, np);
 cl_mem buf = gen.GenerateToGpu({12e6, 4096}, 1);
 clReleaseMemObject(buf);
 ```
@@ -475,13 +475,13 @@ clReleaseMemObject(buf);
 ```cpp
 #include "generators/form_signal_generator.hpp"
 
-signal_gen::FormParams p;
+dsp::signal_generators::FormParams p;
 p.fs = 12e6;  p.f0 = 1e6;  p.fdev = 0.0;  // CW; fdev!=0 → chirp
 p.antennas = 8;  p.points = 4096;
 p.amplitude = 1.0;  p.noise_amplitude = 0.1;
 p.tau_step = 1e-5;  // LINEAR: 10 мкс между каналами (в секундах!)
 
-signal_gen::FormSignalGenerator gen(backend);
+dsp::signal_generators::FormSignalGenerator gen(backend);
 gen.SetParams(p);
 
 auto input = gen.GenerateInputData();   // InputData<cl_mem>
@@ -498,13 +498,13 @@ gen.SetParamsFromString("f0=1e6,a=1.0,an=0.1,antennas=8,points=4096,fs=12e6");
 ```cpp
 #include "generators/delayed_form_signal_generator.hpp"
 
-signal_gen::FormParams p;
+dsp::signal_generators::FormParams p;
 p.fs = 12e6;  p.f0 = 1e6;
 p.antennas = 8;  p.points = 4096;
 p.amplitude = 1.0;
 p.noise_amplitude = 0.1;  // шум добавляется ПОСЛЕ задержки
 
-signal_gen::DelayedFormSignalGenerator gen(backend);
+dsp::signal_generators::DelayedFormSignalGenerator gen(backend);
 gen.SetParams(p);
 gen.SetDelays({0.0f, 1.5f, 3.0f, 4.5f, 6.0f, 7.5f, 9.0f, 10.5f}); // мкс!
 
@@ -520,10 +520,10 @@ clReleaseMemObject(input.data);
 ```cpp
 #include "generators/lfm_generator_analytical_delay.hpp"
 
-signal_gen::LfmParams params;
+dsp::signal_generators::LfmParams params;
 params.f_start = 1e6;  params.f_end = 2e6;  params.amplitude = 1.0;
 
-signal_gen::LfmGeneratorAnalyticalDelay gen(backend, params);
+dsp::signal_generators::LfmGeneratorAnalyticalDelay gen(backend, params);
 gen.SetSampling({12e6, 4096});
 gen.SetDelays({0.0f, 2.7f, 5.4f});  // мкс, 3 антенны
 
@@ -538,7 +538,7 @@ auto cpu = gen.GenerateToCpu();  // vector<vector<complex<float>>>
 ```cpp
 #include "generators/lfm_conjugate_generator.hpp"
 
-signal_gen::LfmConjugateGenerator gen(backend, lfm_params);
+dsp::signal_generators::LfmConjugateGenerator gen(backend, lfm_params);
 gen.SetSampling({12e6, 4096});
 
 cl_mem ref = gen.GenerateToGpu();  // conj(s_tx), для HeterodyneDechirp
@@ -550,7 +550,7 @@ clReleaseMemObject(ref);
 ```cpp
 #include "generators/form_script_generator.hpp"
 
-signal_gen::FormScriptGenerator gen(backend);
+dsp::signal_generators::FormScriptGenerator gen(backend);
 gen.SetParams(p);
 
 // Режим 1: компиляция + сохранение (~50 мс)
@@ -571,18 +571,18 @@ bool ready = gen.IsReady();
 ### 6.9 C++ — SignalService / SignalGeneratorFactory
 
 ```cpp
-#include <signal_generators/signal_service.hpp>
-#include <signal_generators/signal_generator_factory.hpp>
+#include <dsp/signal_generators/signal_service.hpp>
+#include <dsp/signal_generators/signal_generator_factory.hpp>
 
 // SignalService: фасад
-signal_gen::SignalService service(backend);
+dsp::signal_generators::SignalService service(backend);
 auto cpu_cw  = service.GenerateCpu(cw_params, {12e6, 4096});
 auto gpu_buf = service.GenerateGpu(lfm_params, {12e6, 4096}, 1);
 clReleaseMemObject(gpu_buf);
 
 // Factory: создать по типу
-auto gen = signal_gen::SignalGeneratorFactory::CreateCw(backend, cw_params);
-auto gen2 = signal_gen::SignalGeneratorFactory::Create(backend, signal_request);
+auto gen = dsp::signal_generators::SignalGeneratorFactory::CreateCw(backend, cw_params);
+auto gen2 = dsp::signal_generators::SignalGeneratorFactory::Create(backend, signal_request);
 ```
 
 ### 6.10 Python — FormSignalGenerator
@@ -1037,7 +1037,7 @@ LoadKernel()    → загрузка с диска ~1 мс
 Все ключевые Generate*() имеют overload с `ProfEvents*`:
 
 ```cpp
-signal_gen::CwGenerator::ProfEvents pe;
+dsp::signal_generators::CwGenerator::ProfEvents pe;
 auto buf = gen.GenerateToGpu(sys, 1, &pe);   // benchmark
 // pe["Upload"], pe["Kernel"], pe["Download"] — cl_event timestamps
 

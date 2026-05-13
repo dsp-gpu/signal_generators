@@ -1,4 +1,4 @@
----
+﻿---
 schema_version: 1
 repo: signal_generators
 version: 0.1.0
@@ -15,78 +15,78 @@ modules:
     - signal_generators
 
 key_classes:                            # auto: top по test_params
-  - fqn: signal_gen::SignalGeneratorFactory
+  - fqn: dsp::signal_generators::SignalGeneratorFactory
     brief: "Создаёт генераторы по типу сигнала"
     maturity: alpha
     methods: 7
     test_params_rows: 10
-    test_params: test_params/signal_gen_SignalGeneratorFactory.md
-  - fqn: signal_gen::CwGeneratorROCm
+    test_params: test_params/dsp_signal_generators_SignalGeneratorFactory.md
+  - fqn: dsp::signal_generators::CwGeneratorROCm
     brief: "@ingroup grp_signal_generators"
     maturity: alpha
     methods: 11
     test_params_rows: 7
-    test_params: test_params/signal_gen_CwGeneratorROCm.md
-  - fqn: signal_gen::LfmGeneratorROCm
+    test_params: test_params/dsp_signal_generators_CwGeneratorROCm.md
+  - fqn: dsp::signal_generators::LfmGeneratorROCm
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 11
     test_params_rows: 7
-    test_params: test_params/signal_gen_LfmGeneratorROCm.md
-  - fqn: signal_gen::NoiseGeneratorROCm
+    test_params: test_params/dsp_signal_generators_LfmGeneratorROCm.md
+  - fqn: dsp::signal_generators::NoiseGeneratorROCm
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 11
     test_params_rows: 7
-    test_params: test_params/signal_gen_NoiseGeneratorROCm.md
-  - fqn: signal_gen::ScriptGeneratorROCm
+    test_params: test_params/dsp_signal_generators_NoiseGeneratorROCm.md
+  - fqn: dsp::signal_generators::ScriptGeneratorROCm
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 24
     test_params_rows: 2
-    test_params: test_params/signal_gen_ScriptGeneratorROCm.md
-  - fqn: signal_gen::FormSignalGeneratorROCm
+    test_params: test_params/dsp_signal_generators_ScriptGeneratorROCm.md
+  - fqn: dsp::signal_generators::FormSignalGeneratorROCm
     brief: "@ingroup grp_signal_generators"
     maturity: alpha
     methods: 25
     test_params_rows: 1
-    test_params: test_params/signal_gen_FormSignalGeneratorROCm.md
-  - fqn: signal_gen::LfmGeneratorAnalyticalDelayROCm
+    test_params: test_params/dsp_signal_generators_FormSignalGeneratorROCm.md
+  - fqn: dsp::signal_generators::LfmGeneratorAnalyticalDelayROCm
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 18
     test_params_rows: 1
-    test_params: test_params/signal_gen_LfmGeneratorAnalyticalDelayROCm.md
-  - fqn: signal_gen::DelayedFormSignalGeneratorROCm
+    test_params: test_params/dsp_signal_generators_LfmGeneratorAnalyticalDelayROCm.md
+  - fqn: dsp::signal_generators::DelayedFormSignalGeneratorROCm
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 16
     test_params_rows: 1
-    test_params: test_params/signal_gen_DelayedFormSignalGeneratorROCm.md
-  - fqn: signal_gen::FormParams
+    test_params: test_params/dsp_signal_generators_DelayedFormSignalGeneratorROCm.md
+  - fqn: dsp::signal_generators::FormParams
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 4
     test_params_rows: 1
-    test_params: test_params/signal_gen_FormParams.md
-  - fqn: signal_gen::LfmParams
+    test_params: test_params/dsp_signal_generators_FormParams.md
+  - fqn: dsp::signal_generators::LfmParams
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 3
     test_params_rows: 1
-    test_params: test_params/signal_gen_LfmParams.md
-  - fqn: signal_gen::FormScriptGeneratorROCm
+    test_params: test_params/dsp_signal_generators_LfmParams.md
+  - fqn: dsp::signal_generators::FormScriptGeneratorROCm
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 14
     test_params_rows: 0
-    test_params: test_params/signal_gen_FormScriptGeneratorROCm.md
-  - fqn: signal_gen::LfmConjugateGeneratorROCm
+    test_params: test_params/dsp_signal_generators_FormScriptGeneratorROCm.md
+  - fqn: dsp::signal_generators::LfmConjugateGeneratorROCm
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 13
     test_params_rows: 0
-    test_params: test_params/signal_gen_LfmConjugateGeneratorROCm.md
+    test_params: test_params/dsp_signal_generators_LfmConjugateGeneratorROCm.md
   - fqn: PyLfmAnalyticalDelayROCm
     brief: "TODO: AI-fill"
     maturity: alpha
@@ -99,24 +99,24 @@ key_classes:                            # auto: top по test_params
     methods: 10
     test_params_rows: 0
     test_params: test_params/PyDelayedFormSignalGeneratorROCm.md
-  - fqn: signal_gen::FormSignalGenerator
+  - fqn: dsp::signal_generators::FormSignalGenerator
     brief: "GPU-генератор комплексных сигналов по формуле getX"
     maturity: alpha
     methods: 9
     test_params_rows: 0
-    test_params: test_params/signal_gen_FormSignalGenerator.md
-  - fqn: signal_gen::FormScriptGenerator
+    test_params: test_params/dsp_signal_generators_FormSignalGenerator.md
+  - fqn: dsp::signal_generators::FormScriptGenerator
     brief: "DSL-генератор + on-disk кэш кернелов для формулы getX"
     maturity: alpha
     methods: 8
     test_params_rows: 0
-    test_params: test_params/signal_gen_FormScriptGenerator.md
-  - fqn: signal_gen::ScriptGenerator
+    test_params: test_params/dsp_signal_generators_FormScriptGenerator.md
+  - fqn: dsp::signal_generators::ScriptGenerator
     brief: "Compiles text DSL -> OpenCL kernel and executes on GPU"
     maturity: alpha
     methods: 8
     test_params_rows: 0
-    test_params: test_params/signal_gen_ScriptGenerator.md
+    test_params: test_params/dsp_signal_generators_ScriptGenerator.md
   - fqn: PyFormSignalGeneratorROCm
     brief: "TODO: AI-fill"
     maturity: alpha
@@ -129,12 +129,12 @@ key_classes:                            # auto: top по test_params
     methods: 7
     test_params_rows: 0
     test_params: test_params/PyLfmAnalyticalDelay.md
-  - fqn: signal_gen::DelayedFormSignalGenerator
+  - fqn: dsp::signal_generators::DelayedFormSignalGenerator
     brief: "GPU-генератор с дробной задержкой Farrow (Lagrange 48×5)"
     maturity: alpha
     methods: 7
     test_params_rows: 0
-    test_params: test_params/signal_gen_DelayedFormSignalGenerator.md
+    test_params: test_params/dsp_signal_generators_DelayedFormSignalGenerator.md
 
 test_params_summary:
   classes_with_params: 11
@@ -165,7 +165,7 @@ architecture_files:                       # auto: arch_files generator
 tags:                                    # auto-inferred (RAG_CLAUDE_C4)
   - "#layer:compute"
   - "#repo:signal_generators"
-  - "#namespace:signal_gen"
+  - "#namespace:dsp_signal_generators"
   - "#pattern:Factory:SignalGeneratorFactory"
   - "#pattern:Facade:FormSignalGenerator"
   - "#pattern:Facade:ScriptGenerator"

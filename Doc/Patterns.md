@@ -1,4 +1,4 @@
-# Архитектурные паттерны репо `signal_generators`
+﻿# Архитектурные паттерны репо `signal_generators`
 
 > **Источник истины:** `signal_generators/.rag/_RAG.md` (теги `#pattern:Type:Class`, auto-inferred RAG_CLAUDE_C4 от 9.05).
 > Brief'ы — из `key_classes:` того же манифеста (fallback из `rag_dsp.symbols`).
@@ -11,9 +11,9 @@
 > Тонкий публичный API над набором операций. Стабильный → Python-биндинги не ломаются.
 
 
-- **`signal_gen::FormSignalGenerator`** — `signal_generators/include/signal_generators/generators/form_signal_generator.hpp:67`
+- **`dsp::signal_generators::FormSignalGenerator`** — `signal_generators/include/signal_generators/generators/form_signal_generator.hpp:67`
   - GPU-генератор комплексных сигналов по формуле getX
-- **`signal_gen::ScriptGenerator`** — `signal_generators/include/signal_generators/generators/script_generator.hpp:83`
+- **`dsp::signal_generators::ScriptGenerator`** — `signal_generators/include/signal_generators/generators/script_generator.hpp:83`
   - Compiles text DSL -> OpenCL kernel and executes on GPU
 
 ## Strategy
@@ -21,7 +21,7 @@
 > Семейство взаимозаменяемых алгоритмов за общим интерфейсом (`IPipelineStep`).
 
 
-- **`signal_gen::ISignalGenerator`** — `signal_generators/include/signal_generators/i_signal_generator.hpp:31`
+- **`dsp::signal_generators::ISignalGenerator`** — `signal_generators/include/signal_generators/i_signal_generator.hpp:31`
   - Абстрактный интерфейс генератора сигналов * Реализации: - CwGenerator — синусоида (CW) - LfmGenerator — линейная ЧМ (chirp) - NoiseGenerat
 
 ## Factory
@@ -29,7 +29,7 @@
 > Создание объектов по типу/конфигу без раскрытия конкретных классов.
 
 
-- **`signal_gen::SignalGeneratorFactory`** — `signal_generators/include/signal_generators/signal_generator_factory.hpp:31`
+- **`dsp::signal_generators::SignalGeneratorFactory`** — `signal_generators/include/signal_generators/signal_generator_factory.hpp:31`
   - Создаёт генераторы по типу сигнала
 
 

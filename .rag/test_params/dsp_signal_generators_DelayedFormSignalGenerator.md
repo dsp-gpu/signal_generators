@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: signal_generators
-class_fqn: signal_gen::DelayedFormSignalGenerator
+class_fqn: dsp::signal_generators::DelayedFormSignalGenerator
 file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/delayed_form_signal_generator.hpp
 line: 63
 brief: "GPU-генератор сигналов с дробной задержкой на основе Farrow-интерполяции (Lagrange 48×5)."
@@ -15,7 +15,7 @@ synonyms_en: ['Fractional delay generator', 'Farrow generator', 'Delayed signal'
 tags: ['GPU', 'signal_generation', 'fractional_delay', 'ROCm', 'HIP']
 ---
 
-# `signal_gen::DelayedFormSignalGenerator` — карточка класса
+# `dsp::signal_generators::DelayedFormSignalGenerator` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo signal_generators --class DelayedFormSignalGenerator`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,9 +35,9 @@ tags: ['GPU', 'signal_generation', 'fractional_delay', 'ROCm', 'HIP']
 
 **Пример**:
 ```cpp
-#include "signal_generators/generators/delayed_form_signal_generator.hpp"
+#include "dsp/signal_generators/generators/delayed_form_signal_generator.hpp"
 
-using namespace signal_gen;
+using namespace dsp::signal_generators;
 
 int main() {
   auto backend = std::make_shared<drv_gpu_lib::ROCmBackend>();

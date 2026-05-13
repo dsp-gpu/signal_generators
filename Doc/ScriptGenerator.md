@@ -1,4 +1,4 @@
-# ScriptGenerator — Text DSL -> OpenCL Kernel Compiler
+﻿# ScriptGenerator — Text DSL -> OpenCL Kernel Compiler
 
 ## Обзор
 
@@ -139,7 +139,7 @@ res = amp * sin(freq * (float)T)
 ### 4. C++ использование
 
 ```cpp
-signal_gen::ScriptGenerator gen(backend);
+dsp::signal_generators::ScriptGenerator gen(backend);
 
 gen.LoadScript(R"(
     [Params]

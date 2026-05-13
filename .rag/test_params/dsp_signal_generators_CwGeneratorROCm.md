@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: signal_generators
-class_fqn: signal_gen::CwGeneratorROCm
+class_fqn: dsp::signal_generators::CwGeneratorROCm
 file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/cw_generator_rocm.hpp
 line: 37
 brief: "Генерирует CW-сигналы для обработки на GPU и CPU с поддержкой ROCm."
@@ -15,7 +15,7 @@ synonyms_en: ['CW Generator ROCm', 'ROCm Signal', 'Beam Generator', 'CW Signal',
 tags: ['signal generation', 'GPU processing', 'ROCm', 'CW signal', 'radiolokation']
 ---
 
-# `signal_gen::CwGeneratorROCm` — карточка класса
+# `dsp::signal_generators::CwGeneratorROCm` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo signal_generators --class CwGeneratorROCm`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,8 +35,8 @@ tags: ['signal generation', 'GPU processing', 'ROCm', 'CW signal', 'radiolokatio
 
 **Пример**:
 ```cpp
-#include "signal_generators/generators/cw_generator_rocm.hpp"
-using namespace signal_gen;
+#include "dsp/signal_generators/generators/cw_generator_rocm.hpp"
+using namespace dsp::signal_generators;
 
 int main() {
   CwGeneratorROCm gen;

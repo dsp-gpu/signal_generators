@@ -1,4 +1,4 @@
----
+﻿---
 schema_version: 1
 repo: signal_generators
 arch_level: c4
@@ -24,13 +24,13 @@ description: "C4 Code — реальные классы с паттернами 
 
 ## Все key_classes (FQN список)
 
-- `signal_gen::CwGeneratorROCm` (11 методов)
-- `signal_gen::NoiseGeneratorROCm` (11 методов)
-- `signal_gen::LfmGeneratorROCm` (11 методов)
-- `signal_gen::SignalGeneratorFactory` (7 методов)
-- `signal_gen::DelayedFormSignalGeneratorROCm` (16 методов)
-- `signal_gen::FormSignalGeneratorROCm` (25 методов)
-- `signal_gen::LfmGeneratorAnalyticalDelayROCm` (18 методов)
-- `signal_gen::ScriptGeneratorROCm` (24 методов)
-- `signal_gen::FormScriptGeneratorROCm` (14 методов)
-- `signal_gen::LfmConjugateGeneratorROCm` (13 методов)
+- `dsp::signal_generators::CwGeneratorROCm` (11 методов)
+- `dsp::signal_generators::NoiseGeneratorROCm` (11 методов)
+- `dsp::signal_generators::LfmGeneratorROCm` (11 методов)
+- `dsp::signal_generators::SignalGeneratorFactory` (7 методов)
+- `dsp::signal_generators::DelayedFormSignalGeneratorROCm` (16 методов)
+- `dsp::signal_generators::FormSignalGeneratorROCm` (25 методов)
+- `dsp::signal_generators::LfmGeneratorAnalyticalDelayROCm` (18 методов)
+- `dsp::signal_generators::ScriptGeneratorROCm` (24 методов)
+- `dsp::signal_generators::FormScriptGeneratorROCm` (14 методов)
+- `dsp::signal_generators::LfmConjugateGeneratorROCm` (13 методов)

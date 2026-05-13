@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: signal_generators
-class_fqn: signal_gen::FormSignalGenerator
+class_fqn: dsp::signal_generators::FormSignalGenerator
 file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/form_signal_generator.hpp
 line: 67
 brief: "Генератор комплексных сигналов на GPU по пользовательской формуле с поддержкой мультиканального формирования."
@@ -15,7 +15,7 @@ synonyms_en: ['Signal generator', 'Signal formation', 'GPU generator', 'Multi-ch
 tags: ['GPU', 'сигналы', 'мультиканал', 'ROCm', 'HIP']
 ---
 
-# `signal_gen::FormSignalGenerator` — карточка класса
+# `dsp::signal_generators::FormSignalGenerator` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo signal_generators --class FormSignalGenerator`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,8 +35,8 @@ tags: ['GPU', 'сигналы', 'мультиканал', 'ROCm', 'HIP']
 
 **Пример**:
 ```cpp
-#include "signal_generators/generators/form_signal_generator.hpp"
-using namespace signal_gen;
+#include "dsp/signal_generators/generators/form_signal_generator.hpp"
+using namespace dsp::signal_generators;
 
 int main() {
   auto backend = drv_gpu_lib::GetDefaultBackend();

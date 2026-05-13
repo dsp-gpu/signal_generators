@@ -1,4 +1,4 @@
----
+﻿---
 schema_version: 1
 kind: use_case
 id: signal_generators_benchmark_rocm
@@ -67,7 +67,7 @@ updated_at: 2026-05-06
     backend->Initialize(0);
 
     // ── Параметры генератора ───────────────────────────────────────────────
-    signal_gen::FormParams params;
+    dsp::signal_generators::FormParams params;
     params.fs              = 12e6;
     params.antennas        = 8;
     params.points          = 4096;
@@ -76,7 +76,7 @@ updated_at: 2026-05-06
     params.noise_amplitude = 0.0;
 
     // ── Создать генератор ──────────────────────────────────────────────────
-    signal_gen::FormSignalGeneratorROCm gen(backend.get());
+    dsp::signal_generators::FormSignalGeneratorROCm gen(backend.get());
     gen.SetParams(params);
 
     // ── Benchmark ─────────────────────────────────────────────────────────

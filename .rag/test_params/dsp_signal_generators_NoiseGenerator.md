@@ -1,23 +1,23 @@
----
+﻿---
 schema_version: 1
 repo: signal_generators
-class_fqn: signal_gen::LfmGenerator
-file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/lfm_generator.hpp
+class_fqn: dsp::signal_generators::NoiseGenerator
+file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/noise_generator.hpp
 line: 24
-brief: "Генерирует сигналы с линейной модуляцией частоты (LFM) для радиолокационной обработки."
+brief: "Генерирует белый шум с использованием rocRAND или Philox PRNG на CPU/GPU"
 methods_total: 4
 methods_with_doxygen: 4
 ai_generated: true
 human_verified: false
 parser_version: 2
-synonyms_ru: ['LFM-генератор', 'chirp-генератор', 'линейный модулятор', 'радиолокационный сигнал']
-synonyms_en: ['LFM generator', 'chirp generator', 'linear modulator', 'radar signal']
-tags: ['GPU', 'LFM', 'signal generation', 'ROCm', 'HIP']
+synonyms_ru: ['шум', 'белый шум', 'гауссовский шум', 'генератор шума', 'прерандомизированный сигнал']
+synonyms_en: ['noise', 'white noise', 'gaussian noise', 'noise generator', 'prng signal']
+tags: ['GPU', 'PRNG', 'noise generation', 'signal processing']
 ---
 
-# `signal_gen::LfmGenerator` — карточка класса
+# `dsp::signal_generators::NoiseGenerator` — карточка класса
 
-> **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo signal_generators --class LfmGenerator`.
+> **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo signal_generators --class NoiseGenerator`.
 > Не править руками — правки потеряются при следующем refresh.
 > Источник правды — Doxygen-теги в `.hpp` + секции в `Doc/*.md`.
 
@@ -25,24 +25,24 @@ tags: ['GPU', 'LFM', 'signal generation', 'ROCm', 'HIP']
 
 ## Описание класса
 
-<!-- rag-block: id=signal_generators__lfm_generator__class_overview__v1 -->
+<!-- rag-block: id=signal_generators__noise_generator__class_overview__v1 -->
 
-**ЧТО**: Генерирует сигналы с линейной модуляцией частоты (LFM) для радиолокационной обработки.
+**ЧТО**: Генерирует белый шум с использованием rocRAND или Philox PRNG на CPU/GPU
 
-**ЗАЧЕМ**: Обеспечивает высокоточное создание LFM-сигналов с поддержкой GPU-ускорения для обработки массовых данных.
+**ЗАЧЕМ**: Предоставляет статистически однородный шум для тестирования и обработки сигналов в радарных системах
 
-**КАК**: Использует HIP/ROCm для GPU-генерации, поддерживает многолучевые режимы, оптимизирует кэширование и интегрирует профилирование.
+**КАК**: Использует inline PRNG для CPU, HIP-кэширование для GPU. Поддерживает batch-генерацию с задержкой измерений (prof_events).
 
 **Пример**:
 ```cpp
-#include "signal_generators/generators/lfm_generator.hpp"
-using namespace signal_gen;
+#include "dsp/signal_generators/generators/noise_generator.hpp"
+using namespace dsp::signal_generators;
 
 int main() {
-  LfmGenerator gen;
-  auto gpu_mem = gen.GenerateToGpu(system_params, 8);
-  std::complex<float>* cpu_data = new std::complex<float>[4096];
-  gen.GenerateToCpu(system_params, cpu_data, 4096);
+  NoiseGenerator gen;
+  auto gpu_mem = gen.GenerateToGpu(SystemSampling{1e6, 1e-6}, 8);
+  std::complex<float> cpu_buf[1024];
+  gen.GenerateToCpu(SystemSampling{1e6, 1e-6}, cpu_buf, 1024);
   return 0;
 }
 ```
@@ -51,17 +51,17 @@ int main() {
 
 ## Связанные секции из Doc/
 
-- `signal_generators__gpu__tests_003__v1` (tests): | # | ID | Файл | Что проверяет | Параметры | Порог | |---|----|------|---------------|-----------|-------| | 1 | SG-1 | test_signal_generators.hpp | CW: GPU vs CPU | f0=250 Hz, A=1.5, fs=4 kHz, N=409…
 - `signal_generators__gpu__c2_container_002__v1` (c2_container): ``` ┌─────────────────────────────────────────────────────────────┐ │  signal_generators module                                   │ │                                                             │ │  ┌…
 - `signal_generators__architecture__section_002__v1` (section): ``` ┌─────────────────────────────────────────────────────────────┐ │                     Signal Generators                        │ ├─────────────────────────────────────────────────────────────┤ │  …
 - `signal_generators__meta__claude_card__v1` (meta_claude): <!-- type:meta_claude repo:signal_generators source:signal_generators/CLAUDE.md -->  # signal_generators — Repository Card  _Источник: `signal_generators/CLAUDE.md`_  # 🤖 CLAUDE — `signal_generators` …
 - `signal_generators__gpu__c3_component__v1` (c3_component): ### C3 — Component  ``` signal_gen namespace │ ├── ISignalGenerator (interface) │   ├── + GenerateToCpu(SystemSampling, out*, size) │   ├── + GenerateToGpu(SystemSampling, beam_count) → cl_mem │   └──…
+- `signal_generators__gpu__section_002__v1` (section): ### Какой класс выбрать  | Класс | Для чего | Выход | Задержка | |-------|----------|-------|----------| | `FormSignalGenerator` | CW/Chirp + шум, N антенн | `InputData<cl_mem>` | FIXED/LINEAR/RANDOM …
 
 ## Public-методы (4)
 
 ## Method 1: `GenerateToCpu`
 
-**Сигнатура** (`lfm_generator.hpp:72`):
+**Сигнатура** (`noise_generator.hpp:76`):
 ```cpp
 void GenerateToCpu(const SystemSampling& system, std::complex<float>* out, size_t out_size) override
 ```
@@ -74,7 +74,7 @@ void GenerateToCpu(const SystemSampling& system, std::complex<float>* out, size_
 **Doxygen-источник**:
 ```cpp
 /**
-     * @brief CPU reference генерация LFM chirp.
+     * @brief CPU reference генерация шума (white или Gaussian по NoiseParams::type).
      *
      * @param system Параметры дискретизации (fs, length).
      * @param out Выходной буфер [out_size] complex<float>.
@@ -84,7 +84,7 @@ void GenerateToCpu(const SystemSampling& system, std::complex<float>* out, size_
 
 ## Method 2: `GenerateToGpu`
 
-**Сигнатура** (`lfm_generator.hpp:85`):
+**Сигнатура** (`noise_generator.hpp:89`):
 ```cpp
 cl_mem GenerateToGpu(const SystemSampling& system, size_t beam_count = 1) override
 ```
@@ -98,7 +98,7 @@ cl_mem GenerateToGpu(const SystemSampling& system, size_t beam_count = 1) overri
 **Doxygen-источник**:
 ```cpp
 /**
-     * @brief GPU production генерация LFM chirp (multi-beam).
+     * @brief GPU production: Philox+BoxMuller kernel, multi-beam.
      *
      * @param system Параметры дискретизации (fs, length).
      * @param beam_count Количество лучей в выходе.
@@ -111,7 +111,7 @@ cl_mem GenerateToGpu(const SystemSampling& system, size_t beam_count = 1) overri
 
 ## Method 3: `GenerateToGpu`
 
-**Сигнатура** (`lfm_generator.hpp:100`):
+**Сигнатура** (`noise_generator.hpp:104`):
 ```cpp
 cl_mem GenerateToGpu(const SystemSampling& system, size_t beam_count, ProfEvents* prof_events)
 ```
@@ -130,7 +130,7 @@ cl_mem GenerateToGpu(const SystemSampling& system, size_t beam_count, ProfEvents
      * @param prof_events nullptr → production (zero overhead); &vec → benchmark
      *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
      *
-     * Собирает события: "Kernel" (lfm_kernel)
+     * Собирает события: "Kernel" (noise_kernel / Philox+BoxMuller)
      * @param system Параметры дискретизации (fs, length).
      * @param beam_count Количество лучей в выходе.
      *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
@@ -141,9 +141,9 @@ cl_mem GenerateToGpu(const SystemSampling& system, size_t beam_count, ProfEvents
 
 ## Method 4: `Kind`
 
-**Сигнатура** (`lfm_generator.hpp:110`):
+**Сигнатура** (`noise_generator.hpp:114`):
 ```cpp
-SignalKind Kind() const override { return SignalKind::LFM;
+SignalKind Kind() const override { return SignalKind::NOISE;
 ```
 
 **Возвращает**: `SignalKind`
@@ -153,8 +153,8 @@ SignalKind Kind() const override { return SignalKind::LFM;
 /**
      * @brief Возвращает тип сигнала (для introspection).
      *
-     * @return Всегда `SignalKind::LFM` для этого класса.
-     *   @test_check result == SignalKind::LFM
+     * @return Всегда `SignalKind::NOISE` для этого класса.
+     *   @test_check result == SignalKind::NOISE
      */
 ```
 

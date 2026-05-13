@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: signal_generators
-class_fqn: signal_gen::FormScriptGenerator
+class_fqn: dsp::signal_generators::FormScriptGenerator
 file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/form_script_generator.hpp
 line: 72
 brief: "Генератор сигналов с DSL-компиляцией и дисковым кэшированием кернелов для формул getX"
@@ -15,7 +15,7 @@ synonyms_en: ['signal generator', 'DSL generator', 'kernel cache generator', 'fo
 tags: ['signal generation', 'kernel caching', 'DSL', 'GPU', 'ROCm', 'HIP', 'caching']
 ---
 
-# `signal_gen::FormScriptGenerator` — карточка класса
+# `dsp::signal_generators::FormScriptGenerator` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo signal_generators --class FormScriptGenerator`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,7 +35,7 @@ tags: ['signal generation', 'kernel caching', 'DSL', 'GPU', 'ROCm', 'HIP', 'cach
 
 **Пример**:
 ```cpp
-#include "signal_generators/generators/form_script_generator.hpp"
+#include "dsp/signal_generators/generators/form_script_generator.hpp"
 
 using namespace signal_generators;
 

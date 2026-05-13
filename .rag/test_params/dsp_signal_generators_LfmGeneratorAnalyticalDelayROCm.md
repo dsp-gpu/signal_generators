@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: signal_generators
-class_fqn: signal_gen::LfmGeneratorAnalyticalDelayROCm
+class_fqn: dsp::signal_generators::LfmGeneratorAnalyticalDelayROCm
 file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/lfm_generator_analytical_delay_rocm.hpp
 line: 35
 brief: "Генератор сигналов с линейной модуляцией (LFM) с аналитической задержкой, использующий ROCm для GPU-вычислений."
@@ -15,7 +15,7 @@ synonyms_en: ['ROCm LFM Signal Generator', 'Analytical Delay LFM Generator', 'GP
 tags: ['GPU', 'ROCm', 'LFM', 'Сигналы', 'Радиолокация']
 ---
 
-# `signal_gen::LfmGeneratorAnalyticalDelayROCm` — карточка класса
+# `dsp::signal_generators::LfmGeneratorAnalyticalDelayROCm` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo signal_generators --class LfmGeneratorAnalyticalDelayROCm`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,9 +35,9 @@ tags: ['GPU', 'ROCm', 'LFM', 'Сигналы', 'Радиолокация']
 
 **Пример**:
 ```cpp
-#include "signal_generators/generators/lfm_generator_analytical_delay_rocm.hpp"
+#include "dsp/signal_generators/generators/lfm_generator_analytical_delay_rocm.hpp"
 
-using namespace signal_gen;
+using namespace dsp::signal_generators;
 
 int main() {
     LfmGeneratorAnalyticalDelayROCm gen;

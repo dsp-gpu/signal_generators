@@ -1,4 +1,4 @@
-# Signal Generators — API Reference
+﻿# Signal Generators — API Reference
 
 **Namespace**: `signal_gen`
 
@@ -202,10 +202,10 @@ cl_mem GenerateGpu(const NoiseParams& params, const SystemSampling& system, size
 
 ```cpp
 // CW
-signal_gen::CwParams cw{.f0 = 440.0, .amplitude = 0.5};
-auto gen = signal_gen::SignalGeneratorFactory::CreateCw(backend, cw);
+dsp::signal_generators::CwParams cw{.f0 = 440.0, .amplitude = 0.5};
+auto gen = dsp::signal_generators::SignalGeneratorFactory::CreateCw(backend, cw);
 
-signal_gen::SystemSampling sys{.fs = 44100.0, .length = 8192};
+dsp::signal_generators::SystemSampling sys{.fs = 44100.0, .length = 8192};
 cl_mem gpu_data = gen->GenerateToGpu(sys, 16);  // 16 лучей
 // ...
 clReleaseMemObject(gpu_data);
@@ -214,22 +214,22 @@ clReleaseMemObject(gpu_data);
 ### Через SignalService
 
 ```cpp
-signal_gen::SignalService service(backend);
+dsp::signal_generators::SignalService service(backend);
 
 // LFM chirp 100→500 Hz
-signal_gen::LfmParams lfm{.f_start = 100.0, .f_end = 500.0};
+dsp::signal_generators::LfmParams lfm{.f_start = 100.0, .f_end = 500.0};
 auto cpu_data = service.GenerateCpu(lfm, {44100.0, 4096});
 ```
 
 ### Через SignalRequest (variant)
 
 ```cpp
-signal_gen::SignalRequest req;
-req.kind = signal_gen::SignalKind::CW;
+dsp::signal_generators::SignalRequest req;
+req.kind = dsp::signal_generators::SignalKind::CW;
 req.system = {1000.0, 4096};
-req.params = signal_gen::CwParams{.f0 = 100.0};
+req.params = dsp::signal_generators::CwParams{.f0 = 100.0};
 
-auto gen = signal_gen::SignalGeneratorFactory::Create(backend, req);
+auto gen = dsp::signal_generators::SignalGeneratorFactory::Create(backend, req);
 ```
 
 ---

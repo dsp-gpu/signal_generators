@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: signal_generators
-class_fqn: signal_gen::LfmGeneratorROCm
+class_fqn: dsp::signal_generators::LfmGeneratorROCm
 file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/lfm_generator_rocm.hpp
 line: 35
 brief: "Генерирует линейно-частотно-модулированные сигналы (LFM) для GPU и CPU."
@@ -15,7 +15,7 @@ synonyms_en: ['LFM generator', 'GPU generator', 'ROCm generator', 'signal_genera
 tags: ['LFM', 'GPU', 'ROCm', 'SignalGeneration']
 ---
 
-# `signal_gen::LfmGeneratorROCm` — карточка класса
+# `dsp::signal_generators::LfmGeneratorROCm` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo signal_generators --class LfmGeneratorROCm`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,7 +35,7 @@ tags: ['LFM', 'GPU', 'ROCm', 'SignalGeneration']
 
 **Пример**:
 ```cpp
-#include "signal_generators/generators/lfm_generator_rocm.hpp"
+#include "dsp/signal_generators/generators/lfm_generator_rocm.hpp"
 using namespace signal_generators;
 
 int main() {

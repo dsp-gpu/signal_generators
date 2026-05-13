@@ -1,4 +1,4 @@
----
+﻿---
 schema_version: 1
 repo: signal_generators
 arch_level: c2
@@ -6,7 +6,7 @@ tags:
   - "#level:c2"
   - "#repo:signal_generators"
   - "#layer:compute"
-  - "#namespace:signal_gen"
+  - "#namespace:dsp_signal_generators"
   - "#namespace:test_signal_generators_rocm"
 description: "C2 Container — namespace tree и зависимости репо signal_generators."
 ---

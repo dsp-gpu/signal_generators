@@ -1,4 +1,4 @@
-# Signal Generators Module
+﻿# Signal Generators Module
 
 > Генерация сигналов на GPU (OpenCL) с поддержкой CPU reference
 
@@ -40,14 +40,14 @@
 ### C++
 
 ```cpp
-#include <signal_generators/signal_service.hpp>
+#include <dsp/signal_generators/signal_service.hpp>
 
 // Создать сервис
-signal_gen::SignalService service(backend);
+dsp::signal_generators::SignalService service(backend);
 
 // CW сигнал: 100 Hz, шаг 10 Hz между лучами
-signal_gen::CwParams cw{.f0 = 100.0, .freq_step = 10.0};
-signal_gen::SystemSampling sys{.fs = 1000.0, .length = 4096};
+dsp::signal_generators::CwParams cw{.f0 = 100.0, .freq_step = 10.0};
+dsp::signal_generators::SystemSampling sys{.fs = 1000.0, .length = 4096};
 
 // CPU (1 луч)
 auto cpu_data = service.GenerateCpu(cw, sys);

@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: signal_generators
-class_fqn: signal_gen::LfmGeneratorAnalyticalDelay
+class_fqn: dsp::signal_generators::LfmGeneratorAnalyticalDelay
 file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/lfm_generator_analytical_delay.hpp
 line: 49
 brief: "Генератор LFM-сигналов с аналитической задержкой на антенну для GPU/CPU."
@@ -15,7 +15,7 @@ synonyms_en: ['lfm delay generator', 'analytical delay', 'gpu signal generator',
 tags: ['lfm', 'gpu', 'задержка', 'ROCm', 'signal_generation']
 ---
 
-# `signal_gen::LfmGeneratorAnalyticalDelay` — карточка класса
+# `dsp::signal_generators::LfmGeneratorAnalyticalDelay` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo signal_generators --class LfmGeneratorAnalyticalDelay`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,9 +35,9 @@ tags: ['lfm', 'gpu', 'задержка', 'ROCm', 'signal_generation']
 
 **Пример**:
 ```cpp
-#include "signal_generators/generators/lfm_generator_analytical_delay.hpp"
+#include "dsp/signal_generators/generators/lfm_generator_analytical_delay.hpp"
 
-using namespace signal_gen;
+using namespace dsp::signal_generators;
 
 int main() {
   IBackend* backend = new RocmBackend();

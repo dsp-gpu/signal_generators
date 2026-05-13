@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: signal_generators
-class_fqn: signal_gen::DelayedFormSignalGeneratorROCm
+class_fqn: dsp::signal_generators::DelayedFormSignalGeneratorROCm
 file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/delayed_form_signal_generator_rocm.hpp
 line: 31
 brief: "Генерирует сигналы с задержками для радиолокационной обработки на GPU с использованием ROCm."
@@ -15,7 +15,7 @@ synonyms_en: ['Delayed Signal Generator', 'ROCm Signal Generator', 'Form Signal 
 tags: ['GPU', 'ROCm', 'Сигналы', 'Задержки', 'Обработка сигналов']
 ---
 
-# `signal_gen::DelayedFormSignalGeneratorROCm` — карточка класса
+# `dsp::signal_generators::DelayedFormSignalGeneratorROCm` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo signal_generators --class DelayedFormSignalGeneratorROCm`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,7 +35,7 @@ tags: ['GPU', 'ROCm', 'Сигналы', 'Задержки', 'Обработка 
 
 **Пример**:
 ```cpp
-#include "signal_generators/generators/delayed_form_signal_generator_rocm.hpp"
+#include "dsp/signal_generators/generators/delayed_form_signal_generator_rocm.hpp"
 using namespace signal_generators;
 
 DelayedFormSignalGeneratorROCm gen;

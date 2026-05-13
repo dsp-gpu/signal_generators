@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: signal_generators
-class_fqn: signal_gen::ScriptGenerator
+class_fqn: dsp::signal_generators::ScriptGenerator
 file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/script_generator.hpp
 line: 83
 brief: "Компилирует текстовый DSL в OpenCL-кернел для выполнения на GPU"
@@ -15,7 +15,7 @@ synonyms_en: ['ScriptGenerator', 'DSL Generator', 'OpenCL Generator', 'GPU Scrip
 tags: ['GPU', 'OpenCL', 'DSL', 'Signal Generation', 'Scripting', 'DSP']
 ---
 
-# `signal_gen::ScriptGenerator` — карточка класса
+# `dsp::signal_generators::ScriptGenerator` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo signal_generators --class ScriptGenerator`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,8 +35,8 @@ tags: ['GPU', 'OpenCL', 'DSL', 'Signal Generation', 'Scripting', 'DSP']
 
 **Пример**:
 ```cpp
-#include "signal_generators/generators/script_generator.hpp"
-using namespace signal_gen;
+#include "dsp/signal_generators/generators/script_generator.hpp"
+using namespace dsp::signal_generators;
 
 int main() {
     IBackend* backend = ...;

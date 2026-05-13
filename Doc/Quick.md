@@ -1,4 +1,4 @@
-# Signal Generators — Краткий справочник
+﻿# Signal Generators — Краткий справочник
 
 > Генерация CW/LFM/Noise/FormSignal на GPU: OpenCL (все платформы) + ROCm (AMD, ENABLE_ROCM=1)
 
@@ -104,12 +104,12 @@ phi(t) = 2π·f0·t + π·fdev/ti·(t - ti/2)² + phase
 ```cpp
 #include "generators/form_signal_generator.hpp"
 
-signal_gen::FormParams p;
+dsp::signal_generators::FormParams p;
 p.fs = 12e6;  p.f0 = 1e6;  p.antennas = 8;  p.points = 4096;
 p.amplitude = 1.0;  p.noise_amplitude = 0.1;
 p.tau_step = 1e-5;   // LINEAR 10 мкс (в СЕКУНДАХ!)
 
-signal_gen::FormSignalGenerator gen(backend);
+dsp::signal_generators::FormSignalGenerator gen(backend);
 gen.SetParams(p);
 
 auto input = gen.GenerateInputData();   // InputData<cl_mem>
@@ -123,7 +123,7 @@ auto cpu = gen.GenerateToCpu();         // vector<vector<complex<float>>>
 ```cpp
 #include "generators/delayed_form_signal_generator.hpp"
 
-signal_gen::DelayedFormSignalGenerator gen(backend);
+dsp::signal_generators::DelayedFormSignalGenerator gen(backend);
 gen.SetParams(p);
 gen.SetDelays({0.0f, 1.5f, 3.0f, 4.5f});   // МКС per-antenna!
 
@@ -136,7 +136,7 @@ clReleaseMemObject(input.data);
 ```cpp
 #include "generators/lfm_generator_analytical_delay.hpp"
 
-signal_gen::LfmGeneratorAnalyticalDelay gen(backend, lfm_params);
+dsp::signal_generators::LfmGeneratorAnalyticalDelay gen(backend, lfm_params);
 gen.SetSampling({12e6, 4096});
 gen.SetDelays({0.0f, 2.7f, 5.4f});   // МКС, 3 антенны
 
@@ -147,7 +147,7 @@ clReleaseMemObject(result.data);
 ### C++ — CW / LFM / Noise (простые)
 
 ```cpp
-signal_gen::CwGenerator cw(backend, {.f0=1e6, .amplitude=1.0});
+dsp::signal_generators::CwGenerator cw(backend, {.f0=1e6, .amplitude=1.0});
 cl_mem buf = cw.GenerateToGpu({12e6, 4096}, /*beams=*/1);
 clReleaseMemObject(buf);
 ```

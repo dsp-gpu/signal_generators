@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: signal_generators
-class_fqn: signal_gen::LfmConjugateGenerator
+class_fqn: dsp::signal_generators::LfmConjugateGenerator
 file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/lfm_conjugate_generator.hpp
 line: 48
 brief: "Генерирует конъюгированный LFM-сигнал для деширпирования"
@@ -15,7 +15,7 @@ synonyms_en: ['conjugate LFM generator', 'dechirp reference signal', 'dechirp ge
 tags: ['GPU', 'CPU', 'деширпирование', 'LFM', 'сигналы']
 ---
 
-# `signal_gen::LfmConjugateGenerator` — карточка класса
+# `dsp::signal_generators::LfmConjugateGenerator` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo signal_generators --class LfmConjugateGenerator`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,9 +35,9 @@ tags: ['GPU', 'CPU', 'деширпирование', 'LFM', 'сигналы']
 
 **Пример**:
 ```cpp
-#include "signal_generators/generators/lfm_conjugate_generator.hpp"
+#include "dsp/signal_generators/generators/lfm_conjugate_generator.hpp"
 
-using namespace signal_gen;
+using namespace dsp::signal_generators;
 
 int main() {
   auto gen = LfmConjugateGenerator::Create(Backend::HIP, LfmParams{...});

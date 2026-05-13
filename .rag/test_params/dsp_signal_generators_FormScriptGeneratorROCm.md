@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: signal_generators
-class_fqn: signal_gen::FormScriptGeneratorROCm
+class_fqn: dsp::signal_generators::FormScriptGeneratorROCm
 file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/form_script_generator_rocm.hpp
 line: 28
 brief: "Класс предоставляет интерфейс для генерации входных данных для GPU-обработки сигналов с поддержкой ROCm."
@@ -15,7 +15,7 @@ synonyms_en: ['data generator', 'ROCm', 'GPU processing', 'signal', 'input data'
 tags: ['GPU', 'ROCm', 'генератор', 'сигнал', 'данные']
 ---
 
-# `signal_gen::FormScriptGeneratorROCm` — карточка класса
+# `dsp::signal_generators::FormScriptGeneratorROCm` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo signal_generators --class FormScriptGeneratorROCm`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,7 +35,7 @@ tags: ['GPU', 'ROCm', 'генератор', 'сигнал', 'данные']
 
 **Пример**:
 ```cpp
-#include "signal_generators/generators/form_script_generator_rocm.hpp"
+#include "dsp/signal_generators/generators/form_script_generator_rocm.hpp"
 using namespace signal_generators;
 
 int main() {

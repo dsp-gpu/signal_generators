@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: signal_generators
-class_fqn: signal_gen::ScriptGeneratorROCm
+class_fqn: dsp::signal_generators::ScriptGeneratorROCm
 file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/script_generator_rocm.hpp
 line: 36
 brief: "Класс генерирует входные данные для GPU-обработки сигналов с поддержкой ROCm."
@@ -15,7 +15,7 @@ synonyms_en: ['ROCm signal generator', 'GPU data generator', 'abstract generator
 tags: ['GPU', 'ROCm', 'signal generation', 'data generation', 'platform abstraction']
 ---
 
-# `signal_gen::ScriptGeneratorROCm` — карточка класса
+# `dsp::signal_generators::ScriptGeneratorROCm` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo signal_generators --class ScriptGeneratorROCm`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,7 +35,7 @@ tags: ['GPU', 'ROCm', 'signal generation', 'data generation', 'platform abstract
 
 **Пример**:
 ```cpp
-#include "signal_generators/generators/script_generator_rocm.hpp"
+#include "dsp/signal_generators/generators/script_generator_rocm.hpp"
 using namespace signal_generators;
 
 int main() {

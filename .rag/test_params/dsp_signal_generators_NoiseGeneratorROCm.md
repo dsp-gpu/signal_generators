@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: signal_generators
-class_fqn: signal_gen::NoiseGeneratorROCm
+class_fqn: dsp::signal_generators::NoiseGeneratorROCm
 file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/noise_generator_rocm.hpp
 line: 36
 brief: "Генерирует шум для радиолокационных сигналов на GPU (ROCm) и CPU."
@@ -15,7 +15,7 @@ synonyms_en: ['ROCm Noise Generator', 'GPU Noise Generator', 'Noise Generator RO
 tags: ['GPU', 'ROCm', 'Шум', 'Генерация', 'Радиолокация']
 ---
 
-# `signal_gen::NoiseGeneratorROCm` — карточка класса
+# `dsp::signal_generators::NoiseGeneratorROCm` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo signal_generators --class NoiseGeneratorROCm`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,9 +35,9 @@ tags: ['GPU', 'ROCm', 'Шум', 'Генерация', 'Радиолокация'
 
 **Пример**:
 ```cpp
-#include "signal_generators/generators/noise_generator_rocm.hpp"
+#include "dsp/signal_generators/generators/noise_generator_rocm.hpp"
 
-using namespace signal_gen;
+using namespace dsp::signal_generators;
 
 int main() {
     SystemSampling system;
