@@ -10,7 +10,6 @@ target_link_libraries(dsp_signal_generators PRIVATE
   DspSignalGenerators::DspSignalGenerators)
 target_include_directories(dsp_signal_generators PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${PROJECT_SOURCE_DIR}/src/signal_generators/include
   # py_gpu_context.hpp — ROCmGPUContext shared header
   ${FETCHCONTENT_SOURCE_DIR_DSPCORE}/python)
 target_compile_definitions(dsp_signal_generators PRIVATE

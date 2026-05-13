@@ -23,21 +23,21 @@ add_library(DspSignalGenerators::DspSignalGenerators ALIAS DspSignalGenerators)
 set_target_properties(DspSignalGenerators PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_sources(DspSignalGenerators PRIVATE
-  src/signal_generators/src/cw_generator_rocm.cpp
-  src/signal_generators/src/lfm_generator_rocm.cpp
-  src/signal_generators/src/lfm_conjugate_generator_rocm.cpp
-  src/signal_generators/src/lfm_generator_analytical_delay_rocm.cpp
-  src/signal_generators/src/noise_generator_rocm.cpp
-  src/signal_generators/src/script_generator_rocm.cpp
-  src/signal_generators/src/form_signal_generator_rocm.cpp
-  src/signal_generators/src/delayed_form_signal_generator_rocm.cpp
-  src/signal_generators/src/form_script_generator_rocm.cpp
-  src/signal_generators/src/signal_generator_factory.cpp
+  src/signal_generators/cw_generator_rocm.cpp
+  src/signal_generators/lfm_generator_rocm.cpp
+  src/signal_generators/lfm_conjugate_generator_rocm.cpp
+  src/signal_generators/lfm_generator_analytical_delay_rocm.cpp
+  src/signal_generators/noise_generator_rocm.cpp
+  src/signal_generators/script_generator_rocm.cpp
+  src/signal_generators/form_signal_generator_rocm.cpp
+  src/signal_generators/delayed_form_signal_generator_rocm.cpp
+  src/signal_generators/form_script_generator_rocm.cpp
+  src/signal_generators/signal_generator_factory.cpp
 )
 
 target_include_directories(DspSignalGenerators
   PUBLIC
-    # Стандарт AMD: #include <signal_generators/generators/...>
+    # Стандарт DSP-GPU: #include <dsp/signal_generators/generators/...>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/generated>
     $<INSTALL_INTERFACE:include>
