@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 /**
  * @file py_form_signal_rocm.hpp
@@ -22,7 +22,7 @@
  * @date 2026-03-10
  */
 
-#include <signal_generators/generators/form_signal_generator_rocm.hpp>
+#include <dsp/signal_generators/generators/form_signal_generator_rocm.hpp>
 
 // ============================================================================
 // PyFormSignalGeneratorROCm — pythonic wrapper
@@ -57,7 +57,7 @@ public:
       double   tau_max      = 0.0,
       uint32_t tau_seed     = 12345)
   {
-    signal_gen::FormParams p;
+    dsp::signal_generators::FormParams p;
     p.antennas        = antennas;
     p.points          = points;
     p.fs              = fs;
@@ -130,7 +130,7 @@ public:
 
 private:
   ROCmGPUContext& ctx_;
-  signal_gen::FormSignalGeneratorROCm gen_;
+  dsp::signal_generators::FormSignalGeneratorROCm gen_;
 };
 
 // ============================================================================

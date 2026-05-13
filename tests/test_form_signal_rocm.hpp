@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // test_form_signal_rocm — тесты FormSignalGeneratorROCm (ROCm)
@@ -34,8 +34,8 @@
 
 #if ENABLE_ROCM
 
-#include <signal_generators/generators/form_signal_generator_rocm.hpp>
-#include <signal_generators/params/form_params.hpp>
+#include <dsp/signal_generators/generators/form_signal_generator_rocm.hpp>
+#include <dsp/signal_generators/params/form_params.hpp>
 #include <core/backends/rocm/rocm_backend.hpp>
 
 // test_utils — единая тестовая инфраструктура
@@ -52,7 +52,7 @@
 
 namespace test_form_signal_rocm {
 
-using namespace signal_gen;
+using namespace dsp::signal_generators;
 using namespace drv_gpu_lib;
 using namespace gpu_test_utils;
 

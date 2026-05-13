@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file signal_generator_factory.cpp
  * @brief Реализация фабрики генераторов
  *
@@ -6,14 +6,14 @@
  * @date 2026-02-13
  */
 
-#include <signal_generators/signal_generator_factory.hpp>
-#include <signal_generators/generators/cw_generator.hpp>
-#include <signal_generators/generators/lfm_generator.hpp>
-#include <signal_generators/generators/noise_generator.hpp>
+#include <dsp/signal_generators/signal_generator_factory.hpp>
+#include <dsp/signal_generators/generators/cw_generator.hpp>
+#include <dsp/signal_generators/generators/lfm_generator.hpp>
+#include <dsp/signal_generators/generators/noise_generator.hpp>
 
 #include <stdexcept>
 
-namespace signal_gen {
+namespace dsp::signal_generators {
 
 std::unique_ptr<ISignalGenerator> SignalGeneratorFactory::CreateCw(
     drv_gpu_lib::IBackend* backend, const CwParams& params) {
@@ -75,4 +75,4 @@ std::unique_ptr<ISignalGenerator> SignalGeneratorFactory::Create(
     }
 }
 
-} // namespace signal_gen
+} // namespace dsp::signal_generators

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file form_script_generator_rocm.cpp
  * @brief ROCm: FormParams → DSL → ScriptGeneratorROCm
  *
@@ -8,7 +8,7 @@
 
 #if ENABLE_ROCM
 
-#include <signal_generators/generators/form_script_generator_rocm.hpp>
+#include <dsp/signal_generators/generators/form_script_generator_rocm.hpp>
 
 #include <sstream>
 #include <iomanip>
@@ -18,7 +18,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-namespace signal_gen {
+namespace dsp::signal_generators {
 
 FormScriptGeneratorROCm::FormScriptGeneratorROCm(drv_gpu_lib::IBackend* backend)
     : backend_(backend), script_gen_(backend) {
@@ -97,6 +97,6 @@ FormScriptGeneratorROCm::GenerateToCpu() {
   return out;
 }
 
-}  // namespace signal_gen
+} // namespace dsp::signal_generators
 
 #endif  // ENABLE_ROCM

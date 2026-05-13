@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 /**
  * @file py_delayed_form_signal_rocm.hpp
@@ -21,7 +21,7 @@
  * @date 2026-03-23
  */
 
-#include <signal_generators/generators/delayed_form_signal_generator_rocm.hpp>
+#include <dsp/signal_generators/generators/delayed_form_signal_generator_rocm.hpp>
 
 // ============================================================================
 // PyDelayedFormSignalGeneratorROCm — pythonic wrapper
@@ -46,7 +46,7 @@ public:
       double   norm            = 0.7071067811865476,
       uint32_t noise_seed      = 0)
   {
-    signal_gen::FormParams p;
+    dsp::signal_generators::FormParams p;
     p.fs              = fs;
     p.antennas        = antennas;
     p.points          = points;
@@ -121,7 +121,7 @@ public:
 
 private:
   ROCmGPUContext& ctx_;
-  signal_gen::DelayedFormSignalGeneratorROCm gen_;
+  dsp::signal_generators::DelayedFormSignalGeneratorROCm gen_;
 };
 
 // ============================================================================

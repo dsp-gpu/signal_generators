@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lfm_generator_rocm.cpp
  * @brief LfmGeneratorROCm implementation — LFM chirp on GPU (ROCm/HIP)
  *
@@ -8,9 +8,9 @@
 
 #if ENABLE_ROCM
 
-#include <signal_generators/generators/lfm_generator_rocm.hpp>
-#include <signal_generators/kernels/lfm_kernels_rocm.hpp>
-#include <spectrum/utils/rocm_profiling_helpers.hpp>
+#include <dsp/signal_generators/generators/lfm_generator_rocm.hpp>
+#include <dsp/signal_generators/kernels/lfm_kernels_rocm.hpp>
+#include <dsp/spectrum/utils/rocm_profiling_helpers.hpp>
 #include <core/services/scoped_hip_event.hpp>
 #include <core/services/console_output.hpp>
 #include <core/services/cache_dir_resolver.hpp>
@@ -21,7 +21,7 @@
 using fft_func_utils::MakeROCmDataFromEvents;
 using drv_gpu_lib::ScopedHipEvent;
 
-namespace signal_gen {
+namespace dsp::signal_generators {
 
 static const std::vector<std::string> kLfmKernelNames = {
   "generate_lfm", "generate_lfm_real"
@@ -132,6 +132,6 @@ std::vector<std::complex<float>> LfmGeneratorROCm::GenerateToCpu(
   return output;
 }
 
-}  // namespace signal_gen
+} // namespace dsp::signal_generators
 
 #endif  // ENABLE_ROCM

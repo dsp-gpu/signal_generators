@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file cw_generator_rocm.cpp
  * @brief CwGeneratorROCm implementation — CW signal on GPU (ROCm/HIP)
  *
@@ -8,9 +8,9 @@
 
 #if ENABLE_ROCM
 
-#include <signal_generators/generators/cw_generator_rocm.hpp>
-#include <signal_generators/kernels/cw_kernels_rocm.hpp>
-#include <spectrum/utils/rocm_profiling_helpers.hpp>
+#include <dsp/signal_generators/generators/cw_generator_rocm.hpp>
+#include <dsp/signal_generators/kernels/cw_kernels_rocm.hpp>
+#include <dsp/spectrum/utils/rocm_profiling_helpers.hpp>
 #include <core/services/scoped_hip_event.hpp>
 #include <core/services/console_output.hpp>
 #include <core/services/cache_dir_resolver.hpp>
@@ -21,7 +21,7 @@
 using fft_func_utils::MakeROCmDataFromEvents;
 using drv_gpu_lib::ScopedHipEvent;
 
-namespace signal_gen {
+namespace dsp::signal_generators {
 
 static const std::vector<std::string> kCwKernelNames = {
   "generate_cw", "generate_cw_real"
@@ -137,6 +137,6 @@ std::vector<std::complex<float>> CwGeneratorROCm::GenerateToCpu(
   return output;
 }
 
-}  // namespace signal_gen
+} // namespace dsp::signal_generators
 
 #endif  // ENABLE_ROCM

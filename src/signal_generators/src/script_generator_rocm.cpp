@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file script_generator_rocm.cpp
  * @brief ScriptGeneratorROCm — DSL → HIP kernel via GpuContext (disk cache v2)
  *
@@ -14,8 +14,8 @@
 
 #if ENABLE_ROCM
 
-#include <signal_generators/generators/script_generator_rocm.hpp>
-#include <signal_generators/generators/script_generator.hpp>  // ParsedScript, ScriptParams (types only)
+#include <dsp/signal_generators/generators/script_generator_rocm.hpp>
+#include <dsp/signal_generators/generators/script_generator.hpp>  // ParsedScript, ScriptParams (types only)
 
 #include <core/services/cache_dir_resolver.hpp>
 
@@ -27,7 +27,7 @@
 #include <cstring>
 #include <utility>
 
-namespace signal_gen {
+namespace dsp::signal_generators {
 
 // ============================================================================
 // Constructor / Destructor / Move
@@ -308,6 +308,6 @@ std::string ScriptGeneratorROCm::ToUpper(const std::string& s) {
   return r;
 }
 
-}  // namespace signal_gen
+} // namespace dsp::signal_generators
 
 #endif  // ENABLE_ROCM

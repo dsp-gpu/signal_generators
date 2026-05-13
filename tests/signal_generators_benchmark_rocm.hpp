@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // FormSignalGeneratorROCmBenchmark — бенчмарк GenerateInputData() (ROCm)
@@ -20,7 +20,7 @@
 
 #if ENABLE_ROCM
 
-#include <signal_generators/generators/form_signal_generator_rocm.hpp>
+#include <dsp/signal_generators/generators/form_signal_generator_rocm.hpp>
 #include <core/services/gpu_benchmark_base.hpp>
 #include <core/services/profiling/profiling_facade.hpp>
 
@@ -41,7 +41,7 @@ public:
    */
   FormSignalGeneratorROCmBenchmark(
       drv_gpu_lib::IBackend* backend,
-      signal_gen::FormSignalGeneratorROCm& gen,
+      dsp::signal_generators::FormSignalGeneratorROCm& gen,
       GpuBenchmarkBase::Config cfg = {
           .n_warmup   = 5,
           .n_runs     = 20,
@@ -58,7 +58,7 @@ protected:
 
   /// Замер — GenerateInputData с ROCmProfEvents → ProfilingFacade::BatchRecord
   void ExecuteKernelTimed() override {
-    signal_gen::ROCmProfEvents events;
+    dsp::signal_generators::ROCmProfEvents events;
     auto input = gen_.GenerateInputData(&events);
     hipFree(input.data);
     drv_gpu_lib::profiling::ProfilingFacade::GetInstance()
@@ -66,7 +66,7 @@ protected:
   }
 
 private:
-  signal_gen::FormSignalGeneratorROCm& gen_;
+  dsp::signal_generators::FormSignalGeneratorROCm& gen_;
 };
 
 }  // namespace test_signal_generators_rocm

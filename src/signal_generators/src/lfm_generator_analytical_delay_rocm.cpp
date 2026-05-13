@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lfm_generator_analytical_delay_rocm.cpp
  * @brief ROCm implementation of LFM with analytical per-antenna delay
  *
@@ -8,9 +8,9 @@
 
 #if ENABLE_ROCM
 
-#include <signal_generators/generators/lfm_generator_analytical_delay_rocm.hpp>
-#include <signal_generators/kernels/lfm_kernels_rocm.hpp>
-#include <spectrum/utils/rocm_profiling_helpers.hpp>
+#include <dsp/signal_generators/generators/lfm_generator_analytical_delay_rocm.hpp>
+#include <dsp/signal_generators/kernels/lfm_kernels_rocm.hpp>
+#include <dsp/spectrum/utils/rocm_profiling_helpers.hpp>
 
 #include <cmath>
 #include <stdexcept>
@@ -25,7 +25,7 @@
 using fft_func_utils::MakeROCmDataFromEvents;
 using drv_gpu_lib::ScopedHipEvent;
 
-namespace signal_gen {
+namespace dsp::signal_generators {
 
 static const std::vector<std::string> kDelayKernelNames = {
   "generate_lfm_analytical_delay"
@@ -145,6 +145,6 @@ LfmGeneratorAnalyticalDelayROCm::GenerateToCpu() {
   return result;
 }
 
-}  // namespace signal_gen
+} // namespace dsp::signal_generators
 
 #endif  // ENABLE_ROCM

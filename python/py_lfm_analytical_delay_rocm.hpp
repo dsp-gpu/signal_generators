@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 /**
  * @file py_lfm_analytical_delay_rocm.hpp
@@ -21,7 +21,7 @@
  * @date 2026-03-23
  */
 
-#include <signal_generators/generators/lfm_generator_analytical_delay_rocm.hpp>
+#include <dsp/signal_generators/generators/lfm_generator_analytical_delay_rocm.hpp>
 
 // ============================================================================
 // PyLfmAnalyticalDelayROCm — pythonic wrapper
@@ -35,18 +35,18 @@ public:
                             double amplitude = 1.0)
       : ctx_(ctx)
   {
-    signal_gen::LfmParams params;
+    dsp::signal_generators::LfmParams params;
     params.f_start = f_start;
     params.f_end = f_end;
     params.amplitude = amplitude;
-    gen_ = std::make_unique<signal_gen::LfmGeneratorAnalyticalDelayROCm>(
+    gen_ = std::make_unique<dsp::signal_generators::LfmGeneratorAnalyticalDelayROCm>(
         ctx.backend(), params);
   }
 
   // -- Parameters -----------------------------------------------------------
 
   void set_sampling(double fs, size_t length) {
-    signal_gen::SystemSampling sys;
+    dsp::signal_generators::SystemSampling sys;
     sys.fs = fs;
     sys.length = length;
     gen_->SetSampling(sys);
@@ -57,7 +57,7 @@ public:
   }
 
   void set_params(double f_start, double f_end, double amplitude = 1.0) {
-    signal_gen::LfmParams p;
+    dsp::signal_generators::LfmParams p;
     p.f_start = f_start;
     p.f_end = f_end;
     p.amplitude = amplitude;
@@ -130,7 +130,7 @@ public:
 
 private:
   ROCmGPUContext& ctx_;
-  std::unique_ptr<signal_gen::LfmGeneratorAnalyticalDelayROCm> gen_;
+  std::unique_ptr<dsp::signal_generators::LfmGeneratorAnalyticalDelayROCm> gen_;
 };
 
 // ============================================================================

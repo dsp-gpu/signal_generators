@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lfm_conjugate_generator_rocm.cpp
  * @brief LfmConjugateGeneratorROCm — Ref03 implementation
  *
@@ -8,8 +8,8 @@
 
 #if ENABLE_ROCM
 
-#include <signal_generators/generators/lfm_conjugate_generator_rocm.hpp>
-#include <signal_generators/kernels/lfm_kernels_rocm.hpp>
+#include <dsp/signal_generators/generators/lfm_conjugate_generator_rocm.hpp>
+#include <dsp/signal_generators/kernels/lfm_kernels_rocm.hpp>
 #include <core/services/cache_dir_resolver.hpp>
 
 #include <cmath>
@@ -20,7 +20,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-namespace signal_gen {
+namespace dsp::signal_generators {
 
 static const std::vector<std::string> kConjKernelNames = {
   "generate_lfm_conjugate"
@@ -111,6 +111,6 @@ std::vector<std::complex<float>> LfmConjugateGeneratorROCm::GenerateToCpu() {
   return result;
 }
 
-}  // namespace signal_gen
+} // namespace dsp::signal_generators
 
 #endif  // ENABLE_ROCM

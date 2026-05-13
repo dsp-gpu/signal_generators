@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // test_signal_generators_rocm_basic — CW/LFM/Noise/LfmConjugate (ROCm)
@@ -32,10 +32,10 @@
 
 #if ENABLE_ROCM
 
-#include <signal_generators/generators/cw_generator_rocm.hpp>
-#include <signal_generators/generators/lfm_generator_rocm.hpp>
-#include <signal_generators/generators/noise_generator_rocm.hpp>
-#include <signal_generators/generators/lfm_conjugate_generator_rocm.hpp>
+#include <dsp/signal_generators/generators/cw_generator_rocm.hpp>
+#include <dsp/signal_generators/generators/lfm_generator_rocm.hpp>
+#include <dsp/signal_generators/generators/noise_generator_rocm.hpp>
+#include <dsp/signal_generators/generators/lfm_conjugate_generator_rocm.hpp>
 #include <core/backends/rocm/rocm_backend.hpp>
 
 // test_utils — единая тестовая инфраструктура
@@ -51,7 +51,7 @@
 
 namespace test_signal_generators_rocm_basic {
 
-using namespace signal_gen;
+using namespace dsp::signal_generators;
 using namespace drv_gpu_lib;
 using namespace gpu_test_utils;
 

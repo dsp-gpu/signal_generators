@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file delayed_form_signal_generator_rocm.cpp
  * @brief ROCm pipeline: FormSignalROCm → LchFarrowROCm (delay + noise)
  *
@@ -8,11 +8,11 @@
 
 #if ENABLE_ROCM
 
-#include <signal_generators/generators/delayed_form_signal_generator_rocm.hpp>
+#include <dsp/signal_generators/generators/delayed_form_signal_generator_rocm.hpp>
 
 #include <stdexcept>
 
-namespace signal_gen {
+namespace dsp::signal_generators {
 
 DelayedFormSignalGeneratorROCm::DelayedFormSignalGeneratorROCm(
     drv_gpu_lib::IBackend* backend)
@@ -74,6 +74,6 @@ DelayedFormSignalGeneratorROCm::GenerateToCpu() {
   return out;
 }
 
-}  // namespace signal_gen
+} // namespace dsp::signal_generators
 
 #endif  // ENABLE_ROCM

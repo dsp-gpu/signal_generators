@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file form_signal_generator_rocm.cpp
  * @brief FormSignalGeneratorROCm — Ref03 implementation (GpuContext)
  *
@@ -11,9 +11,9 @@
 
 #if ENABLE_ROCM
 
-#include <signal_generators/generators/form_signal_generator_rocm.hpp>
-#include <signal_generators/kernels/form_signal_kernels_rocm.hpp>
-#include <spectrum/utils/rocm_profiling_helpers.hpp>
+#include <dsp/signal_generators/generators/form_signal_generator_rocm.hpp>
+#include <dsp/signal_generators/kernels/form_signal_kernels_rocm.hpp>
+#include <dsp/spectrum/utils/rocm_profiling_helpers.hpp>
 #include <core/services/console_output.hpp>
 
 #include <stdexcept>
@@ -28,7 +28,7 @@
 using fft_func_utils::MakeROCmDataFromEvents;
 using drv_gpu_lib::ScopedHipEvent;
 
-namespace signal_gen {
+namespace dsp::signal_generators {
 
 static const std::vector<std::string> kKernelNames = {
   "generate_form_signal"
@@ -206,6 +206,6 @@ FormSignalGeneratorROCm::GenerateToCpu() {
   return result;
 }
 
-}  // namespace signal_gen
+} // namespace dsp::signal_generators
 
 #endif  // ENABLE_ROCM
