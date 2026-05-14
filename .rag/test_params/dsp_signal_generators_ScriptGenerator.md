@@ -1,18 +1,15 @@
-﻿---
+---
 schema_version: 1
 repo: signal_generators
 class_fqn: dsp::signal_generators::ScriptGenerator
-file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/script_generator.hpp
-line: 83
-brief: "Компилирует текстовый DSL в OpenCL-кернел для выполнения на GPU"
+file: /home/alex/DSP-GPU/signal_generators/include/dsp/signal_generators/generators/script_generator.hpp
+line: 90
+brief: "/**  * @class ScriptGenerator  * @brief Компилятор текстового DSL в OpenCL kernel с исполнением на GPU.  *  * @note Move-only: cl_program/queue/context уникальны на инстанс.  * @note backend не владее"
 methods_total: 4
 methods_with_doxygen: 4
-ai_generated: true
+ai_generated: false
 human_verified: false
-parser_version: 2
-synonyms_ru: ['ScriptGenerator', 'DSL-генератор', 'OpenCL-генератор', 'GPU-скрипт', 'SignalScriptGenerator']
-synonyms_en: ['ScriptGenerator', 'DSL Generator', 'OpenCL Generator', 'GPU Script', 'SignalScriptGenerator']
-tags: ['GPU', 'OpenCL', 'DSL', 'Signal Generation', 'Scripting', 'DSP']
+parser_version: 1
 ---
 
 # `dsp::signal_generators::ScriptGenerator` — карточка класса
@@ -27,35 +24,40 @@ tags: ['GPU', 'OpenCL', 'DSL', 'Signal Generation', 'Scripting', 'DSP']
 
 <!-- rag-block: id=signal_generators__script_generator__class_overview__v1 -->
 
-**ЧТО**: Компилирует текстовый DSL в OpenCL-кернел для выполнения на GPU
-
-**ЗАЧЕМ**: Автоматизирует генерацию сигналов через скрипты, упрощая разработку и тестирование
-
-**КАК**: Использует DSL для описания параметров и сигналов, компилирует в OpenCL-код, оптимизирует для GPU-вычислений
-
-**Пример**:
-```cpp
-#include "dsp/signal_generators/generators/script_generator.hpp"
-using namespace dsp::signal_generators;
-
-int main() {
-    IBackend* backend = ...;
-    ScriptGenerator gen(backend);
-    gen.LoadScript(R"([Params] ANTENNAS=8 POINTS=4096 [Defs] var_W=0.1+ID*0.005 [Signal] res=sin(var_W*T))");
-    cl_mem gpu_buf = gen.Generate();
-    // ... use gpu_buf ...
-    clReleaseMemObject(gpu_buf);
-    return 0;
-}
-```
+/**
+ * @class ScriptGenerator
+ * @brief Компилятор текстового DSL в OpenCL kernel с исполнением на GPU.
+ *
+ * @note Move-only: cl_program/queue/context уникальны на инстанс.
+ * @note backend не владеет — caller гарантирует переживание генератора.
+ * @note OpenCL-вариант. ROCm-аналог: ScriptGeneratorROCm.
+ * @see dsp::signal_generators::ScriptGeneratorROCm
+ *
+ * @code
+ * ScriptGenerator gen(backend);
+ * gen.LoadScript(R"(
+ *     [Params]
+ *     ANTENNAS = 8
+ *     POINTS = 4096
+ *     [Defs]
+ *     var_W = 0.1 + (float)ID * 0.005
+ *     [Signal]
+ *     res = sin(var_W * (float)T);
+ * )");
+ *
+ * cl_mem gpu_buf = gen.Generate();
+ * // ... use gpu_buf ...
+ * clReleaseMemObject(gpu_buf);
+ * @endcode
+ */
 
 <!-- /rag-block -->
 
 ## Связанные секции из Doc/
 
 - `signal_generators__gpu__c2_container_002__v1` (c2_container): ``` ┌─────────────────────────────────────────────────────────────┐ │  signal_generators module                                   │ │                                                             │ │  ┌…
-- `signal_generators__architecture__section_002__v1` (section): ``` ┌─────────────────────────────────────────────────────────────┐ │                     Signal Generators                        │ ├─────────────────────────────────────────────────────────────┤ │  …
 - `signal_generators__meta__claude_card__v1` (meta_claude): <!-- type:meta_claude repo:signal_generators source:signal_generators/CLAUDE.md -->  # signal_generators — Repository Card  _Источник: `signal_generators/CLAUDE.md`_  # 🤖 CLAUDE — `signal_generators` …
+- `signal_generators__architecture__section_002__v1` (section): ``` ┌─────────────────────────────────────────────────────────────┐ │                     Signal Generators                        │ ├─────────────────────────────────────────────────────────────┤ │  …
 - `signal_generators__gpu__c3_component__v1` (c3_component): ### C3 — Component  ``` signal_gen namespace │ ├── ISignalGenerator (interface) │   ├── + GenerateToCpu(SystemSampling, out*, size) │   ├── + GenerateToGpu(SystemSampling, beam_count) → cl_mem │   └──…
 - `signal_generators__gpu__c4_code__v1` (c4_code): ### C4 — Code (ключевые классы)  ``` FormSignalGenerator   + FormSignalGenerator(IBackend* backend)   + SetParams(const FormParams&)   + SetParamsFromString(const string&)   + GenerateInputData() → In…
 
@@ -73,10 +75,10 @@ void LoadScript(const std::string& script_text)
 
 **Doxygen-источник**:
 ```cpp
-/**
-     * @brief Parse and compile script from string
-     * @param script_text Script in [Params]/[Defs]/[Signal] format
-     * @throws std::runtime_error on parse or compilation failure
+/**
+     * @brief Parse and compile script from string
+     * @param script_text Script in [Params]/[Defs]/[Signal] format
+     * @throws std::runtime_error on parse or compilation failure
      */
 ```
 
@@ -92,11 +94,11 @@ void LoadFile(const std::string& file_path)
 
 **Doxygen-источник**:
 ```cpp
-/**
-     * @brief Parse and compile script from file
-     * @param file_path Path to .signal or .txt file
-     *   @test { values=["/tmp/test_config.json"] }
-     * @throws std::runtime_error if file cannot be read
+/**
+     * @brief Parse and compile script from file
+     * @param file_path Path to .signal or .txt file
+     *   @test { values=["/tmp/test_config.json"] }
+     * @throws std::runtime_error if file cannot be read
      */
 ```
 
@@ -111,11 +113,11 @@ cl_mem Generate()
 
 **Doxygen-источник**:
 ```cpp
-/**
-     * @brief Generate signal on GPU
-     * @return cl_mem buffer [antennas * points * sizeof(complex<float>)]
-     * @note Caller must release via clReleaseMemObject()
-     *   @test_check result != nullptr (требуется LoadScript/LoadFile перед Generate)
+/**
+     * @brief Generate signal on GPU
+     * @return cl_mem buffer [antennas * points * sizeof(complex<float>)]
+     * @note Caller must release via clReleaseMemObject()
+     *   @test_check result != nullptr (требуется LoadScript/LoadFile перед Generate)
      */
 ```
 
@@ -130,10 +132,10 @@ std::vector<std::complex<float>> GenerateToCpu()
 
 **Doxygen-источник**:
 ```cpp
-/**
-     * @brief Generate and read back to CPU
-     * @return Vector of complex samples [antennas * points]
-     *   @test_check result.size() == script_.params.antennas * script_.params.points
+/**
+     * @brief Generate and read back to CPU
+     * @return Vector of complex samples [antennas * points]
+     *   @test_check result.size() == script_.params.antennas * script_.params.points
      */
 ```
 

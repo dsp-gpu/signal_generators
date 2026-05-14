@@ -1,18 +1,15 @@
-﻿---
+---
 schema_version: 1
 repo: signal_generators
 class_fqn: dsp::signal_generators::FormScriptGeneratorROCm
-file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/form_script_generator_rocm.hpp
-line: 28
-brief: "Класс предоставляет интерфейс для генерации входных данных для GPU-обработки сигналов с поддержкой ROCm."
+file: /home/alex/DSP-GPU/signal_generators/include/dsp/signal_generators/generators/form_script_generator_rocm.hpp
+line: 58
+brief: "/**  * @class FormScriptGeneratorROCm  * @brief Композиция над ScriptGeneratorROCm: FormParams → DSL → HIP-сигнал.  *  * @ingroup grp_signal_generators  * @note Доступен только при ENABLE_ROCM=1. Open"
 methods_total: 4
 methods_with_doxygen: 4
-ai_generated: true
+ai_generated: false
 human_verified: false
-parser_version: 2
-synonyms_ru: ['генератор данных', 'ROCm', 'GPU-обработка', 'сигнал', 'входные данные']
-synonyms_en: ['data generator', 'ROCm', 'GPU processing', 'signal', 'input data']
-tags: ['GPU', 'ROCm', 'генератор', 'сигнал', 'данные']
+parser_version: 1
 ---
 
 # `dsp::signal_generators::FormScriptGeneratorROCm` — карточка класса
@@ -27,30 +24,21 @@ tags: ['GPU', 'ROCm', 'генератор', 'сигнал', 'данные']
 
 <!-- rag-block: id=signal_generators__form_script_generator_rocm__class_overview__v1 -->
 
-**ЧТО**: Класс предоставляет интерфейс для генерации входных данных для GPU-обработки сигналов с поддержкой ROCm.
-
-**ЗАЧЕМ**: Решает проблему платформенной зависимости генерации данных для GPU, обеспечивая отдельную реализацию для ROCm.
-
-**КАК**: Использует паттерн lazy initialization для проверки активации ROCm. Все методы выбрасывают исключение при отсутствии поддержки. Реализует абстрактные методы для разных GPU-платформ.
-
-**Пример**:
-```cpp
-#include "dsp/signal_generators/generators/form_script_generator_rocm.hpp"
-using namespace signal_generators;
-
-int main() {
-    FormScriptGeneratorROCm gen;
-    try {
-        auto input = gen.GenerateInputData();
-        auto cpu_data = gen.GenerateToCpu();
-    } catch (const std::runtime_error& e) {
-        // Обработка ошибки отсутствия ROCm
-    }
-    return 0;
-}
-```
+/**
+ * @class FormScriptGeneratorROCm
+ * @brief Композиция над ScriptGeneratorROCm: FormParams → DSL → HIP-сигнал.
+ *
+ * @ingroup grp_signal_generators
+ * @note Доступен только при ENABLE_ROCM=1. OpenCL-вариант: FormScriptGenerator.
+ * @see dsp::signal_generators::FormScriptGenerator
+ * @see dsp::signal_generators::ScriptGeneratorROCm
+ */
 
 <!-- /rag-block -->
+
+## Связанные секции из Doc/
+
+- `signal_generators__form_script_generator__class_overview__v1` (class_overview): /**  * @class FormScriptGenerator  * @brief DSL-генератор + on-disk кэш OpenCL kernels для формулы getX.  *  * @note Move-only: GPU-ресурсы (cl_program/queue/context) уникальны на инстанс.  * @note То…
 
 ## Public-методы (4)
 
@@ -65,11 +53,11 @@ drv_gpu_lib::InputData<void*> GenerateInputData()
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief GPU production: FormParams → DSL → hiprtc → HIP launch. Возвращает InputData<void*>.
-   *
-   * @return InputData<void*> [antennas × points × complex<float>]; caller обязан hipFree result.data.
-   *   @test_check result != nullptr && result.antenna_count == params_.antennas
+/**
+   * @brief GPU production: FormParams → DSL → hiprtc → HIP launch. Возвращает InputData<void*>.
+   *
+   * @return InputData<void*> [antennas × points × complex<float>]; caller обязан hipFree result.data.
+   *   @test_check result != nullptr && result.antenna_count == params_.antennas
    */
 ```
 
@@ -84,11 +72,11 @@ std::vector<std::vector<std::complex<float>>> GenerateToCpu()
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Полный pipeline с readback на CPU (для unit-тестов и сверки).
-   *
-   * @return vector[antenna_id][sample_id] complex<float>.
-   *   @test_check result.size() == params_.antennas && result[0].size() == params_.points
+/**
+   * @brief Полный pipeline с readback на CPU (для unit-тестов и сверки).
+   *
+   * @return vector[antenna_id][sample_id] complex<float>.
+   *   @test_check result.size() == params_.antennas && result[0].size() == params_.points
    */
 ```
 
@@ -103,14 +91,14 @@ drv_gpu_lib::InputData<void*> GenerateInputData() { throw std::runtime_error("Fo
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Stub: бросает runtime_error — GenerateInputData доступен только в ROCm-сборке.
-   *
-   * @return Никогда не возвращает (всегда throw).
-   *   @test_check throws std::runtime_error
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
+/**
+   * @brief Stub: бросает runtime_error — GenerateInputData доступен только в ROCm-сборке.
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
    */
 ```
 
@@ -125,14 +113,14 @@ std::vector<std::vector<std::complex<float>>> GenerateToCpu() { throw std::runti
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
-   *
-   * @return Никогда не возвращает (всегда throw).
-   *   @test_check throws std::runtime_error
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
+/**
+   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
    */
 ```
 

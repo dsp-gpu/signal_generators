@@ -1,18 +1,15 @@
-﻿---
+---
 schema_version: 1
 repo: signal_generators
 class_fqn: dsp::signal_generators::LfmConjugateGenerator
-file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/lfm_conjugate_generator.hpp
-line: 48
-brief: "Генерирует конъюгированный LFM-сигнал для деширпирования"
+file: /home/alex/DSP-GPU/signal_generators/include/dsp/signal_generators/generators/lfm_conjugate_generator.hpp
+line: 69
+brief: "/**  * @class LfmConjugateGenerator  * @brief GPU/CPU conjugate-LFM генератор — reference для dechirp.  *  * @note Move-only: cl_program/queue/context уникальны на инстанс.  * @note backend не владеет"
 methods_total: 3
 methods_with_doxygen: 3
-ai_generated: true
+ai_generated: false
 human_verified: false
-parser_version: 2
-synonyms_ru: ['генератор конъюгированного LFM', 'опорный сигнал для деширпа', 'деширп-генератор', 'сопряженный LFM-сигнал']
-synonyms_en: ['conjugate LFM generator', 'dechirp reference signal', 'dechirp generator', 'conjugated LFM signal']
-tags: ['GPU', 'CPU', 'деширпирование', 'LFM', 'сигналы']
+parser_version: 1
 ---
 
 # `dsp::signal_generators::LfmConjugateGenerator` — карточка класса
@@ -27,31 +24,29 @@ tags: ['GPU', 'CPU', 'деширпирование', 'LFM', 'сигналы']
 
 <!-- rag-block: id=signal_generators__lfm_conjugate_generator__class_overview__v1 -->
 
-**ЧТО**: Генерирует конъюгированный LFM-сигнал для деширпирования
-
-**ЗАЧЕМ**: Позволяет создавать опорный сигнал для обработки отраженных волн в радарных системах
-
-**КАК**: Оптимизирован для GPU с direct memory access, поддерживает lazy init и кэширование промежуточных данных
-
-**Пример**:
-```cpp
-#include "dsp/signal_generators/generators/lfm_conjugate_generator.hpp"
-
-using namespace dsp::signal_generators;
-
-int main() {
-  auto gen = LfmConjugateGenerator::Create(Backend::HIP, LfmParams{...});
-  gen->SetSampling(SystemSampling::SAMPLING_1);
-  
-  cl_mem gpu_ref = gen->GenerateToGpu();
-  // ... обработка в деширп-пайплайне ...
-  clReleaseMemObject(gpu_ref);
-
-  auto cpu_ref = gen->GenerateToCpu();
-  // ... обработка на CPU ...
-  return 0;
-}
-```
+/**
+ * @class LfmConjugateGenerator
+ * @brief GPU/CPU conjugate-LFM генератор — reference для dechirp.
+ *
+ * @note Move-only: cl_program/queue/context уникальны на инстанс.
+ * @note backend не владеет — caller гарантирует переживание генератора.
+ * @note OpenCL-вариант. ROCm-аналог: LfmConjugateGeneratorROCm.
+ * @see dsp::signal_generators::LfmConjugateGeneratorROCm
+ * @see HeterodyneDechirp (radar/heterodyne)
+ *
+ * @code
+ * LfmConjugateGenerator gen(backend, lfm_params);
+ * gen.SetSampling(system);
+ *
+ * // GPU
+ * cl_mem ref = gen.GenerateToGpu();
+ * // ... use in dechirp pipeline ...
+ * clReleaseMemObject(ref);
+ *
+ * // CPU
+ * auto ref_cpu = gen.GenerateToCpu();
+ * @endcode
+ */
 
 <!-- /rag-block -->
 
@@ -59,9 +54,9 @@ int main() {
 
 - `signal_generators__gpu__c2_container_002__v1` (c2_container): ``` ┌─────────────────────────────────────────────────────────────┐ │  signal_generators module                                   │ │                                                             │ │  ┌…
 - `signal_generators__gpu__c3_component__v1` (c3_component): ### C3 — Component  ``` signal_gen namespace │ ├── ISignalGenerator (interface) │   ├── + GenerateToCpu(SystemSampling, out*, size) │   ├── + GenerateToGpu(SystemSampling, beam_count) → cl_mem │   └──…
-- `signal_generators__gpu__section_002__v1` (section): ### Какой класс выбрать  | Класс | Для чего | Выход | Задержка | |-------|----------|-------|----------| | `FormSignalGenerator` | CW/Chirp + шум, N антенн | `InputData<cl_mem>` | FIXED/LINEAR/RANDOM …
-- `signal_generators__gpu__section_003__v1` (section): ### Иерархия классов  ``` ISignalGenerator (interface)     ├── CwGenerator          → cw_kernel.cl     ├── LfmGenerator         → lfm_kernel.cl     └── NoiseGenerator       → noise_kernel.cl + prng.cl…
 - `signal_generators__quick__section_002__v1` (section): ## Какой класс выбрать  | Задача | Класс | |--------|-------| | CW/Chirp + шум, N каналов | `FormSignalGenerator` | | То же + on-disk кэш kernel | `FormScriptGenerator` | | Дробная задержка (Farrow 48…
+- `signal_generators__gpu__section_006__v1` (section): ### Ссылки  | Документ | Описание | |----------|----------| | [Quick.md](Quick.md) | Краткий справочник — первый старт | | [Doc/Modules/lch_farrow/Full.md](../lch_farrow/Full.md) | Математика Farrow 4…
+- `signal_generators__quick__lfmconjugategenerator__v1` (lfmconjugategenerator): ### LfmConjugateGenerator — опорный сигнал для дечирпа  **Что делает**: генерирует комплексно сопряжённую копию LFM сигнала — conj(s_tx). Это не имитация принятого сигнала, а опорный сигнал для операц…
 
 ## Public-методы (3)
 
@@ -76,11 +71,11 @@ cl_mem GenerateToGpu()
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Generate conjugate LFM on GPU
-   * @return cl_mem with [num_samples] complex signal (conj LFM)
-   * @note Caller must release via clReleaseMemObject()
-   *   @test_check result != nullptr (cl_mem [system_.length × complex<float>])
+/**
+   * @brief Generate conjugate LFM on GPU
+   * @return cl_mem with [num_samples] complex signal (conj LFM)
+   * @note Caller must release via clReleaseMemObject()
+   *   @test_check result != nullptr (cl_mem [system_.length × complex<float>])
    */
 ```
 
@@ -98,14 +93,14 @@ cl_mem GenerateToGpu(ProfEvents* prof_events)
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Генерация на GPU с опциональным сбором событий профилирования.
-   * @param prof_events nullptr → production (zero overhead); &vec → benchmark
-   *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
-   *
-   * Собирает события: "Kernel" (lfm_conjugate.cl)
-   * @return cl_mem [system_.length × complex<float>] с conj(LFM); caller обязан clReleaseMemObject.
-   *   @test_check result != nullptr
+/**
+   * @brief Генерация на GPU с опциональным сбором событий профилирования.
+   * @param prof_events nullptr → production (zero overhead); &vec → benchmark
+   *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
+   *
+   * Собирает события: "Kernel" (lfm_conjugate.cl)
+   * @return cl_mem [system_.length × complex<float>] с conj(LFM); caller обязан clReleaseMemObject.
+   *   @test_check result != nullptr
    */
 ```
 
@@ -120,10 +115,10 @@ std::vector<std::complex<float>> GenerateToCpu()
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Generate conjugate LFM on CPU (reference)
-   * @return vector of complex<float>, length = system_.length
-   *   @test_check result.size() == system_.length
+/**
+   * @brief Generate conjugate LFM on CPU (reference)
+   * @return vector of complex<float>, length = system_.length
+   *   @test_check result.size() == system_.length
    */
 ```
 

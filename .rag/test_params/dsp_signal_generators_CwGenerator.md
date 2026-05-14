@@ -1,18 +1,15 @@
-﻿---
+---
 schema_version: 1
 repo: signal_generators
 class_fqn: dsp::signal_generators::CwGenerator
-file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/cw_generator.hpp
-line: 30
-brief: "Генерирует сигналы непрерывной волны (CW) для CPU и GPU. Создает cl_mem для OpenCL-ускорения."
+file: /home/alex/DSP-GPU/signal_generators/include/dsp/signal_generators/generators/cw_generator.hpp
+line: 55
+brief: "/**  * @class CwGenerator  * @brief OpenCL-генератор CW (комплексной синусоиды) с поддержкой multi-beam.  *  * @note Move-only: GPU-ресурсы (cl_program/queue/context) уникальны на инстанс.  * @note ba"
 methods_total: 4
 methods_with_doxygen: 4
-ai_generated: true
+ai_generated: false
 human_verified: false
-parser_version: 2
-synonyms_ru: ['Генератор непрерывных волн', 'CW Signal Generator', 'Сигнал непрерывной волны', 'Одночастотный генератор']
-synonyms_en: ['Continuous Wave Generator', 'CW Signal Generator', 'Single Frequency Generator', 'Monochromatic Signal Generator']
-tags: ['GPU', 'OpenCL', 'Signal Generation', 'Radar', 'CW']
+parser_version: 1
 ---
 
 # `dsp::signal_generators::CwGenerator` — карточка класса
@@ -27,31 +24,26 @@ tags: ['GPU', 'OpenCL', 'Signal Generation', 'Radar', 'CW']
 
 <!-- rag-block: id=signal_generators__cw_generator__class_overview__v1 -->
 
-**ЧТО**: Генерирует сигналы непрерывной волны (CW) для CPU и GPU. Создает cl_mem для OpenCL-ускорения.
-
-**ЗАЧЕМ**: Решает задачу генерации одночастотных сигналов для радарных систем с высокой производительностью.
-
-**КАК**: Использует OpenCL для GPU-ускорения, поддерживает многолучевые сигналы. Методы переопределяют интерфейс ISignalGenerator.
-
-**Пример**:
-```cpp
-#include "dsp/signal_generators/generators/cw_generator.hpp"
-using namespace dsp::signal_generators;
-CwGenerator gen;
-cl_mem gpu_buffer = gen.GenerateToGpu(system, 8);
-std::complex<float>* cpu_data = new std::complex<float>[1024];
-gen.GenerateToCpu(system, cpu_data, 1024);
-```
+/**
+ * @class CwGenerator
+ * @brief OpenCL-генератор CW (комплексной синусоиды) с поддержкой multi-beam.
+ *
+ * @note Move-only: GPU-ресурсы (cl_program/queue/context) уникальны на инстанс.
+ * @note backend не владеет — caller гарантирует переживание генератора.
+ * @note Доступен только в OpenCL-сборке. ROCm-вариант: CwGeneratorROCm.
+ * @see dsp::signal_generators::CwGeneratorROCm
+ * @see dsp::signal_generators::ISignalGenerator
+ */
 
 <!-- /rag-block -->
 
 ## Связанные секции из Doc/
 
 - `signal_generators__gpu__c2_container_002__v1` (c2_container): ``` ┌─────────────────────────────────────────────────────────────┐ │  signal_generators module                                   │ │                                                             │ │  ┌…
-- `signal_generators__architecture__section_002__v1` (section): ``` ┌─────────────────────────────────────────────────────────────┐ │                     Signal Generators                        │ ├─────────────────────────────────────────────────────────────┤ │  …
 - `signal_generators__meta__claude_card__v1` (meta_claude): <!-- type:meta_claude repo:signal_generators source:signal_generators/CLAUDE.md -->  # signal_generators — Repository Card  _Источник: `signal_generators/CLAUDE.md`_  # 🤖 CLAUDE — `signal_generators` …
+- `signal_generators__architecture__section_002__v1` (section): ``` ┌─────────────────────────────────────────────────────────────┐ │                     Signal Generators                        │ ├─────────────────────────────────────────────────────────────┤ │  …
 - `signal_generators__gpu__c3_component__v1` (c3_component): ### C3 — Component  ``` signal_gen namespace │ ├── ISignalGenerator (interface) │   ├── + GenerateToCpu(SystemSampling, out*, size) │   ├── + GenerateToGpu(SystemSampling, beam_count) → cl_mem │   └──…
-- `signal_generators__gpu__section_002__v1` (section): ### Какой класс выбрать  | Класс | Для чего | Выход | Задержка | |-------|----------|-------|----------| | `FormSignalGenerator` | CW/Chirp + шум, N антенн | `InputData<cl_mem>` | FIXED/LINEAR/RANDOM …
+- `signal_generators__quick__tests__v1` (tests): ### Простые генераторы — для базовых тестов  **CwGenerator** — тон. Одна синусоида фиксированной частоты, один канал. Используй когда нужно проверить фильтр или FFT на простом предсказуемом сигнале.  …
 
 ## Public-методы (4)
 
@@ -69,12 +61,12 @@ void GenerateToCpu(const SystemSampling& system, std::complex<float>* out, size_
 
 **Doxygen-источник**:
 ```cpp
-/**
-     * @brief CPU reference генерация CW (continuous wave) сигнала.
-     *
-     * @param system Параметры дискретизации (fs, length).
-     * @param out Выходной буфер [out_size] complex<float>.
-     * @param out_size Размер буфера (должен быть >= system.length).
+/**
+     * @brief CPU reference генерация CW (continuous wave) сигнала.
+     *
+     * @param system Параметры дискретизации (fs, length).
+     * @param out Выходной буфер [out_size] complex<float>.
+     * @param out_size Размер буфера (должен быть >= system.length).
      */
 ```
 
@@ -93,15 +85,15 @@ cl_mem GenerateToGpu(const SystemSampling& system, size_t beam_count = 1) overri
 
 **Doxygen-источник**:
 ```cpp
-/**
-     * @brief GPU production генерация CW (multi-beam через freq_step).
-     *
-     * @param system Параметры дискретизации (fs, length).
-     * @param beam_count Количество лучей в выходе.
-     *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
-     *
-     * @return cl_mem [beam_count × system.length × complex<float>]; caller обязан clReleaseMemObject.
-     *   @test_check result != nullptr
+/**
+     * @brief GPU production генерация CW (multi-beam через freq_step).
+     *
+     * @param system Параметры дискретизации (fs, length).
+     * @param beam_count Количество лучей в выходе.
+     *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
+     *
+     * @return cl_mem [beam_count × system.length × complex<float>]; caller обязан clReleaseMemObject.
+     *   @test_check result != nullptr
      */
 ```
 
@@ -121,17 +113,17 @@ cl_mem GenerateToGpu(const SystemSampling& system, size_t beam_count, ProfEvents
 
 **Doxygen-источник**:
 ```cpp
-/**
-     * @brief Генерация на GPU с опциональным сбором событий профилирования.
-     * @param prof_events nullptr → production (zero overhead); &vec → benchmark
-     *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
-     *
-     * Собирает события: "Kernel" (cw_kernel)
-     * @param system Параметры дискретизации (fs, length).
-     * @param beam_count Количество лучей в выходе.
-     *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
-     * @return cl_mem [beam_count × system.length × complex<float>]; caller обязан clReleaseMemObject.
-     *   @test_check result != nullptr
+/**
+     * @brief Генерация на GPU с опциональным сбором событий профилирования.
+     * @param prof_events nullptr → production (zero overhead); &vec → benchmark
+     *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
+     *
+     * Собирает события: "Kernel" (cw_kernel)
+     * @param system Параметры дискретизации (fs, length).
+     * @param beam_count Количество лучей в выходе.
+     *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
+     * @return cl_mem [beam_count × system.length × complex<float>]; caller обязан clReleaseMemObject.
+     *   @test_check result != nullptr
      */
 ```
 
@@ -146,11 +138,11 @@ SignalKind Kind() const override { return SignalKind::CW;
 
 **Doxygen-источник**:
 ```cpp
-/**
-     * @brief Возвращает тип сигнала (для introspection).
-     *
-     * @return Всегда `SignalKind::CW` для этого класса.
-     *   @test_check result == SignalKind::CW
+/**
+     * @brief Возвращает тип сигнала (для introspection).
+     *
+     * @return Всегда `SignalKind::CW` для этого класса.
+     *   @test_check result == SignalKind::CW
      */
 ```
 

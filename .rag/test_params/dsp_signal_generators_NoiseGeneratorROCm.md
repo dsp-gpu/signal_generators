@@ -1,18 +1,15 @@
-﻿---
+---
 schema_version: 1
 repo: signal_generators
 class_fqn: dsp::signal_generators::NoiseGeneratorROCm
-file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/noise_generator_rocm.hpp
-line: 36
-brief: "Генерирует шум для радиолокационных сигналов на GPU (ROCm) и CPU."
+file: /home/alex/DSP-GPU/signal_generators/include/dsp/signal_generators/generators/noise_generator_rocm.hpp
+line: 62
+brief: "/**  * @class NoiseGeneratorROCm  * @brief ROCm/HIP-генератор гауссовского комплексного шума.  *  * @note Move-only: GPU-ресурсы (GpuContext, hipModule) уникальны.  * @note Требует #if ENABLE_ROCM. На"
 methods_total: 4
 methods_with_doxygen: 4
-ai_generated: true
+ai_generated: false
 human_verified: false
-parser_version: 2
-synonyms_ru: ['Генератор шума ROCm', 'Шумовой генератор GPU', 'ROCm шум', 'Генератор сигналов']
-synonyms_en: ['ROCm Noise Generator', 'GPU Noise Generator', 'Noise Generator ROCm', 'Signal Generator']
-tags: ['GPU', 'ROCm', 'Шум', 'Генерация', 'Радиолокация']
+parser_version: 1
 ---
 
 # `dsp::signal_generators::NoiseGeneratorROCm` — карточка класса
@@ -27,30 +24,23 @@ tags: ['GPU', 'ROCm', 'Шум', 'Генерация', 'Радиолокация'
 
 <!-- rag-block: id=signal_generators__noise_generator_rocm__class_overview__v1 -->
 
-**ЧТО**: Генерирует шум для радиолокационных сигналов на GPU (ROCm) и CPU.
-
-**ЗАЧЕМ**: Решает задачу эффективной генерации шума с использованием GPU для ускорения обработки сигналов.
-
-**КАК**: Использует ROCm для GPU-вычислений, CPU-версии для совместимости. Перегрузки методов проверяют поддержку ROCm.
-
-**Пример**:
-```cpp
-#include "dsp/signal_generators/generators/noise_generator_rocm.hpp"
-
-using namespace dsp::signal_generators;
-
-int main() {
-    SystemSampling system;
-    NoiseParams params;
-    uint32_t beam_count = 128;
-    ROCmProfEvents prof_events;
-    
-    auto gpu_data = NoiseGeneratorROCm().GenerateToGpu(system, params, beam_count, &prof_events);
-    return 0;
-}
-```
+/**
+ * @class NoiseGeneratorROCm
+ * @brief ROCm/HIP-генератор гауссовского комплексного шума.
+ *
+ * @note Move-only: GPU-ресурсы (GpuContext, hipModule) уникальны.
+ * @note Требует #if ENABLE_ROCM. На Windows — stub (все методы throw).
+ * @note API совместим с NoiseGenerator (OpenCL) по семантике.
+ * @see dsp::signal_generators::NoiseGenerator (legacy OpenCL)
+ * @see drv_gpu_lib::GpuContext (Layer 1 Ref03)
+ */
 
 <!-- /rag-block -->
+
+## Связанные секции из Doc/
+
+- `signal_generators__meta__claude_card__v1` (meta_claude): <!-- type:meta_claude repo:signal_generators source:signal_generators/CLAUDE.md -->  # signal_generators — Repository Card  _Источник: `signal_generators/CLAUDE.md`_  # 🤖 CLAUDE — `signal_generators` …
+- `signal_generators__noise_generator__class_overview__v1` (class_overview): /**  * @class NoiseGenerator  * @brief OpenCL-генератор Gaussian-шума (Philox-2x32 + Box-Muller).  *  * @note Move-only: GPU-ресурсы уникальны на инстанс.  * @note backend не владеет — caller гарантир…
 
 ## Public-методы (4)
 
@@ -71,19 +61,19 @@ drv_gpu_lib::InputData<void*> GenerateToGpu( const SystemSampling& system, const
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief GPU production генерация шума через Philox+BoxMuller. Multi-beam за один launch.
-   *
-   * @param system Параметры дискретизации (fs, length).
-   * @param params Параметры шума (type, power, seed).
-   *   @test_ref NoiseParams
-   * @param beam_count Количество лучей в выходе.
-   *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
-   * @param prof_events Сборщик ROCm-событий профилирования (опционально).
-   *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
-   *
-   * @return InputData<void*> с HIP device pointer; caller обязан hipFree result.data.
-   *   @test_check result != nullptr
+/**
+   * @brief GPU production генерация шума через Philox+BoxMuller. Multi-beam за один launch.
+   *
+   * @param system Параметры дискретизации (fs, length).
+   * @param params Параметры шума (type, power, seed).
+   *   @test_ref NoiseParams
+   * @param beam_count Количество лучей в выходе.
+   *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
+   * @param prof_events Сборщик ROCm-событий профилирования (опционально).
+   *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
+   *
+   * @return InputData<void*> с HIP device pointer; caller обязан hipFree result.data.
+   *   @test_check result != nullptr
    */
 ```
 
@@ -103,17 +93,17 @@ std::vector<std::complex<float>> GenerateToCpu( const SystemSampling& system, co
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief CPU reference генерация шума (для unit-тестов и сверки с GPU).
-   *
-   * @param system Параметры дискретизации (fs, length).
-   * @param params Параметры шума (type, power, seed).
-   *   @test_ref NoiseParams
-   * @param beam_count Количество лучей в выходе.
-   *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
-   *
-   * @return Массив [beam_count × system.length] complex<float> (interleaved beams).
-   *   @test_check result.size() == beam_count * system.length
+/**
+   * @brief CPU reference генерация шума (для unit-тестов и сверки с GPU).
+   *
+   * @param system Параметры дискретизации (fs, length).
+   * @param params Параметры шума (type, power, seed).
+   *   @test_ref NoiseParams
+   * @param beam_count Количество лучей в выходе.
+   *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
+   *
+   * @return Массив [beam_count × system.length] complex<float> (interleaved beams).
+   *   @test_check result.size() == beam_count * system.length
    */
 ```
 
@@ -134,15 +124,15 @@ drv_gpu_lib::InputData<void*> GenerateToGpu(const SystemSampling&, const NoisePa
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Stub: бросает runtime_error — GenerateToGpu доступен только в ROCm-сборке.
-   *
-   *
-   * @return Никогда не возвращает (всегда throw).
-   *   @test_check throws std::runtime_error
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
+/**
+   * @brief Stub: бросает runtime_error — GenerateToGpu доступен только в ROCm-сборке.
+   *
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
    */
 ```
 
@@ -162,15 +152,15 @@ std::vector<std::complex<float>> GenerateToCpu(const SystemSampling&, const Nois
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
-   *
-   *
-   * @return Никогда не возвращает (всегда throw).
-   *   @test_check throws std::runtime_error
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
+/**
+   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
+   *
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
    */
 ```
 

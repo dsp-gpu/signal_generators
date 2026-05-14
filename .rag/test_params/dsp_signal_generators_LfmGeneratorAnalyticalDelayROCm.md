@@ -1,18 +1,15 @@
-﻿---
+---
 schema_version: 1
 repo: signal_generators
 class_fqn: dsp::signal_generators::LfmGeneratorAnalyticalDelayROCm
-file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/lfm_generator_analytical_delay_rocm.hpp
-line: 35
-brief: "Генератор сигналов с линейной модуляцией (LFM) с аналитической задержкой, использующий ROCm для GPU-вычислений."
+file: /home/alex/DSP-GPU/signal_generators/include/dsp/signal_generators/generators/lfm_generator_analytical_delay_rocm.hpp
+line: 60
+brief: "/**  * @class LfmGeneratorAnalyticalDelayROCm  * @brief ROCm/HIP LFM-генератор с аналитической per-antenna задержкой.  *  * @note Move-only: GPU-ресурсы (GpuContext, hipModule) уникальны.  * @note Тре"
 methods_total: 4
 methods_with_doxygen: 4
-ai_generated: true
+ai_generated: false
 human_verified: false
-parser_version: 2
-synonyms_ru: ['Генератор LFM с задержкой на ROCm', 'Аналитический генератор сигналов ROCm', 'Сигнал генератор LFM GPU', 'ROCm LFM-сигнал']
-synonyms_en: ['ROCm LFM Signal Generator', 'Analytical Delay LFM Generator', 'GPU LFM Signal Generator', 'ROCm LFM Generator']
-tags: ['GPU', 'ROCm', 'LFM', 'Сигналы', 'Радиолокация']
+parser_version: 1
 ---
 
 # `dsp::signal_generators::LfmGeneratorAnalyticalDelayROCm` — карточка класса
@@ -27,27 +24,22 @@ tags: ['GPU', 'ROCm', 'LFM', 'Сигналы', 'Радиолокация']
 
 <!-- rag-block: id=signal_generators__lfm_generator_analytical_delay_rocm__class_overview__v1 -->
 
-**ЧТО**: Генератор сигналов с линейной модуляцией (LFM) с аналитической задержкой, использующий ROCm для GPU-вычислений.
-
-**ЗАЧЕМ**: Решает задачу эффективной генерации LFM-сигналов на GPU для радиолокационных систем с поддержкой ROCm.
-
-**КАК**: Реализует асинхронную генерацию сигналов на GPU с кэшированием результатов. Поддерживает CPU-вычисления как fallback. Использует паттерн lazy init для оптимизации памяти.
-
-**Пример**:
-```cpp
-#include "dsp/signal_generators/generators/lfm_generator_analytical_delay_rocm.hpp"
-
-using namespace dsp::signal_generators;
-
-int main() {
-    LfmGeneratorAnalyticalDelayROCm gen;
-    auto gpu_data = gen.GenerateToGpu();
-    auto cpu_data = gen.GenerateToCpu();
-    return 0;
-}
-```
+/**
+ * @class LfmGeneratorAnalyticalDelayROCm
+ * @brief ROCm/HIP LFM-генератор с аналитической per-antenna задержкой.
+ *
+ * @note Move-only: GPU-ресурсы (GpuContext, hipModule) уникальны.
+ * @note Требует #if ENABLE_ROCM. На Windows — stub (все методы throw).
+ * @note API совместим с LfmGeneratorAnalyticalDelay (OpenCL).
+ * @see dsp::signal_generators::LfmGeneratorAnalyticalDelay (legacy OpenCL)
+ * @see drv_gpu_lib::GpuContext (Layer 1 Ref03)
+ */
 
 <!-- /rag-block -->
+
+## Связанные секции из Doc/
+
+- `signal_generators__lfm_generator_analytical_delay__class_overview__v1` (class_overview): /**  * @class LfmGeneratorAnalyticalDelay  * @brief GPU/CPU LFM-генератор с аналитической per-antenna задержкой.  *  * @note Move-only: cl_program/queue/context уникальны на инстанс.  * @note backend …
 
 ## Public-методы (4)
 
@@ -65,14 +57,14 @@ drv_gpu_lib::InputData<void*> GenerateToGpu(ROCmProfEvents* prof_events = nullpt
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief GPU production генерация LFM с аналитической per-antenna задержкой.
-   *
-   * @param prof_events Сборщик ROCm-событий профилирования (опционально).
-   *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
-   *
-   * @return InputData<void*> [antennas × points × complex<float>]; caller обязан hipFree result.data.
-   *   @test_check result != nullptr
+/**
+   * @brief GPU production генерация LFM с аналитической per-antenna задержкой.
+   *
+   * @param prof_events Сборщик ROCm-событий профилирования (опционально).
+   *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
+   *
+   * @return InputData<void*> [antennas × points × complex<float>]; caller обязан hipFree result.data.
+   *   @test_check result != nullptr
    */
 ```
 
@@ -87,11 +79,11 @@ std::vector<std::vector<std::complex<float>>> GenerateToCpu()
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief CPU reference генерация LFM с аналитической задержкой (для сверки с GPU).
-   *
-   * @return vector[antenna_id][sample_id] complex<float>.
-   *   @test_check result.size() == delay_us_.size() && result[0].size() == system_.length
+/**
+   * @brief CPU reference генерация LFM с аналитической задержкой (для сверки с GPU).
+   *
+   * @return vector[antenna_id][sample_id] complex<float>.
+   *   @test_check result.size() == delay_us_.size() && result[0].size() == system_.length
    */
 ```
 
@@ -109,15 +101,15 @@ drv_gpu_lib::InputData<void*> GenerateToGpu(void* = nullptr) { throw std::runtim
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Stub: бросает runtime_error — GenerateToGpu доступен только в ROCm-сборке.
-   *
-   *
-   * @return Никогда не возвращает (всегда throw).
-   *   @test_check throws std::runtime_error
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
+/**
+   * @brief Stub: бросает runtime_error — GenerateToGpu доступен только в ROCm-сборке.
+   *
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
    */
 ```
 
@@ -132,14 +124,14 @@ std::vector<std::vector<std::complex<float>>> GenerateToCpu() { throw std::runti
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
-   *
-   * @return Никогда не возвращает (всегда throw).
-   *   @test_check throws std::runtime_error
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
+/**
+   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
    */
 ```
 

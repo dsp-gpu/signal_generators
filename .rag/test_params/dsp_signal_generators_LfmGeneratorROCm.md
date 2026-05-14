@@ -1,18 +1,15 @@
-﻿---
+---
 schema_version: 1
 repo: signal_generators
 class_fqn: dsp::signal_generators::LfmGeneratorROCm
-file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/lfm_generator_rocm.hpp
-line: 35
-brief: "Генерирует линейно-частотно-модулированные сигналы (LFM) для GPU и CPU."
+file: /home/alex/DSP-GPU/signal_generators/include/dsp/signal_generators/generators/lfm_generator_rocm.hpp
+line: 59
+brief: "/**  * @class LfmGeneratorROCm  * @brief ROCm/HIP-генератор LFM chirp с multi-beam.  *  * @note Move-only: GPU-ресурсы (GpuContext, hipModule) уникальны.  * @note Требует #if ENABLE_ROCM. На Windows —"
 methods_total: 4
 methods_with_doxygen: 4
-ai_generated: true
+ai_generated: false
 human_verified: false
-parser_version: 2
-synonyms_ru: ['LFM-генератор', 'GPU-генератор', 'ROCm-генератор', 'сигнал_генератор']
-synonyms_en: ['LFM generator', 'GPU generator', 'ROCm generator', 'signal_generator']
-tags: ['LFM', 'GPU', 'ROCm', 'SignalGeneration']
+parser_version: 1
 ---
 
 # `dsp::signal_generators::LfmGeneratorROCm` — карточка класса
@@ -27,30 +24,23 @@ tags: ['LFM', 'GPU', 'ROCm', 'SignalGeneration']
 
 <!-- rag-block: id=signal_generators__lfm_generator_rocm__class_overview__v1 -->
 
-**ЧТО**: Генерирует линейно-частотно-модулированные сигналы (LFM) для GPU и CPU.
-
-**ЗАЧЕМ**: Обеспечивает оптимизированную генерацию сигналов для радиолокационных систем с поддержкой GPU и CPU.
-
-**КАК**: Использует lazy init для отложенной инициализации, кэширование параметров, поддержку batch-обработки. Методы для GPU требуют ROCm-библиотеки, иначе выбрасывают исключение.
-
-**Пример**:
-```cpp
-#include "dsp/signal_generators/generators/lfm_generator_rocm.hpp"
-using namespace signal_generators;
-
-int main() {
-    SystemSampling system;
-    LfmParams params;
-    uint32_t beams = 128;
-    
-    auto gpu_data = LfmGeneratorROCm().GenerateToGpu(system, params, beams);
-    auto cpu_data = LfmGeneratorROCm().GenerateToCpu(system, params, beams);
-    
-    return 0;
-}
-```
+/**
+ * @class LfmGeneratorROCm
+ * @brief ROCm/HIP-генератор LFM chirp с multi-beam.
+ *
+ * @note Move-only: GPU-ресурсы (GpuContext, hipModule) уникальны.
+ * @note Требует #if ENABLE_ROCM. На Windows — stub (все методы throw).
+ * @note API совместим с LfmGenerator для прозрачной замены backend'а.
+ * @see dsp::signal_generators::LfmGenerator (legacy OpenCL)
+ * @see drv_gpu_lib::GpuContext (Layer 1 Ref03)
+ */
 
 <!-- /rag-block -->
+
+## Связанные секции из Doc/
+
+- `signal_generators__meta__claude_card__v1` (meta_claude): <!-- type:meta_claude repo:signal_generators source:signal_generators/CLAUDE.md -->  # signal_generators — Repository Card  _Источник: `signal_generators/CLAUDE.md`_  # 🤖 CLAUDE — `signal_generators` …
+- `signal_generators__lfm_generator__class_overview__v1` (class_overview): /**  * @class LfmGenerator  * @brief OpenCL-генератор LFM chirp с поддержкой multi-beam.  *  * @note Move-only: GPU-ресурсы (cl_program/queue/context) уникальны на инстанс.  * @note backend не владеет…
 
 ## Public-методы (4)
 
@@ -71,19 +61,19 @@ drv_gpu_lib::InputData<void*> GenerateToGpu( const SystemSampling& system, const
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief GPU production генерация LFM chirp. Multi-beam за один HIP launch.
-   *
-   * @param system Параметры дискретизации (fs, length).
-   * @param params Параметры LFM (f_start, f_end, amplitude, complex_iq).
-   *   @test_ref LfmParams
-   * @param beam_count Количество лучей в выходе.
-   *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
-   * @param prof_events Сборщик ROCm-событий профилирования (опционально).
-   *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
-   *
-   * @return InputData<void*> с HIP device pointer; caller обязан hipFree result.data.
-   *   @test_check result != nullptr
+/**
+   * @brief GPU production генерация LFM chirp. Multi-beam за один HIP launch.
+   *
+   * @param system Параметры дискретизации (fs, length).
+   * @param params Параметры LFM (f_start, f_end, amplitude, complex_iq).
+   *   @test_ref LfmParams
+   * @param beam_count Количество лучей в выходе.
+   *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
+   * @param prof_events Сборщик ROCm-событий профилирования (опционально).
+   *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
+   *
+   * @return InputData<void*> с HIP device pointer; caller обязан hipFree result.data.
+   *   @test_check result != nullptr
    */
 ```
 
@@ -103,17 +93,17 @@ std::vector<std::complex<float>> GenerateToCpu( const SystemSampling& system, co
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief CPU reference генерация LFM (для unit-тестов и сверки с GPU).
-   *
-   * @param system Параметры дискретизации (fs, length).
-   * @param params Параметры LFM (f_start, f_end, amplitude, complex_iq).
-   *   @test_ref LfmParams
-   * @param beam_count Количество лучей в выходе.
-   *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
-   *
-   * @return Массив [beam_count × system.length] complex<float> (interleaved beams).
-   *   @test_check result.size() == beam_count * system.length
+/**
+   * @brief CPU reference генерация LFM (для unit-тестов и сверки с GPU).
+   *
+   * @param system Параметры дискретизации (fs, length).
+   * @param params Параметры LFM (f_start, f_end, amplitude, complex_iq).
+   *   @test_ref LfmParams
+   * @param beam_count Количество лучей в выходе.
+   *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
+   *
+   * @return Массив [beam_count × system.length] complex<float> (interleaved beams).
+   *   @test_check result.size() == beam_count * system.length
    */
 ```
 
@@ -134,15 +124,15 @@ drv_gpu_lib::InputData<void*> GenerateToGpu(const SystemSampling&, const LfmPara
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Stub: бросает runtime_error — GenerateToGpu доступен только в ROCm-сборке.
-   *
-   *
-   * @return Никогда не возвращает (всегда throw).
-   *   @test_check throws std::runtime_error
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
+/**
+   * @brief Stub: бросает runtime_error — GenerateToGpu доступен только в ROCm-сборке.
+   *
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
    */
 ```
 
@@ -162,15 +152,15 @@ std::vector<std::complex<float>> GenerateToCpu(const SystemSampling&, const LfmP
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
-   *
-   *
-   * @return Никогда не возвращает (всегда throw).
-   *   @test_check throws std::runtime_error
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
+/**
+   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
+   *
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
    */
 ```
 

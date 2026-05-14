@@ -1,18 +1,15 @@
-﻿---
+---
 schema_version: 1
 repo: signal_generators
 class_fqn: dsp::signal_generators::DelayedFormSignalGeneratorROCm
-file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/delayed_form_signal_generator_rocm.hpp
-line: 31
-brief: "Генерирует сигналы с задержками для радиолокационной обработки на GPU с использованием ROCm."
+file: /home/alex/DSP-GPU/signal_generators/include/dsp/signal_generators/generators/delayed_form_signal_generator_rocm.hpp
+line: 62
+brief: "/**  * @class DelayedFormSignalGeneratorROCm  * @brief ROCm-композит: FormSignalGeneratorROCm + LchFarrowROCm (delay + noise).  *  * @ingroup grp_signal_generators  * @note Доступен только при ENABLE_"
 methods_total: 5
 methods_with_doxygen: 5
-ai_generated: true
+ai_generated: false
 human_verified: false
-parser_version: 2
-synonyms_ru: ['Генератор задержек', 'Сигнал ROCm', 'Генератор форм']
-synonyms_en: ['Delayed Signal Generator', 'ROCm Signal Generator', 'Form Signal Generator']
-tags: ['GPU', 'ROCm', 'Сигналы', 'Задержки', 'Обработка сигналов']
+parser_version: 1
 ---
 
 # `dsp::signal_generators::DelayedFormSignalGeneratorROCm` — карточка класса
@@ -27,28 +24,23 @@ tags: ['GPU', 'ROCm', 'Сигналы', 'Задержки', 'Обработка 
 
 <!-- rag-block: id=signal_generators__delayed_form_signal_generator_rocm__class_overview__v1 -->
 
-**ЧТО**: Генерирует сигналы с задержками для радиолокационной обработки на GPU с использованием ROCm.
-
-**ЗАЧЕМ**: Решает проблему эффективной генерации задержанных сигналов на GPU для ускорения обработки в реальном времени.
-
-**КАК**: Использует ROCm для GPU-вычислений, кэширование матриц задержек, поддержка батч-генерации. Методы с проверкой на активацию ROCm.
-
-**Пример**:
-```cpp
-#include "dsp/signal_generators/generators/delayed_form_signal_generator_rocm.hpp"
-using namespace signal_generators;
-
-DelayedFormSignalGeneratorROCm gen;
-gen.LoadMatrix("params.json");
-gen.set_params(fs=1e6, f0=50000, antennas=8, points=4096);
-gen.set_delays({0.0, 1.5, 3.0, 4.5, 6.0, 7.5, 9.0, 10.5});
-auto data = gen.GenerateToCpu();
-```
+/**
+ * @class DelayedFormSignalGeneratorROCm
+ * @brief ROCm-композит: FormSignalGeneratorROCm + LchFarrowROCm (delay + noise).
+ *
+ * @ingroup grp_signal_generators
+ * @note Доступен только при ENABLE_ROCM=1. OpenCL-вариант: DelayedFormSignalGenerator.
+ * @note Шум идёт ПОСЛЕ задержки (через LchFarrowROCm::SetNoise), не до.
+ * @see dsp::signal_generators::DelayedFormSignalGenerator
+ * @see dsp::signal_generators::FormSignalGeneratorROCm
+ * @see dsp::spectrum::LchFarrowROCm
+ */
 
 <!-- /rag-block -->
 
 ## Связанные секции из Doc/
 
+- `signal_generators__delayed_form_signal_generator__class_overview__v1` (class_overview): /**  * @class DelayedFormSignalGenerator  * @brief OpenCL-генератор getX с дробной задержкой Farrow (Lagrange 48×5).  *  * @note Move-only (composite над move-only компонентами).  * @note Шум идёт ПОС…
 - `signal_generators__gpu__s_6_11_python_delayedformsignalgenerator__v1` (s_6_11_python_delayedformsignalgenerator): ### 6.11 Python — DelayedFormSignalGenerator  ```python gen = dsp_signal_generators.DelayedFormSignalGeneratorROCm(ctx) gen.set_params(     fs=1e6, f0=50000,     antennas=8, points=4096,     amplitude…
 - `signal_generators__quick__python_delayedformsignalgenerator__v1` (python_delayedformsignalgenerator): ### Python — DelayedFormSignalGenerator  ```python gen = dsp_signal_generators.DelayedFormSignalGeneratorROCm(ctx) gen.set_params(fs=1e6, f0=50000, antennas=4, points=4096) gen.set_delays([0.0, 1.5, 3…
 
@@ -67,15 +59,10 @@ void LoadMatrix(const std::string& json_path) { lch_farrow_.LoadMatrix(json_path
 **Doxygen-источник**:
 ```cpp
 /**
-
    * @brief Загружает матрицу Lagrange 48×5 для Farrow-фильтра из JSON-файла.
-
    *
-
    * @param json_path Путь к JSON с матрицей (формат: { "data": [[...], ...] }).
-
    *   @test { values=["/tmp/test_config.json"] }
-
    */
 ```
 
@@ -91,15 +78,10 @@ drv_gpu_lib::InputData<void*> GenerateInputData()
 **Doxygen-источник**:
 ```cpp
 /**
-
    * @brief GPU production: чистый сигнал → задержка Farrow → шум. Возвращает InputData<void*>.
-
    *
-
    * @return InputData<void*> [antennas × points × complex<float>]; caller обязан hipFree result.data.
-
    *   @test_check result != nullptr && result.antenna_count == params_.antennas
-
    */
 ```
 
@@ -115,15 +97,10 @@ std::vector<std::vector<std::complex<float>>> GenerateToCpu()
 **Doxygen-источник**:
 ```cpp
 /**
-
    * @brief Полный pipeline с readback на CPU (для unit-тестов и сверки с GPU).
-
    *
-
    * @return vector[antenna_id][sample_id] complex<float>.
-
    *   @test_check result.size() == params_.antennas && result[0].size() == params_.points
-
    */
 ```
 
@@ -139,21 +116,13 @@ drv_gpu_lib::InputData<void*> GenerateInputData() { throw std::runtime_error("De
 **Doxygen-источник**:
 ```cpp
 /**
-
    * @brief Stub: бросает runtime_error — GenerateInputData доступен только в ROCm-сборке.
-
    *
-
    * @return Никогда не возвращает (всегда throw).
-
    *   @test_check throws std::runtime_error
-
    *
-
    * @throws std::runtime_error всегда: "ROCm not enabled".
-
    *   @test_check throws std::runtime_error
-
    */
 ```
 
@@ -169,21 +138,13 @@ std::vector<std::vector<std::complex<float>>> GenerateToCpu() { throw std::runti
 **Doxygen-источник**:
 ```cpp
 /**
-
    * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
-
    *
-
    * @return Никогда не возвращает (всегда throw).
-
    *   @test_check throws std::runtime_error
-
    *
-
    * @throws std::runtime_error всегда: "ROCm not enabled".
-
    *   @test_check throws std::runtime_error
-
    */
 ```
 
@@ -203,3 +164,4 @@ _Источник биндинга_: `signal_generators/python/py_delayed_form_s
 | `load_matrix` | `PyDelayedFormSignalGeneratorROCm::load_matrix` | — |
 | `generate` | `PyDelayedFormSignalGeneratorROCm::generate` | — |
 | `get_params` | `PyDelayedFormSignalGeneratorROCm::get_params_dict` | — |
+

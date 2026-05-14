@@ -1,18 +1,15 @@
-﻿---
+---
 schema_version: 1
 repo: signal_generators
 class_fqn: dsp::signal_generators::LfmConjugateGeneratorROCm
-file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/lfm_conjugate_generator_rocm.hpp
-line: 34
-brief: "Генерирует сигналы LFM сопряженного типа на GPU через ROCm."
+file: /home/alex/DSP-GPU/signal_generators/include/dsp/signal_generators/generators/lfm_conjugate_generator_rocm.hpp
+line: 60
+brief: "/**  * @class LfmConjugateGeneratorROCm  * @brief ROCm/HIP conjugate-LFM генератор для dechirp-обработки.  *  * @note Move-only: GPU-ресурсы (GpuContext, hipModule) уникальны.  * @note Требует #if ENA"
 methods_total: 4
 methods_with_doxygen: 4
-ai_generated: true
+ai_generated: false
 human_verified: false
-parser_version: 2
-synonyms_ru: ['генератор LFM', 'сопряженный сигнал', 'ROCm-генератор', 'радиолокационный сигнал']
-synonyms_en: ['LFM generator', 'conjugate signal', 'ROCm generator', 'radar signal']
-tags: ['LFM', 'ROCm', 'генератор', 'сигнал', 'радиолокация']
+parser_version: 1
 ---
 
 # `dsp::signal_generators::LfmConjugateGeneratorROCm` — карточка класса
@@ -27,31 +24,22 @@ tags: ['LFM', 'ROCm', 'генератор', 'сигнал', 'радиолока�
 
 <!-- rag-block: id=signal_generators__lfm_conjugate_generator_rocm__class_overview__v1 -->
 
-**ЧТО**: Генерирует сигналы LFM сопряженного типа на GPU через ROCm.
-
-**ЗАЧЕМ**: Обеспечивает оптимизацию радиолокационной обработки сигналов на GPU с поддержкой ROCm.
-
-**КАК**: Использует lazy init для отложенной инициализации, кэширование данных и асинхронные паттерны для GPU-вычислений. Методы выбрасывают исключение при отсутствии ROCm.
-
-**Пример**:
-```cpp
-#include <dsp/signal_generators/generators/lfm_conjugate_generator_rocm.hpp>
-
-using namespace dsp::signal_generators;
-
-int main() {
-    LfmConjugateGeneratorROCm gen;
-    try {
-        auto gpu_data = gen.GenerateToGpu();
-        // Обработка GPU-данных
-    } catch (const std::runtime_error& e) {
-        // Обработка ошибки ROCm
-    }
-    return 0;
-}
-```
+/**
+ * @class LfmConjugateGeneratorROCm
+ * @brief ROCm/HIP conjugate-LFM генератор для dechirp-обработки.
+ *
+ * @note Move-only: GPU-ресурсы (GpuContext, hipModule) уникальны.
+ * @note Требует #if ENABLE_ROCM. На Windows — stub (все методы throw).
+ * @note API совместим с LfmConjugateGenerator (OpenCL).
+ * @see dsp::signal_generators::LfmConjugateGenerator (legacy OpenCL)
+ * @see drv_gpu_lib::GpuContext (Layer 1 Ref03)
+ */
 
 <!-- /rag-block -->
+
+## Связанные секции из Doc/
+
+- `signal_generators__lfm_conjugate_generator__class_overview__v1` (class_overview): /**  * @class LfmConjugateGenerator  * @brief GPU/CPU conjugate-LFM генератор — reference для dechirp.  *  * @note Move-only: cl_program/queue/context уникальны на инстанс.  * @note backend не владеет…
 
 ## Public-методы (4)
 
@@ -64,10 +52,10 @@ void* GenerateToGpu()
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Generate conjugate LFM on GPU (ROCm)
-   * @return HIP device pointer [num_samples × complex<float>]
-   *         CALLER OWNS — must hipFree!
+/**
+   * @brief Generate conjugate LFM on GPU (ROCm)
+   * @return HIP device pointer [num_samples × complex<float>]
+   *         CALLER OWNS — must hipFree!
    */
 ```
 
@@ -82,10 +70,10 @@ std::vector<std::complex<float>> GenerateToCpu()
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Generate conjugate LFM on CPU (reference)
-   * @return vector<complex<float>>, length = system_.length
-   *   @test_check result.size() == system_.length
+/**
+   * @brief Generate conjugate LFM on CPU (reference)
+   * @return vector<complex<float>>, length = system_.length
+   *   @test_check result.size() == system_.length
    */
 ```
 
@@ -98,11 +86,11 @@ void* GenerateToGpu() { throw std::runtime_error("LfmConjugateGeneratorROCm: ROC
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Stub: бросает runtime_error — GenerateToGpu доступен только в ROCm-сборке.
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
+/**
+   * @brief Stub: бросает runtime_error — GenerateToGpu доступен только в ROCm-сборке.
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
    */
 ```
 
@@ -117,14 +105,14 @@ std::vector<std::complex<float>> GenerateToCpu() { throw std::runtime_error("Lfm
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
-   *
-   * @return Никогда не возвращает (всегда throw).
-   *   @test_check throws std::runtime_error
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
+/**
+   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
+   *
+   * @return Никогда не возвращает (всегда throw).
+   *   @test_check throws std::runtime_error
+   *
+   * @throws std::runtime_error всегда: "ROCm not enabled".
+   *   @test_check throws std::runtime_error
    */
 ```
 

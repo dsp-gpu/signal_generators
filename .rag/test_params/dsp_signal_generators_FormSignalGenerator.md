@@ -1,18 +1,15 @@
-﻿---
+---
 schema_version: 1
 repo: signal_generators
 class_fqn: dsp::signal_generators::FormSignalGenerator
-file: E:/DSP-GPU/signal_generators/include/signal_generators/generators/form_signal_generator.hpp
-line: 67
-brief: "Генератор комплексных сигналов на GPU по пользовательской формуле с поддержкой мультиканального формирования."
+file: /home/alex/DSP-GPU/signal_generators/include/dsp/signal_generators/generators/form_signal_generator.hpp
+line: 64
+brief: "/**  * @class FormSignalGenerator  * @brief OpenCL-генератор комплексных сигналов по формуле getX (мультиканал).  *  * @note Move-only: GPU-ресурсы (cl_program/queue/context) уникальны на инстанс.  *"
 methods_total: 3
 methods_with_doxygen: 3
-ai_generated: true
+ai_generated: false
 human_verified: false
-parser_version: 2
-synonyms_ru: ['Генератор сигналов', 'Формирование сигналов', 'GPU-генератор', 'Мультиканальный генератор']
-synonyms_en: ['Signal generator', 'Signal formation', 'GPU generator', 'Multi-channel generator']
-tags: ['GPU', 'сигналы', 'мультиканал', 'ROCm', 'HIP']
+parser_version: 1
 ---
 
 # `dsp::signal_generators::FormSignalGenerator` — карточка класса
@@ -27,36 +24,15 @@ tags: ['GPU', 'сигналы', 'мультиканал', 'ROCm', 'HIP']
 
 <!-- rag-block: id=signal_generators__form_signal_generator__class_overview__v1 -->
 
-**ЧТО**: Генератор комплексных сигналов на GPU по пользовательской формуле с поддержкой мультиканального формирования.
-
-**ЗАЧЕМ**: Решает задачу создания гибких сигналов с точностью до 1e-3 для радиолокационной обработки и FFT-анализа.
-
-**КАК**: Использует lazy init для ядра, кэширование параметров, поддержку batch-генерации и оптимизацию для ROCm/HIP. Разделяет GPU/CPU выводы.
-
-**Пример**:
-```cpp
-#include "dsp/signal_generators/generators/form_signal_generator.hpp"
-using namespace dsp::signal_generators;
-
-int main() {
-  auto backend = drv_gpu_lib::GetDefaultBackend();
-  FormSignalGenerator gen(backend);
-
-  FormParams params;
-  params.fs = 12e6;
-  params.f0 = 1e6;
-  params.antennas = 8;
-  params.points = 4096;
-  gen.SetParams(params);
-
-  auto input = gen.GenerateInputData();
-  // ... передать в SpectrumMaximaFinder::Process(input)
-  clReleaseMemObject(input.data);
-
-  auto cpu_data = gen.GenerateToCpu();
-  return 0;
-}
-```
+/**
+ * @class FormSignalGenerator
+ * @brief OpenCL-генератор комплексных сигналов по формуле getX (мультиканал).
+ *
+ * @note Move-only: GPU-ресурсы (cl_program/queue/context) уникальны на инстанс.
+ * @note Доступен только в OpenCL-сборке. ROCm-вариант: FormSignalGeneratorROCm.
+ * @see dsp::signal_generators::FormSignalGeneratorROCm
+ * @see dsp::signal_generators::DelayedFormSignalGenerator
+ */
 
 <!-- /rag-block -->
 
@@ -81,11 +57,11 @@ drv_gpu_lib::InputData<cl_mem> GenerateInputData()
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Генерация на GPU с метаданными (InputData — как в fft_func)
-   * @return InputData<cl_mem> с data, antenna_count, n_point, gpu_memory_bytes
-   * @note Вызывающий код должен освободить input.data через clReleaseMemObject()!
-   *   @test_check result.data != nullptr && result.antenna_count == params_.antennas
+/**
+   * @brief Генерация на GPU с метаданными (InputData — как в fft_func)
+   * @return InputData<cl_mem> с data, antenna_count, n_point, gpu_memory_bytes
+   * @note Вызывающий код должен освободить input.data через clReleaseMemObject()!
+   *   @test_check result.data != nullptr && result.antenna_count == params_.antennas
    */
 ```
 
@@ -103,14 +79,14 @@ drv_gpu_lib::InputData<cl_mem> GenerateInputData(ProfEvents* prof_events)
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Генерация на GPU с опциональным сбором событий профилирования.
-   * @param prof_events nullptr → production (zero overhead); &vec → benchmark
-   *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
-   *
-   * Собирает события: "Kernel" (form_signal.cl)
-   * @return InputData<cl_mem> с data, antenna_count, n_point, gpu_memory_bytes.
-   *   @test_check result.data != nullptr && result.antenna_count == params_.antennas
+/**
+   * @brief Генерация на GPU с опциональным сбором событий профилирования.
+   * @param prof_events nullptr → production (zero overhead); &vec → benchmark
+   *   @test { values=[nullptr], error_values=[0xDEADBEEF, null] }
+   *
+   * Собирает события: "Kernel" (form_signal.cl)
+   * @return InputData<cl_mem> с data, antenna_count, n_point, gpu_memory_bytes.
+   *   @test_check result.data != nullptr && result.antenna_count == params_.antennas
    */
 ```
 
@@ -125,10 +101,10 @@ std::vector<std::vector<std::complex<float>>> GenerateToCpu()
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Генерация с возвратом на CPU (по каналам)
-   * @return vector[antenna_id][sample_id] complex<float>
-   *   @test_check result.size() == params_.antennas && result[0].size() == params_.points
+/**
+   * @brief Генерация с возвратом на CPU (по каналам)
+   * @return vector[antenna_id][sample_id] complex<float>
+   *   @test_check result.size() == params_.antennas && result[0].size() == params_.points
    */
 ```
 

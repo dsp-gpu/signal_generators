@@ -3,47 +3,33 @@ schema_version: 1
 kind: use_case
 id: form_signal_rocm
 repo: signal_generators
-title: "Формирование сигнала на GPU с возможностью сравнения с CPU"
+title: "Form Signal Rocm"
 synonyms:
   ru:
-    - "Генерация сигнала на GPU"
-    - "Сравнение GPU и CPU"
-    - "Формирование сигнала с антеннами"
-    - "Обработка сигналов в реальном времени"
-    - "Генерация форматированного сигнала"
-    - "Тестирование ROCm backend"
-    - "Создание сигнала с фазовым сдвигом"
-    - "Параллельная обработка сигналов"
+    - []
   en:
-    - "GPU signal generation"
-    - "CPU-GPU comparison test"
-    - "Antenna array signal formation"
-    - "Real-time signal processing"
-    - "Formatted signal generation"
-    - "ROCm backend testing"
-    - "Phase-shifted signal creation"
-    - "Parallel signal processing"
+    - []
 primary_class: (unknown)
 primary_method: (unknown)
 related_classes:
 related_use_cases:
   - spectrum__filters_rocm__usecase__v1
-  - spectrum__fir_basic__usecase__v1
-  - spectrum__fft_processor_rocm__usecase__v1
+  - core__rocm_backend__usecase__v1
+  - stats__statistics_rocm__usecase__v1
 maturity: stable
 language: cpp
-tags: [signal_generators, rocm, gpu_signal_generation, cpu_gpu_comparison, antenna_array, benchmarking, signal_processing, batch_processing, fft, dsp]
-ai_generated: true
+tags: []
+ai_generated: false
 human_verified: false
-operator: ai
-updated_at: 2026-05-06
+operator: alex
+updated_at: 2026-05-13
 ---
 
-# Use-case: Формирование сигнала на GPU с возможностью сравнения с CPU
+# Use-case: Form Signal Rocm
 
 ## Когда применять
 
-Когда требуется генерировать сигналы с антеннами на GPU с последующим сравнением с CPU-референсом для тестирования производительности или корректности
+_LLM-fallback: см. описание класса._
 
 ## Решение
 
@@ -90,9 +76,9 @@ _Не определены (нет `@throws` в Doxygen primary_method)._
 ## Что делать дальше
 
 - См. [spectrum__filters_rocm__usecase__v1](./filters_rocm.md)
-- См. [spectrum__fir_basic__usecase__v1](./fir_basic.md)
-- См. [spectrum__fft_processor_rocm__usecase__v1](./fft_processor_rocm.md)
+- См. [core__rocm_backend__usecase__v1](./rocm_backend.md)
+- См. [stats__statistics_rocm__usecase__v1](./statistics_rocm.md)
 
 ## Ссылки
 
-- Источник кода: `E:/DSP-GPU/signal_generators/tests/test_form_signal_rocm.hpp:1`
+- Источник кода: `/home/alex/DSP-GPU/signal_generators/tests/test_form_signal_rocm.hpp:1`

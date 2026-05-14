@@ -3,47 +3,33 @@ schema_version: 1
 kind: use_case
 id: signal_generators_rocm_basic
 repo: signal_generators
-title: "Как генерировать CW сигналы на GPU"
+title: "Signal Generators Rocm Basic"
 synonyms:
   ru:
-    - "генерация CW сигналов на GPU"
-    - "сравнение GPU и CPU для CW"
-    - "многолучевые сигналы на GPU"
-    - "генерация сигналов батчем"
-    - "обработка сигналов ROCm"
-    - "сигналы с частотным шагом"
-    - "тестирование GPU для CW"
-    - "вычисления на GPU для антенн"
+    - []
   en:
-    - "generate cw signals on gpu"
-    - "compare gpu and cpu for cw"
-    - "multi-beam signals on gpu"
-    - "signal generation batch"
-    - "signal processing rocm"
-    - "frequency stepped signals"
-    - "gpu testing for cw"
-    - "antenna array signal generation"
+    - []
 primary_class: (unknown)
 primary_method: (unknown)
 related_classes:
 related_use_cases:
   - signal_generators__signal_generators_benchmark_rocm__usecase__v1
   - signal_generators__form_signal_rocm__usecase__v1
-  - spectrum__filters_rocm__usecase__v1
+  - core__rocm_backend__usecase__v1
 maturity: stable
 language: cpp
-tags: [signal_generators, rocm, fft, batch, antenna, signal_generation, cw, gpu, benchmarking, performance]
-ai_generated: true
+tags: []
+ai_generated: false
 human_verified: false
-operator: ai
-updated_at: 2026-05-06
+operator: alex
+updated_at: 2026-05-13
 ---
 
-# Use-case: Как генерировать CW сигналы на GPU
+# Use-case: Signal Generators Rocm Basic
 
 ## Когда применять
 
-Для тестирования производительности GPU по сравнению с CPU или генерации многолучевых сигналов с частотным шагом
+_LLM-fallback: см. описание класса._
 
 ## Решение
 
@@ -91,8 +77,8 @@ _Не определены (нет `@throws` в Doxygen primary_method)._
 
 - См. [signal_generators__signal_generators_benchmark_rocm__usecase__v1](./signal_generators_benchmark_rocm.md)
 - См. [signal_generators__form_signal_rocm__usecase__v1](./form_signal_rocm.md)
-- См. [spectrum__filters_rocm__usecase__v1](./filters_rocm.md)
+- См. [core__rocm_backend__usecase__v1](./rocm_backend.md)
 
 ## Ссылки
 
-- Источник кода: `E:/DSP-GPU/signal_generators/tests/test_signal_generators_rocm_basic.hpp:1`
+- Источник кода: `/home/alex/DSP-GPU/signal_generators/tests/test_signal_generators_rocm_basic.hpp:1`

@@ -1,49 +1,35 @@
-﻿---
+---
 schema_version: 1
 kind: use_case
 id: signal_generators_benchmark_rocm
 repo: signal_generators
-title: "Как выполнить бенчмаркинг генератора сигналов на GPU ROCm"
+title: "Signal Generators Benchmark Rocm"
 synonyms:
   ru:
-    - "бенчмаркинг генератора сигналов на ROCm"
-    - "тестирование производительности генератора сигналов"
-    - "оценка скорости генерации сигналов на GPU"
-    - "benchmark антенных массивов на ROCm"
-    - "тестирование шумовых сигналов на GPU"
-    - "измерение производительности ROCm для сигналов"
-    - "оценка времени генерации сигналов"
-    - "тестирование ROCm для радиолокационных сигналов"
+    - []
   en:
-    - "benchmark signal generator ROCm"
-    - "performance testing signal generator"
-    - "gpu signal generation benchmark"
-    - "antenna array benchmark ROCm"
-    - "noise signal testing on GPU"
-    - "rocml signal processing benchmark"
-    - "signal generation speed measurement"
-    - "gpu benchmark for radar signals"
+    - []
 primary_class: (unknown)
 primary_method: (unknown)
 related_classes:
 related_use_cases:
-  - signal_generators__form_signal_rocm__usecase__v1
-  - spectrum__lch_farrow_rocm__usecase__v1
   - spectrum__filters_benchmark_rocm__usecase__v1
+  - signal_generators__form_signal_rocm__usecase__v1
+  - stats__statistics_rocm__usecase__v1
 maturity: stable
 language: cpp
-tags: [signal_generators, rocml, benchmark, signal_generator, gpu, performance_testing, antenna_array, noise_processing, dsp]
-ai_generated: true
+tags: []
+ai_generated: false
 human_verified: false
-operator: ai
-updated_at: 2026-05-06
+operator: alex
+updated_at: 2026-05-13
 ---
 
-# Use-case: Как выполнить бенчмаркинг генератора сигналов на GPU ROCm
+# Use-case: Signal Generators Benchmark Rocm
 
 ## Когда применять
 
-Когда нужно протестировать производительность генератора сигналов на ROCm с поддержкой антенных массивов и шумов
+_LLM-fallback: см. описание класса._
 
 ## Решение
 
@@ -89,10 +75,10 @@ _Не определены (нет `@throws` в Doxygen primary_method)._
 
 ## Что делать дальше
 
-- См. [signal_generators__form_signal_rocm__usecase__v1](./form_signal_rocm.md)
-- См. [spectrum__lch_farrow_rocm__usecase__v1](./lch_farrow_rocm.md)
 - См. [spectrum__filters_benchmark_rocm__usecase__v1](./filters_benchmark_rocm.md)
+- См. [signal_generators__form_signal_rocm__usecase__v1](./form_signal_rocm.md)
+- См. [stats__statistics_rocm__usecase__v1](./statistics_rocm.md)
 
 ## Ссылки
 
-- Источник кода: `E:/DSP-GPU/signal_generators/tests/test_signal_generators_benchmark_rocm.hpp:1`
+- Источник кода: `/home/alex/DSP-GPU/signal_generators/tests/test_signal_generators_benchmark_rocm.hpp:1`
