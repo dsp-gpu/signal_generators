@@ -19,12 +19,10 @@
 
 #include "py_helpers.hpp"
 
-#if ENABLE_ROCM
 #include "py_gpu_context.hpp"
 #include "py_form_signal_rocm.hpp"
 #include "py_delayed_form_signal_rocm.hpp"
 #include "py_lfm_analytical_delay_rocm.hpp"
-#endif
 
 PYBIND11_MODULE(dsp_signal_generators, m) {
     m.doc() = "dsp::signal_generators — ROCm signal generators\n\n"
@@ -34,12 +32,10 @@ PYBIND11_MODULE(dsp_signal_generators, m) {
               "  DelayedFormSignalGeneratorROCm     - with fractional delay (ROCm)\n"
               "  LfmAnalyticalDelayGeneratorROCm    - LFM analytical delay (ROCm)\n";
 
-#if ENABLE_ROCM
     // ROCmGPUContext зарегистрирован в dsp_core (один раз глобально).
     py::module_::import("dsp_core");
 
     register_form_signal_rocm(m);
     register_delayed_form_signal_rocm(m);
     register_lfm_analytical_delay_rocm(m);
-#endif
 }

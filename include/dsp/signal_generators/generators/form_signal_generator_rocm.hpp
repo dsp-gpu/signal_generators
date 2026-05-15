@@ -32,7 +32,6 @@
 //   - Создан: 2026-02-23
 // ============================================================================
 
-#if ENABLE_ROCM
 
 #include <dsp/signal_generators/params/form_params.hpp>
 #include <core/interface/i_backend.hpp>
@@ -137,71 +136,3 @@ private:
 
 } // namespace dsp::signal_generators
 
-#else  // !ENABLE_ROCM
-
-// ═══════════════════════════════════════════════════════════════════════════
-// Stub for non-ROCm builds (Windows)
-// ═══════════════════════════════════════════════════════════════════════════
-
-#include <dsp/signal_generators/params/form_params.hpp>
-#include <core/interface/i_backend.hpp>
-#include <core/interface/input_data.hpp>
-
-#include <stdexcept>
-#include <vector>
-#include <complex>
-#include <string>
-#include <cstdint>
-
-namespace dsp::signal_generators {
-
-class FormSignalGeneratorROCm {
-public:
-  explicit FormSignalGeneratorROCm(drv_gpu_lib::IBackend*) {}
-  ~FormSignalGeneratorROCm() = default;
-
-  void SetParams(const FormParams& params) { params_ = params; }
-  void SetParamsFromString(const std::string& params_str) {
-    params_ = FormParams::ParseFromString(params_str);
-  }
-
-  /**
-   * @brief Stub: бросает runtime_error — GenerateInputData доступен только в ROCm-сборке.
-   *
-   * @return Никогда не возвращает (всегда throw).
-   *   @test_check throws std::runtime_error
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
-   */
-  drv_gpu_lib::InputData<void*> GenerateInputData() {
-    throw std::runtime_error("FormSignalGeneratorROCm: ROCm not enabled");
-  }
-
-  /**
-   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
-   *
-   * @return Никогда не возвращает (всегда throw).
-   *   @test_check throws std::runtime_error
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
-   */
-  std::vector<std::vector<std::complex<float>>> GenerateToCpu() {
-    throw std::runtime_error("FormSignalGeneratorROCm: ROCm not enabled");
-  }
-
-  const FormParams& GetParams() const { return params_; }
-  uint32_t GetAntennas() const { return params_.antennas; }
-  uint32_t GetPoints() const { return params_.points; }
-  size_t GetTotalSamples() const {
-    return static_cast<size_t>(params_.antennas) * params_.points;
-  }
-
-private:
-  FormParams params_;
-};
-
-} // namespace dsp::signal_generators
-
-#endif  // ENABLE_ROCM

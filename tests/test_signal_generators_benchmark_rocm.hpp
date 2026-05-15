@@ -28,7 +28,6 @@
  * @see signal_generators_benchmark_rocm.hpp, MemoryBank/tasks/TASK_signal_generators_profiling.md
  */
 
-#if ENABLE_ROCM
 
 #include "signal_generators_benchmark_rocm.hpp"
 #include <core/backends/rocm/rocm_backend.hpp>
@@ -93,4 +92,3 @@ inline int run() {
 
 }  // namespace test_signal_generators_benchmark_rocm
 
-#endif  // ENABLE_ROCM

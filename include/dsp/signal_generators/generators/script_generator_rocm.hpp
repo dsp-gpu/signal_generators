@@ -34,7 +34,6 @@
 //   - Обновлён:  2026-04-22 (миграция на kernel_cache_v2 / CompileKey.Hash)
 // ============================================================================
 
-#if ENABLE_ROCM
 
 #include <core/interface/i_backend.hpp>
 #include <core/interface/gpu_context.hpp>
@@ -132,45 +131,3 @@ private:
 
 } // namespace dsp::signal_generators
 
-#else  // !ENABLE_ROCM
-
-#include <core/interface/i_backend.hpp>
-#include <stdexcept>
-#include <string>
-#include <vector>
-#include <complex>
-
-namespace dsp::signal_generators {
-class ScriptGeneratorROCm {
-public:
-  explicit ScriptGeneratorROCm(drv_gpu_lib::IBackend*) {}
-  /**
-   * @brief Stub: бросает runtime_error — LoadScript доступен только в ROCm-сборке.
-   *
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
-   */
-  void LoadScript(const std::string&) { throw std::runtime_error("ScriptGeneratorROCm: ROCm not enabled"); }
-  /**
-   * @brief Stub: бросает runtime_error — Generate доступен только в ROCm-сборке.
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
-   */
-  void* Generate() { throw std::runtime_error("ScriptGeneratorROCm: ROCm not enabled"); }
-  /**
-   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
-   *
-   * @return Никогда не возвращает (всегда throw).
-   *   @test_check throws std::runtime_error
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
-   */
-  std::vector<std::complex<float>> GenerateToCpu() { throw std::runtime_error("ScriptGeneratorROCm: ROCm not enabled"); }
-  bool IsReady() const { return false; }
-};
-} // namespace dsp::signal_generators
-
-#endif  // ENABLE_ROCM

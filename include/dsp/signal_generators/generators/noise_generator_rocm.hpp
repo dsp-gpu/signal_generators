@@ -31,7 +31,6 @@
 //   - Создан: 2026-03-14 (порт OpenCL-варианта на ROCm для main-ветки)
 // ============================================================================
 
-#if ENABLE_ROCM
 
 #include <dsp/signal_generators/params/signal_request.hpp>
 #include <core/interface/i_backend.hpp>
@@ -117,46 +116,3 @@ private:
 
 } // namespace dsp::signal_generators
 
-#else  // !ENABLE_ROCM
-
-#include <dsp/signal_generators/params/signal_request.hpp>
-#include <core/interface/i_backend.hpp>
-#include <core/interface/input_data.hpp>
-#include <stdexcept>
-#include <vector>
-#include <complex>
-
-namespace dsp::signal_generators {
-class NoiseGeneratorROCm {
-public:
-  explicit NoiseGeneratorROCm(drv_gpu_lib::IBackend*) {}
-  /**
-   * @brief Stub: бросает runtime_error — GenerateToGpu доступен только в ROCm-сборке.
-   *
-   *
-   * @return Никогда не возвращает (всегда throw).
-   *   @test_check throws std::runtime_error
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
-   */
-  drv_gpu_lib::InputData<void*> GenerateToGpu(const SystemSampling&, const NoiseParams&, uint32_t, void* = nullptr) {
-    throw std::runtime_error("NoiseGeneratorROCm: ROCm not enabled");
-  }
-  /**
-   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
-   *
-   *
-   * @return Никогда не возвращает (всегда throw).
-   *   @test_check throws std::runtime_error
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
-   */
-  std::vector<std::complex<float>> GenerateToCpu(const SystemSampling&, const NoiseParams&, uint32_t) {
-    throw std::runtime_error("NoiseGeneratorROCm: ROCm not enabled");
-  }
-};
-} // namespace dsp::signal_generators
-
-#endif  // ENABLE_ROCM

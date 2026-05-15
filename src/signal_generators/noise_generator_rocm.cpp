@@ -8,7 +8,6 @@
  * @date 2026-03-14
  */
 
-#if ENABLE_ROCM
 
 #include <dsp/signal_generators/generators/noise_generator_rocm.hpp>
 #include <dsp/signal_generators/kernels/noise_kernels_rocm.hpp>
@@ -138,4 +137,3 @@ std::vector<std::complex<float>> NoiseGeneratorROCm::GenerateToCpu(
 
 } // namespace dsp::signal_generators
 
-#endif  // ENABLE_ROCM

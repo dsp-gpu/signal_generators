@@ -32,7 +32,6 @@
 //   - Создан: 2026-03-22
 // ============================================================================
 
-#if ENABLE_ROCM
 
 #include <dsp/signal_generators/params/form_params.hpp>
 #include <dsp/signal_generators/generators/script_generator_rocm.hpp>
@@ -98,45 +97,3 @@ private:
 
 } // namespace dsp::signal_generators
 
-#else  // !ENABLE_ROCM
-
-#include <dsp/signal_generators/params/form_params.hpp>
-#include <core/interface/i_backend.hpp>
-#include <core/interface/input_data.hpp>
-#include <stdexcept>
-#include <vector>
-#include <complex>
-
-namespace dsp::signal_generators {
-class FormScriptGeneratorROCm {
-public:
-  explicit FormScriptGeneratorROCm(drv_gpu_lib::IBackend*) {}
-  void SetParams(const FormParams&) {}
-  /**
-   * @brief Stub: бросает runtime_error — GenerateInputData доступен только в ROCm-сборке.
-   *
-   * @return Никогда не возвращает (всегда throw).
-   *   @test_check throws std::runtime_error
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
-   */
-  drv_gpu_lib::InputData<void*> GenerateInputData() {
-    throw std::runtime_error("FormScriptGeneratorROCm: ROCm not enabled");
-  }
-  /**
-   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
-   *
-   * @return Никогда не возвращает (всегда throw).
-   *   @test_check throws std::runtime_error
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
-   */
-  std::vector<std::vector<std::complex<float>>> GenerateToCpu() {
-    throw std::runtime_error("FormScriptGeneratorROCm: ROCm not enabled");
-  }
-};
-} // namespace dsp::signal_generators
-
-#endif  // ENABLE_ROCM

@@ -12,7 +12,6 @@
  * @date 2026-03-22  (migrated 2026-04-22 to GpuContext)
  */
 
-#if ENABLE_ROCM
 
 #include <dsp/signal_generators/generators/script_generator_rocm.hpp>
 #include <dsp/signal_generators/generators/script_generator.hpp>  // ParsedScript, ScriptParams (types only)
@@ -310,4 +309,3 @@ std::string ScriptGeneratorROCm::ToUpper(const std::string& s) {
 
 } // namespace dsp::signal_generators
 
-#endif  // ENABLE_ROCM

@@ -18,7 +18,6 @@
  * @note Не публичный API. Запускается через test_signal_generators_benchmark_rocm.hpp.
  */
 
-#if ENABLE_ROCM
 
 #include <dsp/signal_generators/generators/form_signal_generator_rocm.hpp>
 #include <core/services/gpu_benchmark_base.hpp>
@@ -71,4 +70,3 @@ private:
 
 }  // namespace test_signal_generators_rocm
 
-#endif  // ENABLE_ROCM

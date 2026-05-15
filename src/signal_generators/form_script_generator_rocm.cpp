@@ -6,7 +6,6 @@
  * @date 2026-03-22
  */
 
-#if ENABLE_ROCM
 
 #include <dsp/signal_generators/generators/form_script_generator_rocm.hpp>
 
@@ -99,4 +98,3 @@ FormScriptGeneratorROCm::GenerateToCpu() {
 
 } // namespace dsp::signal_generators
 
-#endif  // ENABLE_ROCM

@@ -6,7 +6,6 @@
  * @date 2026-03-22
  */
 
-#if ENABLE_ROCM
 
 #include <dsp/signal_generators/generators/lfm_generator_analytical_delay_rocm.hpp>
 #include <dsp/signal_generators/kernels/lfm_kernels_rocm.hpp>
@@ -147,4 +146,3 @@ LfmGeneratorAnalyticalDelayROCm::GenerateToCpu() {
 
 } // namespace dsp::signal_generators
 
-#endif  // ENABLE_ROCM

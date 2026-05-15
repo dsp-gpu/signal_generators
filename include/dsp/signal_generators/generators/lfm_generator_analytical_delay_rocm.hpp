@@ -29,7 +29,6 @@
 //   - Создан: 2026-03-22 (порт OpenCL-варианта на ROCm для main-ветки)
 // ============================================================================
 
-#if ENABLE_ROCM
 
 #include <dsp/signal_generators/params/signal_request.hpp>
 #include <dsp/signal_generators/params/system_sampling.hpp>
@@ -108,49 +107,3 @@ private:
 
 } // namespace dsp::signal_generators
 
-#else  // !ENABLE_ROCM
-
-#include <dsp/signal_generators/params/signal_request.hpp>
-#include <dsp/signal_generators/params/system_sampling.hpp>
-#include <core/interface/i_backend.hpp>
-#include <core/interface/input_data.hpp>
-#include <stdexcept>
-#include <vector>
-#include <complex>
-
-namespace dsp::signal_generators {
-class LfmGeneratorAnalyticalDelayROCm {
-public:
-  LfmGeneratorAnalyticalDelayROCm(drv_gpu_lib::IBackend*, const LfmParams&) {}
-  void SetParams(const LfmParams&) {}
-  void SetSampling(const SystemSampling&) {}
-  void SetDelays(const std::vector<float>&) {}
-  /**
-   * @brief Stub: бросает runtime_error — GenerateToGpu доступен только в ROCm-сборке.
-   *
-   *
-   * @return Никогда не возвращает (всегда throw).
-   *   @test_check throws std::runtime_error
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
-   */
-  drv_gpu_lib::InputData<void*> GenerateToGpu(void* = nullptr) {
-    throw std::runtime_error("LfmGeneratorAnalyticalDelayROCm: ROCm not enabled");
-  }
-  /**
-   * @brief Stub: бросает runtime_error — GenerateToCpu доступен только в ROCm-сборке.
-   *
-   * @return Никогда не возвращает (всегда throw).
-   *   @test_check throws std::runtime_error
-   *
-   * @throws std::runtime_error всегда: "ROCm not enabled".
-   *   @test_check throws std::runtime_error
-   */
-  std::vector<std::vector<std::complex<float>>> GenerateToCpu() {
-    throw std::runtime_error("LfmGeneratorAnalyticalDelayROCm: ROCm not enabled");
-  }
-};
-} // namespace dsp::signal_generators
-
-#endif  // ENABLE_ROCM

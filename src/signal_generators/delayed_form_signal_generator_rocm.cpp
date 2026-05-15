@@ -6,7 +6,6 @@
  * @date 2026-03-22
  */
 
-#if ENABLE_ROCM
 
 #include <dsp/signal_generators/generators/delayed_form_signal_generator_rocm.hpp>
 
@@ -76,4 +75,3 @@ DelayedFormSignalGeneratorROCm::GenerateToCpu() {
 
 } // namespace dsp::signal_generators
 
-#endif  // ENABLE_ROCM

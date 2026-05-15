@@ -30,7 +30,6 @@
  * @date 2026-03-22 (migrated 2026-03-23)
  */
 
-#if ENABLE_ROCM
 
 #include <dsp/signal_generators/generators/cw_generator_rocm.hpp>
 #include <dsp/signal_generators/generators/lfm_generator_rocm.hpp>
@@ -209,4 +208,3 @@ inline void run() {
 
 }  // namespace test_signal_generators_rocm_basic
 
-#endif  // ENABLE_ROCM
