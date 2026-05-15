@@ -12,7 +12,7 @@
 //         разные антенны (sub-sample точность) для тестов beamforming'а
 //         и калибровки фазового центра.
 //
-// ПОЧЕМУ: - Под `#if ENABLE_ROCM`. На Windows / без ROCm — stub с throw.
+// ПОЧЕМУ: - На Windows / без ROCm — stub с throw.
 //         - Композиция (не наследование) — SRP: координация здесь,
 //           генерация в FormSignalGeneratorROCm, задержка/шум в LchFarrowROCm.
 //         - Шум через LchFarrowROCm::SetNoise (ПОСЛЕ задержки) — иначе
@@ -52,8 +52,7 @@ namespace dsp::signal_generators {
  * @brief ROCm-композит: FormSignalGeneratorROCm + LchFarrowROCm (delay + noise).
  *
  * @ingroup grp_signal_generators
- * @note Доступен только при ENABLE_ROCM=1. OpenCL-вариант: DelayedFormSignalGenerator.
- * @note Шум идёт ПОСЛЕ задержки (через LchFarrowROCm::SetNoise), не до.
+ * @note OpenCL-вариант: DelayedFormSignalGenerator. * @note Шум идёт ПОСЛЕ задержки (через LchFarrowROCm::SetNoise), не до.
  * @see dsp::signal_generators::DelayedFormSignalGenerator
  * @see dsp::signal_generators::FormSignalGeneratorROCm
  * @see dsp::spectrum::LchFarrowROCm

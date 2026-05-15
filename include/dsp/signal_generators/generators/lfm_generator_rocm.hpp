@@ -50,7 +50,6 @@ using ROCmProfEvents = std::vector<std::pair<const char*, drv_gpu_lib::ROCmProfi
  * @brief ROCm/HIP-генератор LFM chirp с multi-beam.
  *
  * @note Move-only: GPU-ресурсы (GpuContext, hipModule) уникальны.
- * @note Требует #if ENABLE_ROCM. На Windows — stub (все методы throw).
  * @note API совместим с LfmGenerator для прозрачной замены backend'а.
  * @see dsp::signal_generators::LfmGenerator (legacy OpenCL)
  * @see drv_gpu_lib::GpuContext (Layer 1 Ref03)

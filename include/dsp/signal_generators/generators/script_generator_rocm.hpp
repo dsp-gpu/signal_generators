@@ -55,7 +55,6 @@ struct ParsedScript;   // forward
  * @brief ROCm/HIP DSL-генератор с disk-cache HSACO через GpuContext.
  *
  * @note Move-only: GpuContext (unique_ptr) и hipStream уникальны.
- * @note Требует #if ENABLE_ROCM. На Windows — stub (все методы throw).
  * @note Per-script GpuContext: каждый LoadScript пересоздаёт контекст
  *       (см. ctx_) — disk cache ключуется CompileKey.Hash.
  * @see dsp::signal_generators::ScriptGenerator (legacy OpenCL)

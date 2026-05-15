@@ -53,7 +53,6 @@ using ROCmProfEvents = std::vector<std::pair<const char*, drv_gpu_lib::ROCmProfi
  * @brief ROCm/HIP-генератор гауссовского комплексного шума.
  *
  * @note Move-only: GPU-ресурсы (GpuContext, hipModule) уникальны.
- * @note Требует #if ENABLE_ROCM. На Windows — stub (все методы throw).
  * @note API совместим с NoiseGenerator (OpenCL) по семантике.
  * @see dsp::signal_generators::NoiseGenerator (legacy OpenCL)
  * @see drv_gpu_lib::GpuContext (Layer 1 Ref03)

@@ -12,7 +12,7 @@
 //         Один пик в спектре = один частотный bin → эталон для проверки
 //         spectrum-модуля и калибровки тракта на AMD GPU.
 //
-// ПОЧЕМУ: - ROCm-вариант под `#if ENABLE_ROCM`. На Windows / без ROCm —
+// ПОЧЕМУ: - ROCm-вариант. На Windows / без ROCm —
 //           stub с throw std::runtime_error (не падает на этапе линковки).
 //         - Move-only: GpuContext + compiled module уникальны на инстанс,
 //           копирование = double-release HIP-ресурсов.
@@ -53,8 +53,7 @@ using ROCmProfEvents = std::vector<std::pair<const char*, drv_gpu_lib::ROCmProfi
  * @ingroup grp_signal_generators
  * @note Move-only: GpuContext + compiled module уникальны на инстанс.
  * @note backend не владеет — caller гарантирует переживание генератора.
- * @note Доступен только при ENABLE_ROCM=1. OpenCL-вариант: CwGenerator.
- * @see dsp::signal_generators::CwGenerator
+ * @note OpenCL-вариант: CwGenerator. * @see dsp::signal_generators::CwGenerator
  */
 class CwGeneratorROCm {
 public:

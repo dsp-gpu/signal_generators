@@ -51,7 +51,6 @@ using ROCmProfEvents = std::vector<std::pair<const char*, drv_gpu_lib::ROCmProfi
  * @brief ROCm/HIP LFM-генератор с аналитической per-antenna задержкой.
  *
  * @note Move-only: GPU-ресурсы (GpuContext, hipModule) уникальны.
- * @note Требует #if ENABLE_ROCM. На Windows — stub (все методы throw).
  * @note API совместим с LfmGeneratorAnalyticalDelay (OpenCL).
  * @see dsp::signal_generators::LfmGeneratorAnalyticalDelay (legacy OpenCL)
  * @see drv_gpu_lib::GpuContext (Layer 1 Ref03)

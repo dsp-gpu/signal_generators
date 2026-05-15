@@ -13,7 +13,7 @@
 //         AMD GPU делает этот класс. Один launch → готовый InputData<void*>
 //         для FFTProcessor / SpectrumMaximaFinder без копий.
 //
-// ПОЧЕМУ: - Под `#if ENABLE_ROCM`. На Windows / без ROCm — stub с throw,
+// ПОЧЕМУ: - На Windows / без ROCm — stub с throw,
 //           чтобы линковка не падала, а вызов давал понятный runtime error.
 //         - Move-only: GpuContext + compiled module уникальны на инстанс.
 //         - kBlockSize = 256 — оптимум warp=64 на RDNA4/CDNA1.
@@ -58,8 +58,7 @@ using ROCmProfEvents = std::vector<std::pair<const char*, drv_gpu_lib::ROCmProfi
  *
  * @ingroup grp_signal_generators
  * @note Move-only: GpuContext + compiled module уникальны на инстанс.
- * @note Доступен только при ENABLE_ROCM=1. OpenCL-вариант: FormSignalGenerator.
- * @see dsp::signal_generators::FormSignalGenerator
+ * @note OpenCL-вариант: FormSignalGenerator. * @see dsp::signal_generators::FormSignalGenerator
  * @see dsp::signal_generators::DelayedFormSignalGeneratorROCm
  */
 class FormSignalGeneratorROCm {

@@ -51,7 +51,6 @@ namespace dsp::signal_generators {
  * @brief ROCm/HIP conjugate-LFM генератор для dechirp-обработки.
  *
  * @note Move-only: GPU-ресурсы (GpuContext, hipModule) уникальны.
- * @note Требует #if ENABLE_ROCM. На Windows — stub (все методы throw).
  * @note API совместим с LfmConjugateGenerator (OpenCL).
  * @see dsp::signal_generators::LfmConjugateGenerator (legacy OpenCL)
  * @see drv_gpu_lib::GpuContext (Layer 1 Ref03)

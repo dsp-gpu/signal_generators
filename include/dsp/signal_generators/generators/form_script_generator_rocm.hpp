@@ -14,7 +14,7 @@
 //         ROCm. Удобно в radar-pipeline и тестах: SetParams → Generate,
 //         не зная деталей платформы.
 //
-// ПОЧЕМУ: - Под `#if ENABLE_ROCM`. На Windows / без ROCm — stub с throw.
+// ПОЧЕМУ: - На Windows / без ROCm — stub с throw.
 //         - Композиция (не наследование) над ScriptGeneratorROCm: SRP —
 //           этот класс отвечает только за FormParams→DSL, компиляцию и
 //           launch делает базовый класс.
@@ -50,8 +50,7 @@ namespace dsp::signal_generators {
  * @brief Композиция над ScriptGeneratorROCm: FormParams → DSL → HIP-сигнал.
  *
  * @ingroup grp_signal_generators
- * @note Доступен только при ENABLE_ROCM=1. OpenCL-вариант: FormScriptGenerator.
- * @see dsp::signal_generators::FormScriptGenerator
+ * @note OpenCL-вариант: FormScriptGenerator. * @see dsp::signal_generators::FormScriptGenerator
  * @see dsp::signal_generators::ScriptGeneratorROCm
  */
 class FormScriptGeneratorROCm {
